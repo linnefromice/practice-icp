@@ -1,5 +1,11 @@
 actor {
-  public query func greet(name : Text) : async Text {
-    return "Hello, " # name # "!";
+  var question: Text = "enter your question";
+
+  public query func getQuestion(): async Text {
+    question
   };
-};
+
+  public func setQuestion(q: Text) {
+    question := q
+  };
+}
