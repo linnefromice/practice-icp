@@ -1,0 +1,28 @@
+{
+  "canisters": {
+    "multiple_actors_backend": {
+      "main": "src/multiple_actors_backend/main.mo",
+      "type": "motoko"
+    },
+    "multiple_actors_frontend": {
+      "dependencies": [
+        "multiple_actors_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/multiple_actors_frontend/src/index.html"
+      },
+      "source": [
+        "src/multiple_actors_frontend/assets",
+        "dist/multiple_actors_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "version": 1
+}
