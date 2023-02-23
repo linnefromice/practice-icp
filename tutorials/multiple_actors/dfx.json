@@ -1,21 +1,16 @@
 {
   "canisters": {
-    "multiple_actors_backend": {
-      "main": "src/multiple_actors_backend/main.mo",
+    "assistant": {
+      "main": "src/assistant/main.mo",
       "type": "motoko"
     },
-    "multiple_actors_frontend": {
-      "dependencies": [
-        "multiple_actors_backend"
-      ],
-      "frontend": {
-        "entrypoint": "src/multiple_actors_frontend/src/index.html"
-      },
-      "source": [
-        "src/multiple_actors_frontend/assets",
-        "dist/multiple_actors_frontend/"
-      ],
-      "type": "assets"
+    "rock_paper_scissors": {
+      "main": "src/rock_paper_scissors/main.mo",
+      "type": "motoko"
+    },
+    "daemon": {
+      "main": "src/daemon/main.mo",
+      "type": "motoko"
     }
   },
   "defaults": {
