@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "canisters": {
+    "linkedup_backend": {
+      "type": "motoko",
+      "main": "src/linkedup_backend/main.mo"
+    },
+    "linkedup_frontend": {
+      "type": "assets",
+      "source": [
+        "src/linkedup_frontend/assets"
+      ],
+      "dependencies": [
+        "linkedup_backend"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  }
+}
