@@ -1,18 +1,13 @@
 {
   "version": 1,
   "canisters": {
-    "linkedup_backend": {
+    "linkedup": {
       "type": "motoko",
-      "main": "src/linkedup_backend/main.mo"
+      "main": "src/linkedup/main.mo"
     },
-    "linkedup_frontend": {
-      "type": "assets",
-      "source": [
-        "src/linkedup_frontend/assets"
-      ],
-      "dependencies": [
-        "linkedup_backend"
-      ]
+    "connected": {
+      "type": "motoko",
+      "main": "src/connected/main.mo"
     }
   },
   "defaults": {
