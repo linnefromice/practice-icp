@@ -1,7 +1,8 @@
-// import Connectd "canister:connectd";
+import Connected "canister:connected";
 import Database "database";
 import Types "types";
 import Utils "utils";
+
 actor LinkedUp {
   var directory: Database.Directory = Database.Directory();
 
@@ -31,21 +32,21 @@ actor LinkedUp {
     directory.findBy(term)
   };
 
-  // // Connections
-  // public shared(msg) func connect(userId: UserId): async () {
-  //   // Call Connectd's public methods without an API
-  //   await Connectd.connect(msg.caller, userId);
-  // };
+  // Connections
+  public shared(msg) func connect(userId: UserId): async () {
+    // Call Connectd's public methods without an API
+    await Connected.connect(msg.caller, userId);
+  };
 
-  // public func getConnections(userId: UserId): async [Profile] {
-  //   let userIds = await Connectd.getConnections(userId);
-  //   directory.findMany(userIds)
-  // };
+  public func getConnections(userId: UserId): async [Profile] {
+    let userIds = await Connected.getConnections(userId);
+    directory.findMany(userIds)
+  };
 
-  // public shared(msg) func isConnected(userId: UserId): async Bool {
-  //   let userIds = await Connectd.getConnections(msg.caller);
-  //   Utils.includes(userId, userIds)
-  // };
+  public shared(msg) func isConnected(userId: UserId): async Bool {
+    let userIds = await Connected.getConnections(msg.caller);
+    Utils.includes(userId, userIds)
+  };
 
   // User Auth
   public shared query(msg) func getOwnId(): async UserId { msg.caller }
