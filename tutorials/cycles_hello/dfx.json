@@ -1,21 +1,8 @@
 {
   "canisters": {
-    "cycles_hello_backend": {
-      "main": "src/cycles_hello_backend/main.mo",
+    "cycles_hello": {
+      "main": "src/cycles_hello/main.mo",
       "type": "motoko"
-    },
-    "cycles_hello_frontend": {
-      "dependencies": [
-        "cycles_hello_backend"
-      ],
-      "frontend": {
-        "entrypoint": "src/cycles_hello_frontend/src/index.html"
-      },
-      "source": [
-        "src/cycles_hello_frontend/assets",
-        "dist/cycles_hello_frontend/"
-      ],
-      "type": "assets"
     }
   },
   "defaults": {
