@@ -1,5 +1,32 @@
 #!/usr/bin/env bash
 
+deploy_icrc1_ledger () {
+  canister_name=$1
+  owner=$2
+  controller=$3
+  token_name=$4
+  token_symbol=$5
+  echo "canister_name: $canister_name"
+  echo "owner: $owner"
+  echo "controller: $controller"
+  echo "token_name: $token_name"
+  echo "token_symbol: $token_symbol"
+
+  dfx deploy $canister_name --argument "(record {
+    token_name = \"$token_name\";
+    token_symbol = \"$token_symbol\";
+    minting_account = record { owner = principal \"$owner\" };
+    initial_balances = vec {};
+    metadata = vec {};
+    transfer_fee = 10;
+    archive_options = record {
+      num_blocks_to_archive = 1000;
+      trigger_threshold = 2000;
+      controller_id = principal \"$controller\";
+    };
+  })"
+}
+
 echo "##### SETUP #####"
 
 echo "# pre-process"
@@ -19,34 +46,8 @@ dfx start --background --clean
 export DEFAULT_PRINCIPAL_ID=$(dfx identity get-principal --identity default)
 echo "principal-id to use: $DEFAULT_PRINCIPAL_ID"
 
-export TOKEN_NAME="Polygon MATIC"
-export TOKEN_SYMBOL="MATIC"
-dfx deploy icrc1-ledger1 --argument "(record {
-  token_name = \"${TOKEN_NAME}\";
-  token_symbol = \"${TOKEN_SYMBOL}\";
-  minting_account = record { owner = principal \"${DEFAULT_PRINCIPAL_ID}\" };
-  initial_balances = vec {};
-  metadata = vec {};
-  transfer_fee = 10;
-  archive_options = record {
-    num_blocks_to_archive = 1000;
-    trigger_threshold = 2000;
-    controller_id = principal \"${DEFAULT_PRINCIPAL_ID}\";
-  };
-})"
+deploy_icrc1_ledger icrc1-ledger1 \
+  $DEFAULT_PRINCIPAL_ID $DEFAULT_PRINCIPAL_ID "Polygon MATIC" "MATIC"
 
-export TOKEN_NAME="Cosmos ATOM"
-export TOKEN_SYMBOL="ATOM"
-dfx deploy icrc1-ledger2 --argument "(record {
-  token_name = \"${TOKEN_NAME}\";
-  token_symbol = \"${TOKEN_SYMBOL}\";
-  minting_account = record { owner = principal \"${DEFAULT_PRINCIPAL_ID}\" };
-  initial_balances = vec {};
-  metadata = vec {};
-  transfer_fee = 10;
-  archive_options = record {
-    num_blocks_to_archive = 1000;
-    trigger_threshold = 2000;
-    controller_id = principal \"${DEFAULT_PRINCIPAL_ID}\";
-  };
-})"
+deploy_icrc1_ledger icrc1-ledger2 \
+  $DEFAULT_PRINCIPAL_ID $DEFAULT_PRINCIPAL_ID "Cosmos ATOM" "ATOM"
