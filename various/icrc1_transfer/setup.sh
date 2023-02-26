@@ -6,17 +6,23 @@ deploy_icrc1_ledger () {
   controller=$3
   token_name=$4
   token_symbol=$5
+  account=$6
   echo "canister_name: $canister_name"
   echo "owner: $owner"
   echo "controller: $controller"
   echo "token_name: $token_name"
   echo "token_symbol: $token_symbol"
+  echo "account: $account"
 
   dfx deploy $canister_name --argument "(record {
     token_name = \"$token_name\";
     token_symbol = \"$token_symbol\";
     minting_account = record { owner = principal \"$owner\" };
-    initial_balances = vec {};
+    initial_balances = vec {
+      record {
+        record { owner = principal \"$owner\"; }; 100_000_000_000
+      };
+    };
     metadata = vec {};
     transfer_fee = 10;
     archive_options = record {
@@ -44,10 +50,12 @@ echo "# dfx"
 dfx start --background --clean
 
 export DEFAULT_PRINCIPAL_ID=$(dfx identity get-principal --identity default)
+export DEFAULT_ACCOUNT_ID=$(dfx ledger account-id --identity default)
 echo "principal-id to use: $DEFAULT_PRINCIPAL_ID"
+echo "account-id to use: $DEFAULT_ACCOUNT_ID"
 
 deploy_icrc1_ledger icrc1-ledger1 \
-  $DEFAULT_PRINCIPAL_ID $DEFAULT_PRINCIPAL_ID "Polygon MATIC" "MATIC"
+  $DEFAULT_PRINCIPAL_ID $DEFAULT_PRINCIPAL_ID "Polygon MATIC" "MATIC" $DEFAULT_ACCOUNT_ID
 
 deploy_icrc1_ledger icrc1-ledger2 \
-  $DEFAULT_PRINCIPAL_ID $DEFAULT_PRINCIPAL_ID "Cosmos ATOM" "ATOM"
+  $DEFAULT_PRINCIPAL_ID $DEFAULT_PRINCIPAL_ID "Cosmos ATOM" "ATOM" $DEFAULT_ACCOUNT_ID
