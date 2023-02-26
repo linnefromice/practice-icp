@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "canisters": {
+    "icrc1_transfer_backend": {
+      "type": "motoko",
+      "main": "src/icrc1_transfer_backend/main.mo"
+    },
+    "icrc1_transfer_frontend": {
+      "type": "assets",
+      "source": [
+        "src/icrc1_transfer_frontend/assets"
+      ],
+      "dependencies": [
+        "icrc1_transfer_backend"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  }
+}
