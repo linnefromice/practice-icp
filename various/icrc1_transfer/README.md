@@ -36,9 +36,9 @@ dfx canister call icrc1-ledger2 --identity default \
   })"
 ### check
 dfx canister call icrc1-ledger1 --identity default \
-  icrc1_balance_of "(record { owner=principal \"${PRINCIPAL_ID}\" })"
+  icrc1_balance_of "(record { owner=principal \"${DEFAULT_PRINCIPAL_ID}\" })"
 dfx canister call icrc1-ledger2 --identity default \
-  icrc1_balance_of "(record { owner=principal \"${PRINCIPAL_ID}\" })"
+  icrc1_balance_of "(record { owner=principal \"${DEFAULT_PRINCIPAL_ID}\" })"
 dfx canister call icrc1-ledger1 --identity default \
   icrc1_balance_of "(record { owner=principal \"${USERA_PRINCIPAL_ID}\" })"
 dfx canister call icrc1-ledger2 --identity default \
@@ -82,9 +82,14 @@ URLs:
     icrc1-ledger2: http://127.0.0.1:4943/?canisterId=ryjl3-tyaaa-aaaaa-aaaba-cai&id=r7inp-6aaaa-aaaaa-aaabq-cai
     icrc1_transfer_backend: http://127.0.0.1:4943/?canisterId=ryjl3-tyaaa-aaaaa-aaaba-cai&id=rkp4c-7iaaa-aaaaa-aaaca-cai
 % dfx canister call icrc1_transfer_backend --identity default \
-  token_info "r7inp-6aaaa-aaaaa-aaabq-cai"
-("Cosmos ATOM", "ATOM", 8 : nat8)
-% dfx canister call icrc1_transfer_backend --identity default \
   token_info "rrkah-fqaaa-aaaaa-aaaaq-cai"
 ("Polygon MATIC", "MATIC", 8 : nat8)
+% dfx canister call icrc1_transfer_backend --identity default \
+  token_info "r7inp-6aaaa-aaaaa-aaabq-cai"
+("Cosmos ATOM", "ATOM", 8 : nat8)
+```
+
+```bash
+% dfx canister call icrc1_transfer_backend --identity user-a \
+  transfer "(\"rrkah-fqaaa-aaaaa-aaaaq-cai\", \"${USERB_PRINCIPAL_ID}\", 250000)"
 ```
