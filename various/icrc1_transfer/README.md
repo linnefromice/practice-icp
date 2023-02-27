@@ -93,3 +93,30 @@ URLs:
 % dfx canister call icrc1_transfer_backend --identity user-a \
   transfer "(\"rrkah-fqaaa-aaaaa-aaaaq-cai\", \"${USERB_PRINCIPAL_ID}\", 250000)"
 ```
+
+## memo
+
+- icrc-1
+  - <https://internetcomputer.org/docs/current/developer-docs/integrations/icrc-1/>
+    - <https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-1>
+    - how to deploy
+      - <https://github.com/dfinity/ic/tree/master/rs/rosetta-api/icrc1/ledger#step-2-start-the-replica>
+      - <https://internetcomputer.org/docs/current/developer-docs/integrations/icrc-1/deploy-new-token>
+    - example (full implementation): <https://github.com/NatLabs/icrc1>
+- inter-canister calls
+  - <https://forum.dfinity.org/t/simplest-best-way-to-make-inter-canister-calls-in-motoko/18058>
+  - <https://forum.dfinity.org/t/inter-canister-query-calls-community-consideration/6754>
+- flow: transfer
+  - <https://internetcomputer.org/docs/current/developer-docs/integrations/ledger/interact-with-ledger/>
+  - currently cannot transfer, so use notifacton
+    - <https://drive.google.com/drive/u/0/folders/1TlaDISjZpAKpqJdXzYMw4hhuKj5YxZ3J>
+    - ICRC-2: Approve and Transfer From
+      - <https://github.com/dfinity/ICRC-1/tree/main/standards/ICRC-2>
+    - ICRC-3: A Standard for Accessing the Transaction Log
+      - <https://github.com/dfinity/ICRC-1/tree/roman-icrc3/standards/ICRC-3>
+
+### tokens
+
+- [ICP (NNS Ledger)](https://dashboard.internetcomputer.org/canister/ryjl3-tyaaa-aaaaa-aaaba-cai)
+- [SNS-1 (SNS-1 Ledger)](https://dashboard.internetcomputer.org/canister/zfcdd-tqaaa-aaaaq-aaaga-cai)
+- [ckBTC](https://dashboard.internetcomputer.org/canister/mxzaz-hqaaa-aaaar-qaada-cai)
