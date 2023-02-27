@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "canisters": {
+    "icrc1-ledger1": {
+      "type": "custom",
+      "wasm": "resource-icrc1/ic-icrc1-ledger.wasm",
+      "candid": "resource-icrc1/icrc1.did"
+    },
+    "icrc1-ledger2": {
+      "type": "custom",
+      "wasm": "resource-icrc1/ic-icrc1-ledger.wasm",
+      "candid": "resource-icrc1/icrc1.did"
+    },
+    "icrc1_transfer_backend": {
+      "type": "motoko",
+      "main": "src/icrc1_transfer_backend/main.mo"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  }
+}
