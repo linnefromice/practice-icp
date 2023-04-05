@@ -1,4 +1,10 @@
-#[ic_cdk_macros::query]
-fn greet(name: String) -> String {
-    format!("Hello, {}!", name)
+use ic_cdk_macros::*;
+use ic_cdk::export::candid;
+
+#[import(canister = "multiply_deps")]
+struct CounterCanister;
+
+#[update]
+async fn read() -> candid::Nat {
+    CounterCanister::read().await.0
 }

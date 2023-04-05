@@ -1,22 +1,16 @@
 {
   "canisters": {
+    "multiply_deps": {
+      "main": "src/multiply_deps/main.mo",
+      "type": "motoko"
+    },
     "rust_deps_backend": {
       "candid": "src/rust_deps_backend/rust_deps_backend.did",
       "package": "rust_deps_backend",
-      "type": "rust"
-    },
-    "rust_deps_frontend": {
+      "type": "rust",
       "dependencies": [
-        "rust_deps_backend"
-      ],
-      "frontend": {
-        "entrypoint": "src/rust_deps_frontend/src/index.html"
-      },
-      "source": [
-        "src/rust_deps_frontend/assets",
-        "dist/rust_deps_frontend/"
-      ],
-      "type": "assets"
+        "multiply_deps"
+      ]
     }
   },
   "defaults": {
