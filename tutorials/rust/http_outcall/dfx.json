@@ -1,0 +1,30 @@
+{
+  "canisters": {
+    "http_outcall_backend": {
+      "candid": "src/http_outcall_backend/http_outcall_backend.did",
+      "package": "http_outcall_backend",
+      "type": "rust"
+    },
+    "http_outcall_frontend": {
+      "dependencies": [
+        "http_outcall_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/http_outcall_frontend/src/index.html"
+      },
+      "source": [
+        "src/http_outcall_frontend/assets",
+        "dist/http_outcall_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
