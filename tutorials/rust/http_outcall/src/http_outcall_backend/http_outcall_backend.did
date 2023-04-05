@@ -1,3 +1,7 @@
 service : {
-    "greet": (text) -> (text) query;
+    "get": ()    -> (nat) query;
+    "set": (nat) -> ();
+    "inc": ()    -> ();
+    "call_api_query": () -> (text) query;
+    "call_api": () -> (text);
 }
