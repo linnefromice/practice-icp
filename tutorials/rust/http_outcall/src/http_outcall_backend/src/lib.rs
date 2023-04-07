@@ -10,6 +10,10 @@ thread_local! {
     static COUNTER: RefCell<Nat> = RefCell::new(Nat::from(0))
 }
 
+const NAME_SIGNATURE: &str = "0x06fdde03"; // name()
+const SYMBOL_SIGNATURE: &str = "0x95d89b41"; // symbol()
+const DECIMALS_SIGNATURE: &str = "0x313ce567"; // decimals()
+
 #[query]
 fn get() -> Nat {
     COUNTER.with(|counter| (*counter.borrow()).clone())
@@ -49,20 +53,18 @@ async fn call_eth_block_number() -> String {
 async fn call_eth_call(to: String, data: String) -> String {
     let res = call_eth_call_internal(to.as_str(), data.as_str()).await;
     return match res {
-        Ok(value) => value.get("result").unwrap().as_str().unwrap().to_string(),
+        Ok(body) => result_from_json_res_body(&body),
         Err(msg) => msg
     }
 }
 
 #[update]
 async fn call_eth_call_name(to: String) -> String {
-    let data = "0x06fdde03"; // name()
-    let res = call_eth_call_internal(to.as_str(), data).await;
+    let res = call_eth_call_internal(to.as_str(), NAME_SIGNATURE).await;
     return match res {
-        Ok(value) => {
-            let result = value.get("result").unwrap().as_str().unwrap();
-            let bytes = Vec::from_hex(&result[2..]).unwrap();
-            String::from_utf8(bytes).unwrap()
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_utf8_string(remove_0x_prefix(&result))
         },
         Err(msg) => msg
     }
@@ -70,13 +72,11 @@ async fn call_eth_call_name(to: String) -> String {
 
 #[update]
 async fn call_eth_call_symbol(to: String) -> String {
-    let data = "0x95d89b41"; // symbol()
-    let res = call_eth_call_internal(to.as_str(), data).await;
+    let res = call_eth_call_internal(to.as_str(), SYMBOL_SIGNATURE).await;
     return match res {
-        Ok(value) => {
-            let result = value.get("result").unwrap().as_str().unwrap();
-            let bytes = Vec::from_hex(&result[2..]).unwrap();
-            String::from_utf8(bytes).unwrap()
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_utf8_string(remove_0x_prefix(&result))
         },
         Err(msg) => msg
     }
@@ -84,12 +84,11 @@ async fn call_eth_call_symbol(to: String) -> String {
 
 #[update]
 async fn call_eth_call_decimals(to: String) -> u64 {
-    let data = "0x313ce567"; // decimals()
-    let res = call_eth_call_internal(to.as_str(), data).await;
+    let res = call_eth_call_internal(to.as_str(), DECIMALS_SIGNATURE).await;
     return match res {
-        Ok(value) => {
-            let result = value.get("result").unwrap().as_str().unwrap();
-            u64::from_str_radix(&result[2..], 16).unwrap()
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_u64(remove_0x_prefix(&result))
         },
         Err(_) => 0 // temp
     }
@@ -97,19 +96,19 @@ async fn call_eth_call_decimals(to: String) -> u64 {
 
 #[update]
 async fn call_matic_token_metadata() -> (String, String, u64) {
-    let to = "0x0000000000000000000000000000000000001010"; // USDC
+    let to = "0x0000000000000000000000000000000000001010"; // MATIC
     join!(
         call_eth_call_internal_for_string(
             to,
-            "0x06fdde03" // name()
+            NAME_SIGNATURE // name()
         ),
         call_eth_call_internal_for_string(
             to,
-            "0x95d89b41" // symbol()
+            SYMBOL_SIGNATURE // symbol()
         ),
         call_eth_call_internal_for_nat64(
             to,
-            "0x313ce567" // decimals()
+            DECIMALS_SIGNATURE // decimals()
         )
     )
 }
@@ -120,15 +119,15 @@ async fn call_usdc_token_metadata() -> (String, String, u64) {
     join!(
         call_eth_call_internal_for_string(
             to,
-            "0x06fdde03" // name()
+            NAME_SIGNATURE // name()
         ),
         call_eth_call_internal_for_string(
             to,
-            "0x95d89b41" // symbol()
+            SYMBOL_SIGNATURE // symbol()
         ),
         call_eth_call_internal_for_nat64(
             to,
-            "0x313ce567" // decimals()
+            DECIMALS_SIGNATURE // decimals()
         )
     )
 }
@@ -136,10 +135,9 @@ async fn call_usdc_token_metadata() -> (String, String, u64) {
 async fn call_eth_call_internal_for_string(to: &str, data: &str) -> String {
     let res = call_eth_call_internal(to, data).await;
     return match res {
-        Ok(value) => {
-            let result = value.get("result").unwrap().as_str().unwrap();
-            let bytes = Vec::from_hex(&result[2..]).unwrap();
-            String::from_utf8(bytes).unwrap()
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_utf8_string(remove_0x_prefix(&result))
         },
         Err(msg) => msg
     }
@@ -148,9 +146,9 @@ async fn call_eth_call_internal_for_string(to: &str, data: &str) -> String {
 async fn call_eth_call_internal_for_nat64(to: &str, data: &str) -> u64 {
     let res = call_eth_call_internal(to, data).await;
     return match res {
-        Ok(value) => {
-            let result = value.get("result").unwrap().as_str().unwrap();
-            u64::from_str_radix(&result[2..], 16).unwrap()
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_u64(remove_0x_prefix(&result))
         },
         Err(_) => 0 // temp
     }
@@ -177,8 +175,7 @@ async fn call_eth_block_number_internal() -> String {
     };
     match http_request(request).await {
         Ok((response,)) => {
-            let json: Value = serde_json::from_slice(&response.body).expect("Transformed response is not JSON payload.");
-            let result = json.get("result").unwrap().as_str().unwrap();
+            let result = result_from_json_res_body(&response.body);
             let block_number = u64::from_str_radix(&result[2..], 16).unwrap();
             block_number.to_string()
         },
@@ -189,7 +186,7 @@ async fn call_eth_block_number_internal() -> String {
 }
 
 
-async fn call_eth_call_internal(to: &str, data: &str) -> Result<Value, String> {
+async fn call_eth_call_internal(to: &str, data: &str) -> Result<Vec<u8>, String> {
     let host = "polygon-mainnet.g.alchemy.com";
     let request_headers = create_request_header(host);
 
@@ -214,7 +211,7 @@ async fn call_eth_call_internal(to: &str, data: &str) -> Result<Value, String> {
     };
     match http_request(request).await {
         Ok((response,)) => {
-            Ok(serde_json::from_slice(&response.body).expect("Transformed response is not JSON payload."))
+            Ok(response.body)
         },
         Err((_, m)) => {
             Err(m)
@@ -270,6 +267,27 @@ async fn call_randomuser_api_internal() -> String {
     }
 }
 
+fn result_from_json_res_body(body: &Vec<u8>) -> String {
+    let json: Value = serde_json::from_slice(&body).expect("Transformed response is not JSON payload.");
+    let result = json.get("result").unwrap().as_str().unwrap();
+    result.to_owned()
+}
+
+fn hex_to_utf8_string(s: &str) -> String {
+    let bytes = Vec::from_hex(s).unwrap();
+    String::from_utf8(bytes).unwrap()
+}
+
+fn hex_to_u64(s: &str) -> u64 {
+    u64::from_str_radix(s, 16).unwrap()
+}
+
+fn remove_0x_prefix(base: &str) -> &str {
+    if let Some(stripped) = base.strip_prefix("0x") {
+        return stripped
+    }
+    base
+}
 
 fn create_request_header(host: &str) -> Vec<HttpHeader> {
     let mut host_header = host.clone().to_owned();
