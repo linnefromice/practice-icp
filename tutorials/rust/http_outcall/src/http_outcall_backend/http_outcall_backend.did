@@ -4,5 +4,6 @@ service : {
     "inc": ()    -> ();
     "call_api_query": () -> (text) query;
     "call_binance_api": () -> (text);
+    "call_randomuser_api": () -> (text);
     "call_eth_block_number": () -> (text);
 }
