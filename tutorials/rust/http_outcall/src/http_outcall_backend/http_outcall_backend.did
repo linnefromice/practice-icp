@@ -2,16 +2,16 @@ service : {
     "get": ()    -> (nat) query;
     "set": (nat) -> ();
     "inc": ()    -> ();
-    "call_api_query": () -> (text) query;
-    "call_binance_api": () -> (text);
-    "call_randomuser_api": () -> (text);
+    "call_api_by_query": () -> (text) query;
+    "call_api_binance": () -> (text);
+    "call_api_randomuser": () -> (text);
     "call_eth_block_number": () -> (text);
     "call_eth_call": (text, text) -> (text);
     "call_eth_call_name": (text) -> (text);
     "call_eth_call_symbol": (text) -> (text);
     "call_eth_call_decimals": (text) -> (nat64);
     "call_eth_call_total_supply": (text) -> (nat64);
-    "call_matic_token_metadata": () -> (text, text, nat64, nat);
-    "call_usdc_token_metadata": () -> (text, text, nat64, nat);
-    "call_dai_token_metadata": () -> (text, text, nat64, nat);
+    "call_token_metadata_matic": () -> (text, text, nat64, nat);
+    "call_token_metadata_usdc": () -> (text, text, nat64, nat);
+    "call_token_metadata_dai": () -> (text, text, nat64, nat);
 }

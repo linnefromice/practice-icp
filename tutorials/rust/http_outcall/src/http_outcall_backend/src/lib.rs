@@ -31,17 +31,17 @@ fn inc() {
 }
 
 #[query]
-async fn call_api_query() -> String {
+async fn call_api_by_query() -> String {
     call_binance_api_internal().await
 }
 
 #[update]
-async fn call_binance_api() -> String {
+async fn call_api_binance() -> String {
     call_binance_api_internal().await
 }
 
 #[update]
-async fn call_randomuser_api() -> String {
+async fn call_api_randomuser() -> String {
     call_randomuser_api_internal().await
 }
 
@@ -108,54 +108,21 @@ async fn call_eth_call_total_supply(to: String) -> u128 {
 }
 
 #[update]
-async fn call_matic_token_metadata() -> (String, String, u64, u128) {
-    let to = "0x0000000000000000000000000000000000001010"; // MATIC
-    join!(
-        call_eth_call_internal_for_string(
-            to,
-            NAME_SIGNATURE
-        ),
-        call_eth_call_internal_for_string(
-            to,
-            SYMBOL_SIGNATURE
-        ),
-        call_eth_call_internal_for_nat64(
-            to,
-            DECIMALS_SIGNATURE
-        ),
-        call_eth_call_internal_for_nat128(
-            to,
-            TOTAL_SUPPLY_SIGNATURE
-        ) // temp
-    )
+async fn call_token_metadata_matic() -> (String, String, u64, u128) {
+    call_token_metadata_internal("0x0000000000000000000000000000000000001010").await // MATIC
 }
 
 #[update]
-async fn call_usdc_token_metadata() -> (String, String, u64, u128) {
-    let to = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // USDC
-    join!(
-        call_eth_call_internal_for_string(
-            to,
-            NAME_SIGNATURE
-        ),
-        call_eth_call_internal_for_string(
-            to,
-            SYMBOL_SIGNATURE
-        ),
-        call_eth_call_internal_for_nat64(
-            to,
-            DECIMALS_SIGNATURE
-        ),
-        call_eth_call_internal_for_nat128(
-            to,
-            TOTAL_SUPPLY_SIGNATURE
-        ) // temp
-    )
+async fn call_token_metadata_usdc() -> (String, String, u64, u128) {
+    call_token_metadata_internal("0x2791bca1f2de4661ed88a30c99a7a9449aa84174").await // USDC
 }
 
 #[update]
-async fn call_dai_token_metadata() -> (String, String, u64, u128) {
-    let to = "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063"; // DAI
+async fn call_token_metadata_dai() -> (String, String, u64, u128) {
+    call_token_metadata_internal("0x8f3cf7ad23cd3cadbd9735aff958023239c6a063").await // DAI
+}
+
+async fn call_token_metadata_internal(to: &str) -> (String, String, u64, u128) {
     join!(
         call_eth_call_internal_for_string(
             to,
