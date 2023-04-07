@@ -6,4 +6,10 @@ service : {
     "call_binance_api": () -> (text);
     "call_randomuser_api": () -> (text);
     "call_eth_block_number": () -> (text);
+    "call_eth_call": (text, text) -> (text);
+    "call_eth_call_name": (text) -> (text);
+    "call_eth_call_symbol": (text) -> (text);
+    "call_eth_call_decimals": (text) -> (nat64);
+    "call_matic_token_metadata": () -> (text, text, nat64);
+    "call_usdc_token_metadata": () -> (text, text, nat64);
 }

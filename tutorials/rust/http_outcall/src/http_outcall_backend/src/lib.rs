@@ -1,8 +1,10 @@
+use hex::FromHex;
 use std::cell::RefCell;
 use candid::types::number::Nat;
 use ic_cdk::api::management_canister::http_request::{HttpHeader, CanisterHttpRequestArgument, HttpMethod, http_request};
 use ic_cdk_macros::{query, update};
 use serde_json::{json, Value};
+use futures::join;
 
 thread_local! {
     static COUNTER: RefCell<Nat> = RefCell::new(Nat::from(0))
@@ -43,6 +45,117 @@ async fn call_eth_block_number() -> String {
     call_eth_block_number_internal().await
 }
 
+#[update]
+async fn call_eth_call(to: String, data: String) -> String {
+    let res = call_eth_call_internal(to.as_str(), data.as_str()).await;
+    return match res {
+        Ok(value) => value.get("result").unwrap().as_str().unwrap().to_string(),
+        Err(msg) => msg
+    }
+}
+
+#[update]
+async fn call_eth_call_name(to: String) -> String {
+    let data = "0x06fdde03"; // name()
+    let res = call_eth_call_internal(to.as_str(), data).await;
+    return match res {
+        Ok(value) => {
+            let result = value.get("result").unwrap().as_str().unwrap();
+            let bytes = Vec::from_hex(&result[2..]).unwrap();
+            String::from_utf8(bytes).unwrap()
+        },
+        Err(msg) => msg
+    }
+}
+
+#[update]
+async fn call_eth_call_symbol(to: String) -> String {
+    let data = "0x95d89b41"; // symbol()
+    let res = call_eth_call_internal(to.as_str(), data).await;
+    return match res {
+        Ok(value) => {
+            let result = value.get("result").unwrap().as_str().unwrap();
+            let bytes = Vec::from_hex(&result[2..]).unwrap();
+            String::from_utf8(bytes).unwrap()
+        },
+        Err(msg) => msg
+    }
+}
+
+#[update]
+async fn call_eth_call_decimals(to: String) -> u64 {
+    let data = "0x313ce567"; // decimals()
+    let res = call_eth_call_internal(to.as_str(), data).await;
+    return match res {
+        Ok(value) => {
+            let result = value.get("result").unwrap().as_str().unwrap();
+            u64::from_str_radix(&result[2..], 16).unwrap()
+        },
+        Err(_) => 0 // temp
+    }
+}
+
+#[update]
+async fn call_matic_token_metadata() -> (String, String, u64) {
+    let to = "0x0000000000000000000000000000000000001010"; // USDC
+    join!(
+        call_eth_call_internal_for_string(
+            to,
+            "0x06fdde03" // name()
+        ),
+        call_eth_call_internal_for_string(
+            to,
+            "0x95d89b41" // symbol()
+        ),
+        call_eth_call_internal_for_nat64(
+            to,
+            "0x313ce567" // decimals()
+        )
+    )
+}
+
+#[update]
+async fn call_usdc_token_metadata() -> (String, String, u64) {
+    let to = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // USDC
+    join!(
+        call_eth_call_internal_for_string(
+            to,
+            "0x06fdde03" // name()
+        ),
+        call_eth_call_internal_for_string(
+            to,
+            "0x95d89b41" // symbol()
+        ),
+        call_eth_call_internal_for_nat64(
+            to,
+            "0x313ce567" // decimals()
+        )
+    )
+}
+
+async fn call_eth_call_internal_for_string(to: &str, data: &str) -> String {
+    let res = call_eth_call_internal(to, data).await;
+    return match res {
+        Ok(value) => {
+            let result = value.get("result").unwrap().as_str().unwrap();
+            let bytes = Vec::from_hex(&result[2..]).unwrap();
+            String::from_utf8(bytes).unwrap()
+        },
+        Err(msg) => msg
+    }
+}
+
+async fn call_eth_call_internal_for_nat64(to: &str, data: &str) -> u64 {
+    let res = call_eth_call_internal(to, data).await;
+    return match res {
+        Ok(value) => {
+            let result = value.get("result").unwrap().as_str().unwrap();
+            u64::from_str_radix(&result[2..], 16).unwrap()
+        },
+        Err(_) => 0 // temp
+    }
+}
+
 async fn call_eth_block_number_internal() -> String {
     let host = "polygon-mainnet.g.alchemy.com";
     let request_headers = create_request_header(host);
@@ -71,6 +184,40 @@ async fn call_eth_block_number_internal() -> String {
         },
         Err((_, m)) => {
             m
+        }
+    }
+}
+
+
+async fn call_eth_call_internal(to: &str, data: &str) -> Result<Value, String> {
+    let host = "polygon-mainnet.g.alchemy.com";
+    let request_headers = create_request_header(host);
+
+    let json_payload = json!({
+        "jsonrpc": "2.0",
+        "method": "eth_call",
+        "id": 1,
+        "params": [{
+            "to": to,
+            "data": data
+        }, "latest"]
+    });
+    let body = serde_json::to_vec(&json_payload).unwrap();
+    let url = format!("https://{host}/v2/sLp6VfuskMEwx8Wx0DvaRkI8qCoVYF8f");
+        let request = CanisterHttpRequestArgument {
+        url,
+        method: HttpMethod::POST,
+        body: Some(body),
+        max_response_bytes: None,
+        transform: None,
+        headers: request_headers,
+    };
+    match http_request(request).await {
+        Ok((response,)) => {
+            Ok(serde_json::from_slice(&response.body).expect("Transformed response is not JSON payload."))
+        },
+        Err((_, m)) => {
+            Err(m)
         }
     }
 }
