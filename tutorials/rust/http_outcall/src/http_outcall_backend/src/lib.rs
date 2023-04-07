@@ -14,6 +14,7 @@ const NAME_SIGNATURE: &str = "0x06fdde03"; // name()
 const SYMBOL_SIGNATURE: &str = "0x95d89b41"; // symbol()
 const DECIMALS_SIGNATURE: &str = "0x313ce567"; // decimals()
 const TOTAL_SUPPLY_SIGNATURE: &str = "0x18160ddd"; // totalSupply()
+const BALANCE_OF_SIGNATURE: &str = "0x70a08231"; // balanceOf(address)
 
 #[query]
 fn get() -> Nat {
@@ -101,7 +102,21 @@ async fn call_eth_call_total_supply(to: String) -> u128 {
     return match res {
         Ok(body) => {
             let result = result_from_json_res_body(&body);
-            hex_to_u128(remove_0x_prefix(&result))
+            hex_to_u128(remove_0x_prefix(&result)) // temp: u256
+        },
+        Err(_) => 0 // temp
+    }
+}
+
+#[update]
+async fn call_eth_call_balance_of(to: String, account: String) -> u128 {
+    let encoded_address = format!("{:0>64}", &account[2..]);
+    let data = format!("{}{}", BALANCE_OF_SIGNATURE, encoded_address);
+    let res = call_eth_call_internal(to.as_str(), data.as_str()).await;
+    return match res {
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_u128(remove_0x_prefix(&result)) // temp: U256
         },
         Err(_) => 0 // temp
     }
@@ -139,7 +154,7 @@ async fn call_token_metadata_internal(to: &str) -> (String, String, u64, u128) {
         call_eth_call_internal_for_nat128(
             to,
             TOTAL_SUPPLY_SIGNATURE
-        ) // temp
+        ) // temp: u256
     )
 }
 

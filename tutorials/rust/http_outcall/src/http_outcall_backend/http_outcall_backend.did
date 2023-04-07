@@ -10,7 +10,8 @@ service : {
     "call_eth_call_name": (text) -> (text);
     "call_eth_call_symbol": (text) -> (text);
     "call_eth_call_decimals": (text) -> (nat64);
-    "call_eth_call_total_supply": (text) -> (nat64);
+    "call_eth_call_total_supply": (text) -> (nat);
+    "call_eth_call_balance_of": (text, text) -> (nat);
     "call_token_metadata_matic": () -> (text, text, nat64, nat);
     "call_token_metadata_usdc": () -> (text, text, nat64, nat);
     "call_token_metadata_dai": () -> (text, text, nat64, nat);
