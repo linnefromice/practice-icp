@@ -13,6 +13,7 @@ thread_local! {
 const NAME_SIGNATURE: &str = "0x06fdde03"; // name()
 const SYMBOL_SIGNATURE: &str = "0x95d89b41"; // symbol()
 const DECIMALS_SIGNATURE: &str = "0x313ce567"; // decimals()
+const TOTAL_SUPPLY_SIGNATURE: &str = "0x18160ddd"; // totalSupply()
 
 #[query]
 fn get() -> Nat {
@@ -95,40 +96,83 @@ async fn call_eth_call_decimals(to: String) -> u64 {
 }
 
 #[update]
-async fn call_matic_token_metadata() -> (String, String, u64) {
+async fn call_eth_call_total_supply(to: String) -> u128 {
+    let res = call_eth_call_internal(to.as_str(), TOTAL_SUPPLY_SIGNATURE).await;
+    return match res {
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_u128(remove_0x_prefix(&result))
+        },
+        Err(_) => 0 // temp
+    }
+}
+
+#[update]
+async fn call_matic_token_metadata() -> (String, String, u64, u128) {
     let to = "0x0000000000000000000000000000000000001010"; // MATIC
     join!(
         call_eth_call_internal_for_string(
             to,
-            NAME_SIGNATURE // name()
+            NAME_SIGNATURE
         ),
         call_eth_call_internal_for_string(
             to,
-            SYMBOL_SIGNATURE // symbol()
+            SYMBOL_SIGNATURE
         ),
         call_eth_call_internal_for_nat64(
             to,
-            DECIMALS_SIGNATURE // decimals()
-        )
+            DECIMALS_SIGNATURE
+        ),
+        call_eth_call_internal_for_nat128(
+            to,
+            TOTAL_SUPPLY_SIGNATURE
+        ) // temp
     )
 }
 
 #[update]
-async fn call_usdc_token_metadata() -> (String, String, u64) {
+async fn call_usdc_token_metadata() -> (String, String, u64, u128) {
     let to = "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"; // USDC
     join!(
         call_eth_call_internal_for_string(
             to,
-            NAME_SIGNATURE // name()
+            NAME_SIGNATURE
         ),
         call_eth_call_internal_for_string(
             to,
-            SYMBOL_SIGNATURE // symbol()
+            SYMBOL_SIGNATURE
         ),
         call_eth_call_internal_for_nat64(
             to,
-            DECIMALS_SIGNATURE // decimals()
-        )
+            DECIMALS_SIGNATURE
+        ),
+        call_eth_call_internal_for_nat128(
+            to,
+            TOTAL_SUPPLY_SIGNATURE
+        ) // temp
+    )
+}
+
+#[update]
+async fn call_dai_token_metadata() -> (String, String, u64, u128) {
+    let to = "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063"; // DAI
+    join!(
+        call_eth_call_internal_for_string(
+            to,
+            NAME_SIGNATURE
+        ),
+        call_eth_call_internal_for_string(
+            to,
+            SYMBOL_SIGNATURE
+        ),
+        call_eth_call_internal_for_nat64(
+            to,
+            DECIMALS_SIGNATURE
+        ),
+        call_eth_call_internal_for_nat128(
+            to,
+            TOTAL_SUPPLY_SIGNATURE
+        ) // temp
     )
 }
 
@@ -149,6 +193,17 @@ async fn call_eth_call_internal_for_nat64(to: &str, data: &str) -> u64 {
         Ok(body) => {
             let result = result_from_json_res_body(&body);
             hex_to_u64(remove_0x_prefix(&result))
+        },
+        Err(_) => 0 // temp
+    }
+}
+
+async fn call_eth_call_internal_for_nat128(to: &str, data: &str) -> u128 {
+    let res = call_eth_call_internal(to, data).await;
+    return match res {
+        Ok(body) => {
+            let result = result_from_json_res_body(&body);
+            hex_to_u128(remove_0x_prefix(&result))
         },
         Err(_) => 0 // temp
     }
@@ -280,6 +335,10 @@ fn hex_to_utf8_string(s: &str) -> String {
 
 fn hex_to_u64(s: &str) -> u64 {
     u64::from_str_radix(s, 16).unwrap()
+}
+
+fn hex_to_u128(s: &str) -> u128 {
+    u128::from_str_radix(s, 16).unwrap()
 }
 
 fn remove_0x_prefix(base: &str) -> &str {
