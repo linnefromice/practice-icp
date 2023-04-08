@@ -1,13 +1,22 @@
 use hex::FromHex;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use candid::types::number::Nat;
 use ic_cdk::api::management_canister::http_request::{HttpHeader, CanisterHttpRequestArgument, HttpMethod, http_request};
 use ic_cdk_macros::{query, update};
 use serde_json::{json, Value};
 use futures::join;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct TokenMetadata {
+    pub name: String,
+    pub symbol: String,
+    pub decimals: u64, // u8,
+}
+
 thread_local! {
-    static COUNTER: RefCell<Nat> = RefCell::new(Nat::from(0))
+    static COUNTER: RefCell<Nat> = RefCell::new(Nat::from(0));
+    static TOKEN_METADATAS: RefCell<HashMap<String, TokenMetadata>> = RefCell::new(HashMap::new());
 }
 
 const NAME_SIGNATURE: &str = "0x06fdde03"; // name()
@@ -135,6 +144,22 @@ async fn call_token_metadata_usdc() -> (String, String, u64, u128) {
 #[update]
 async fn call_token_metadata_dai() -> (String, String, u64, u128) {
     call_token_metadata_internal("0x8f3cf7ad23cd3cadbd9735aff958023239c6a063").await // DAI
+}
+
+#[query]
+fn get_token_metadata(to: String) -> (String, String, u64) {
+    TOKEN_METADATAS.with(|metadatas| {
+        let datas = metadatas.borrow();
+        let metadata = datas.get(&to).unwrap();
+        (metadata.name.to_owned(), metadata.symbol.to_owned(), metadata.decimals)
+    })
+}
+
+#[update]
+async fn set_token_metadata(to: String) -> (String, String, u64, u128) {
+    let values = call_token_metadata_internal(&to).await;
+    TOKEN_METADATAS.with(|metadatas| metadatas.borrow_mut().insert(to.clone().to_owned(), TokenMetadata { name: values.0.clone(), symbol: values.1.clone(), decimals: values.2.clone() }));
+    values
 }
 
 async fn call_token_metadata_internal(to: &str) -> (String, String, u64, u128) {

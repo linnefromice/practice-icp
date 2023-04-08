@@ -15,4 +15,6 @@ service : {
     "call_token_metadata_matic": () -> (text, text, nat64, nat);
     "call_token_metadata_usdc": () -> (text, text, nat64, nat);
     "call_token_metadata_dai": () -> (text, text, nat64, nat);
+    "get_token_metadata": (text) -> (text, text, nat64) query;
+    "set_token_metadata": (text) -> (text, text, nat64, nat);
 }
