@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "canisters": {
+    "http_outcall_icweb3_backend": {
+      "type": "rust",
+      "package": "http_outcall_icweb3_backend",
+      "candid": "src/http_outcall_icweb3_backend/http_outcall_icweb3_backend.did"
+    },
+    "http_outcall_icweb3_frontend": {
+      "type": "assets",
+      "source": [
+        "src/http_outcall_icweb3_frontend/assets"
+      ],
+      "dependencies": [
+        "http_outcall_icweb3_backend"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
