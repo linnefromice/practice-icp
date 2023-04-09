@@ -1,5 +1,4 @@
 service : {
-    "get_settings": () -> (text) query;
     "get_latest_block": () -> (text);
     "call_name": (text) -> (text);
     "call_symbol": (text) -> (text);

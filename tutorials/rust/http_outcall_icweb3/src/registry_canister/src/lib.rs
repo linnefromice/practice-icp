@@ -48,11 +48,6 @@ fn transform(response: TransformArgs) -> HttpResponse {
     response.response
 }
 
-#[query]
-fn get_settings() -> String {
-    return get_rpc_endpoint();
-}
-
 #[update]
 async fn get_latest_block() -> String {
     match get_block(None).await {
