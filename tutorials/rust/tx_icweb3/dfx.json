@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "tx_icweb3_backend": {
+      "type": "rust",
+      "package": "tx_icweb3_backend",
+      "candid": "src/tx_icweb3_backend/tx_icweb3_backend.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
