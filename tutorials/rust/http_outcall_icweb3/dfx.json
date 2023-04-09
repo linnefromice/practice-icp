@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "http_outcall_icweb3_backend": {
+    "erc20_canister": {
       "type": "rust",
-      "package": "http_outcall_icweb3_backend",
-      "candid": "src/http_outcall_icweb3_backend/http_outcall_icweb3_backend.did"
+      "package": "erc20_canister",
+      "candid": "src/erc20_canister/erc20_canister.did"
     }
   },
   "defaults": {
