@@ -1,4 +1,10 @@
+type AccountInfo = record {
+    address : text;
+    pub_key : text;
+}
 service : {
     "greet": (text) -> (text) query;
+    "account_info": () -> (variant { Ok : AccountInfo; Err : text });
+    "pub_key": () -> (text);
     "eth_addr": () -> (text);
 }
