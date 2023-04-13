@@ -1,0 +1,18 @@
+type AccountInfo = record {
+    address : text;
+    pub_key : text;
+};
+type CandidSignedTransaction = record {
+    message_hash : text;
+    v : nat64;
+    r : text;
+    s : text;
+    raw_transaction : text;
+    transaction_hash : text;
+};
+service : {
+    "account_info": () -> (variant { Ok : AccountInfo; Err : text });
+    "rpc_endpoint": () -> (text);
+    "pub_key": () -> (text);
+    "eth_addr": () -> (text);
+}

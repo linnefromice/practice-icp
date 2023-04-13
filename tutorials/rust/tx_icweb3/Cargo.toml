@@ -1,4 +1,4 @@
 [workspace]
 members = [
-    "src/tx_icweb3_v1",
+    "src/tx_icweb3_v2",
 ]

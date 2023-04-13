@@ -1528,7 +1528,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tx_icweb3_v1"
+name = "tx_icweb3_v2"
 version = "0.1.0"
 dependencies = [
  "candid",

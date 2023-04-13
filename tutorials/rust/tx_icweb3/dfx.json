@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "tx_icweb3_v1": {
+    "tx_icweb3_v2": {
       "type": "rust",
-      "package": "tx_icweb3_v1",
-      "candid": "src/tx_icweb3_v1/tx_icweb3_v1.did"
+      "package": "tx_icweb3_v2",
+      "candid": "src/tx_icweb3_v2/tx_icweb3_v2.did"
     }
   },
   "defaults": {
