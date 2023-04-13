@@ -1,5 +1,5 @@
 [package]
-name = "tx_icweb3_backend_bk"
+name = "tx_icweb3_bk"
 version = "0.1.0"
 edition = "2021"
 
