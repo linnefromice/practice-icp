@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use candid::{Principal, CandidType};
 use ic_cdk_macros::{query, update};
-use ic_web3::{types::{Address, SignedTransaction, TransactionParameters, U256}, ic::{get_public_key as get_public_key_internal, pubkey_to_address as pubkey_to_address_internal, KeyInfo }, transports::ICHttp, Web3};
+use ic_web3::{types::{Address, SignedTransaction, TransactionParameters, U256}, ic::{get_public_key as get_public_key_internal, pubkey_to_address as pubkey_to_address_internal, KeyInfo, ic_raw_sign, recover_address }, transports::ICHttp, Web3, signing::hash_message};
 
 const KEY_NAME: &str = "dfx_test_key";
 
@@ -24,6 +24,16 @@ struct AccountInfo {
     pub address: String,
     pub pub_key: String
 }
+#[derive(CandidType)]
+struct CandidSignedTransaction {
+    pub message_hash: String,
+    pub v: u64,
+    pub r: String,
+    pub s: String,
+    pub raw_transaction: String,
+    pub transaction_hash: String,
+}
+
 
 #[update]
 async fn account_info() -> Result<AccountInfo, String> {
@@ -59,17 +69,43 @@ async fn eth_addr() -> String {
 }
 
 #[update]
-async fn send_eth(to: String, value: u64) -> Result<String, String> {
+async fn send_eth(to: String, value: u64) -> Result<CandidSignedTransaction, String> {
     let res = send_eth_siged_tx(to, value).await;
     if let Err(msg) = res { return Err(msg) };
     let signed_tx = res.unwrap();
-    ic_cdk::println!("message_hash: {:?}", signed_tx.message_hash.as_bytes());
-    ic_cdk::println!("v: {:?}", signed_tx.v);
-    ic_cdk::println!("r: {:?}", signed_tx.r);
-    ic_cdk::println!("s: {:?}", signed_tx.s);
-    ic_cdk::println!("raw_transaction: {:?}", signed_tx.raw_transaction);
-    ic_cdk::println!("transaction_hash: {:?}", signed_tx.transaction_hash);
-    Ok("OK".to_string())
+    Ok(CandidSignedTransaction {
+        message_hash: format!("0x{}", hex::encode(signed_tx.message_hash)),
+        v: signed_tx.v,
+        r: format!("0x{}", hex::encode(signed_tx.r)),
+        s: format!("0x{}", hex::encode(signed_tx.s)),
+        raw_transaction: format!("0x{}", hex::encode(signed_tx.raw_transaction.0)),
+        transaction_hash: format!("0x{}", hex::encode(signed_tx.transaction_hash)),
+    })
+}
+
+#[update]
+async fn raw_sign(msg: String) -> String {
+    let derivation_path = vec![default_derivation_key()];
+    let msg_hash = hash_message(msg);
+    let res = ic_raw_sign(
+        Vec::from(msg_hash.as_bytes()),
+        derivation_path,
+        KEY_NAME.to_string()
+    ).await;
+    match res {
+        Ok(signature) => format!("0x{}", hex::encode(signature)),
+        Err(msg) => msg
+    }
+}
+
+#[update]
+async fn verify_address(msg: String, signature: String, rec_id: u8) -> String {
+    let msg_hash = hash_message(msg);
+    recover_address(
+        Vec::from(msg_hash.as_bytes()),
+        hex::decode(&signature[2..]).unwrap(),
+        rec_id
+    )
 }
 
 
