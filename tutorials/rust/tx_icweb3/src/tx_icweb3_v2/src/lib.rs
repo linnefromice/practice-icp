@@ -1,14 +1,23 @@
 use std::str::FromStr;
 
 use candid::{Principal, CandidType};
+use ic_cdk::api::management_canister::http_request::{TransformArgs, HttpResponse};
 use ic_cdk_macros::{query, update};
-use ic_web3::{types::{Address, SignedTransaction, TransactionParameters, U256}, ic::{get_public_key as get_public_key_internal, pubkey_to_address as pubkey_to_address_internal, KeyInfo, ic_raw_sign, recover_address }, transports::ICHttp, Web3, signing::hash_message};
+use ic_web3::{types::{Address, SignedTransaction}, ic::{get_public_key as get_public_key_internal, pubkey_to_address as pubkey_to_address_internal, KeyInfo }, transports::ICHttp, Web3, contract::{tokens::Tokenize, Contract, Options}};
 
 const KEY_NAME: &str = "dfx_test_key";
 
-const BASE_URL: &'static str = "polygon-mainnet.g.alchemy.com";
-const PATH: &'static str = "/v2/sLp6VfuskMEwx8Wx0DvaRkI8qCoVYF8f";
-const CHAIN_ID: u64 = 1;
+// For Polygon Mainnet
+// const BASE_URL: &'static str = "polygon-mainnet.g.alchemy.com";
+// const PATH: &'static str = "/v2/sLp6VfuskMEwx8Wx0DvaRkI8qCoVYF8f";
+// const CHAIN_ID: u64 = 1;
+// For Polygon Testnet (Mumbai)
+const BASE_URL: &'static str = "polygon-mumbai.g.alchemy.com";
+const PATH: &'static str = "/v2/6GLIzI5pL0n4bp4c3jESZTRfXxE5XJ_Z";
+const CHAIN_ID: u64 = 80001;
+
+
+const ERC20_ABI: &[u8] = include_bytes!("../../abi/erc20.json");
 
 #[derive(CandidType)]
 struct AccountInfo {
@@ -32,7 +41,6 @@ fn get_rpc_endpoint() -> String {
 fn default_derivation_key() -> Vec<u8> {
     ic_cdk::id().as_slice().to_vec()
 }
-
 
 #[update]
 async fn account_info() -> Result<AccountInfo, String> {
@@ -72,6 +80,87 @@ async fn eth_addr() -> String {
     }
 }
 
+#[query(name = "transform")]
+fn transform(response: TransformArgs) -> HttpResponse {
+    response.response
+}
+
+#[update]
+async fn balance_of(contract_addr: String, holder_addr: String) -> Result<u128, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let contract = generate_contract_client(w3, &contract_addr, ERC20_ABI)?;
+
+    let addr = Address::from_str(&holder_addr).unwrap();
+    contract
+        .query("balanceOf", addr, None, Options::default(), None)
+        .await
+        .map_err(|e| format!("query contract error: {}", e))
+}
+
+#[update]
+async fn send_erc20_signed_tx(
+    token_addr: String, // TODO: enable 0x
+    to_addr: String, // TODO: enable 0x
+    value: u64
+) -> Result<CandidSignedTransaction, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    match send_erc20_signed_tx_internal(
+        w3.clone(),
+        token_addr,
+        to_addr,
+        value,
+    ).await {
+        Ok(signed_tx) => 
+            Ok(CandidSignedTransaction {
+                message_hash: format!("0x{}", hex::encode(signed_tx.message_hash)),
+                v: signed_tx.v,
+                r: format!("0x{}", hex::encode(signed_tx.r)),
+                s: format!("0x{}", hex::encode(signed_tx.s)),
+                raw_transaction: format!("0x{}", hex::encode(signed_tx.raw_transaction.0)),
+                transaction_hash: format!("0x{}", hex::encode(signed_tx.transaction_hash)),
+            }),
+        Err(msg) => Err(msg)
+    }
+}
+
+#[update]
+async fn send_erc20(
+    token_addr: String, // TODO: enable 0x
+    to_addr: String, // TODO: enable 0x
+    value: u64
+) -> Result<String, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let signed_tx = send_erc20_signed_tx_internal(
+        w3.clone(),
+        token_addr,
+        to_addr,
+        value,
+    ).await?;
+    match w3.eth().send_raw_transaction(signed_tx.raw_transaction).await {
+        Ok(v) => Ok(format!("0x{}", hex::encode(v))),
+        Err(msg) => Err(format!("send_raw_transaction failed: {}", msg))
+    }
+}
+
+async fn send_erc20_signed_tx_internal(
+    w3: Web3<ICHttp>,
+    token_addr: String,
+    to_addr: String,
+    value: u64
+) -> Result<SignedTransaction, String> {
+    let to_addr = Address::from_str(&to_addr).unwrap();
+    sign(
+        w3,
+        &token_addr,
+        ERC20_ABI,
+        &"transfer",
+        (to_addr, value,)
+    ).await
+}
+
 async fn get_eth_addr(
     canister_id: Option<Principal>,
     derivation_path: Option<Vec<Vec<u8>>>,
@@ -94,4 +183,63 @@ async fn get_public_key(
 
 fn pubkey_to_address(pubkey: &[u8]) -> Result<Address, String> {
     pubkey_to_address_internal(&pubkey)
+}
+
+async fn sign(
+    w3: Web3<ICHttp>,
+    contract_addr: &str,
+    abi: &[u8],
+    func: &str,
+    params: impl Tokenize,
+) -> Result<SignedTransaction, String> {
+    let contract = generate_contract_client(w3.clone(), contract_addr, abi)
+        .map_err(|e| format!("generate_contract_client failed: {}", e))?;
+    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string()).await
+        .map_err(|e| format!("get_eth_addr failed: {}", e))?;
+    
+    let tx_count = w3.eth()
+        .transaction_count(canister_addr, None)
+        .await
+        .map_err(|e| format!("get tx count error: {}", e))?;
+    // let gas_price = w3.eth()
+    //     .gas_price()
+    //     .await
+    //     .map_err(|e| format!("get gas_price error: {}", e))?;
+    let options = Options::with(|op| { 
+        op.nonce = Some(tx_count);
+        // op.gas_price = Some(gas_price);
+        // op.transaction_type = Some(U64::from(2)) //EIP1559_TX_ID
+    });
+    
+    match contract.sign(
+        func,
+        params,
+        options,
+        hex::encode(canister_addr),
+        KeyInfo { derivation_path: vec![default_derivation_key()], key_name: KEY_NAME.to_string() },
+        CHAIN_ID // TODO: switch chain
+    ).await {
+        Ok(v) => Ok(v),
+        Err(msg) => Err(format!("sign failed: {}", msg))
+    }
+}
+
+fn generate_contract_client(w3: Web3<ICHttp>, contract_addr: &str, abi: &[u8]) -> Result<Contract<ICHttp>, String> {
+    let contract_address = Address::from_str(contract_addr).unwrap();
+    Contract::from_json(
+        w3.eth(),
+        contract_address,
+        abi
+    ).map_err(|e| format!("init contract failed: {}", e))
+}
+
+fn generate_web3_client() -> Result<Web3<ICHttp>, String> {
+    match ICHttp::new(
+        get_rpc_endpoint().as_str(),
+        None, // TODO: switch local/prod
+        None // TODO: switch local/prod
+    ) {
+        Ok(v) => Ok(Web3::new(v)),
+        Err(e) => Err(e.to_string())
+    }
 }

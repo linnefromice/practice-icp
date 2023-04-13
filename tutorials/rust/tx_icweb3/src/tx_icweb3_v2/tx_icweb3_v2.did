@@ -15,4 +15,7 @@ service : {
     "rpc_endpoint": () -> (text);
     "pub_key": () -> (text);
     "eth_addr": () -> (text);
+    "balance_of": (text, text) -> (variant { Ok : nat; Err : text });
+    "send_erc20_signed_tx": (text, text, nat64) -> (variant { Ok : CandidSignedTransaction; Err : text });
+    "send_erc20": (text, text, nat64) -> (variant { Ok : text; Err : text });
 }
