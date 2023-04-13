@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "my_timers_backend": {
+      "type": "rust",
+      "package": "my_timers_backend",
+      "candid": "src/my_timers_backend/my_timers_backend.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
