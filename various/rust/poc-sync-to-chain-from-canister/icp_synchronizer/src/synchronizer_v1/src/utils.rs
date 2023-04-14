@@ -6,7 +6,7 @@ pub const KEY_NAME: &str = "dfx_test_key";
 // For Polygon Testnet (Mumbai)
 const BASE_URL: &'static str = "polygon-mumbai.g.alchemy.com";
 const PATH: &'static str = "/v2/6GLIzI5pL0n4bp4c3jESZTRfXxE5XJ_Z";
-const CHAIN_ID: u64 = 80001;
+pub const CHAIN_ID: u64 = 80001;
 
 pub fn get_rpc_endpoint() -> String {
     format!("https://{}{}", BASE_URL, PATH)

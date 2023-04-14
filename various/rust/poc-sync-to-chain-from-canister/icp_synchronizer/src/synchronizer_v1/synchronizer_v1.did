@@ -2,8 +2,18 @@ type AccountInfo = record {
     address : text;
     pub_key : text;
 };
+type CandidSignedTransaction = record {
+    message_hash : text;
+    v : nat64;
+    r : text;
+    s : text;
+    raw_transaction : text;
+    transaction_hash : text;
+};
 service : {
+    "update_state": (nat, int, nat, nat) -> (variant { Ok : text; Err : text });
     "debug_oracle_latest_round_id": () -> (variant { Ok : nat; Err : text });
+    "debug_update_state_signed_tx": (nat, int, nat, nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
     "debug_rpc_endpoint": () -> (text) query;
     "debug_account_info": () -> (variant { Ok : AccountInfo; Err : text });
 }
