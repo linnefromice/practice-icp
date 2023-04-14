@@ -1,4 +1,4 @@
 [workspace]
 members = [
-    "src/icp_synchronizer_backend",
+    "src/synchronizer_v1",
 ]

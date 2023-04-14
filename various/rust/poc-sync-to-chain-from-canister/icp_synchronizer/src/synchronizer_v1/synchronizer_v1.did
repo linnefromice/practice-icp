@@ -1,0 +1,9 @@
+type AccountInfo = record {
+    address : text;
+    pub_key : text;
+};
+service : {
+    "debug_oracle_latest_round_id": () -> (variant { Ok : nat; Err : text });
+    "debug_rpc_endpoint": () -> (text) query;
+    "debug_account_info": () -> (variant { Ok : AccountInfo; Err : text });
+}

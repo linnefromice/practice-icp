@@ -1,5 +1,5 @@
 [package]
-name = "icp_synchronizer_backend"
+name = "synchronizer_v1"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,5 +10,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 candid = "0.8.2"
+hex = "0.4.3"
 ic-cdk = "0.6.0"
 ic-cdk-macros = "0.6.0"
+ic-web3 = "0.1.7"

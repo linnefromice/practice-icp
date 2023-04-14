@@ -1,19 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "icp_synchronizer_backend": {
+    "synchronizer_v1": {
       "type": "rust",
-      "package": "icp_synchronizer_backend",
-      "candid": "src/icp_synchronizer_backend/icp_synchronizer_backend.did"
-    },
-    "icp_synchronizer_frontend": {
-      "type": "assets",
-      "source": [
-        "src/icp_synchronizer_frontend/assets"
-      ],
-      "dependencies": [
-        "icp_synchronizer_backend"
-      ]
+      "package": "synchronizer_v1",
+      "candid": "src/synchronizer_v1/synchronizer_v1.did"
     }
   },
   "defaults": {
