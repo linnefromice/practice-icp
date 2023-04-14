@@ -11,6 +11,7 @@ type CandidSignedTransaction = record {
     transaction_hash : text;
 };
 service : {
+    "periodic_update_state": () -> ();
     "update_state": (nat, int, nat, nat) -> (variant { Ok : text; Err : text });
     "debug_oracle_latest_round_id": () -> (variant { Ok : nat; Err : text });
     "debug_update_state_signed_tx": (nat, int, nat, nat) -> (variant { Ok : CandidSignedTransaction; Err : text });

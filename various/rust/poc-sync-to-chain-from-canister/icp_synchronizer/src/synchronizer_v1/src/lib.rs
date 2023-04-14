@@ -1,6 +1,6 @@
 mod utils;
 
-use std::{str::FromStr, sync::atomic::AtomicU64};
+use std::{str::FromStr, sync::atomic::{AtomicU64, Ordering}};
 use candid::CandidType;
 use ic_cdk::{query, update, api::management_canister::http_request::{TransformArgs, HttpResponse}};
 use ic_web3::{Web3, types::{Address, SignedTransaction, U64}, transports::ICHttp, contract::{Contract, Options, tokens::Tokenize}, ic::{get_eth_addr, KeyInfo}};
@@ -16,9 +16,30 @@ struct AccountInfo {
     pub pub_key: String
 }
 
+static LATEST_ROUND: AtomicU64 = AtomicU64::new(0);
+
 #[query]
 fn transform(response: TransformArgs) -> HttpResponse {
     response.response
+}
+
+#[update]
+async fn periodic_update_state() {
+    let default_timer_interval_secs = 5;
+    let interval = std::time::Duration::from_secs(default_timer_interval_secs);
+    ic_cdk::println!("Starting a periodic task with interval {interval:?}");
+
+    ic_cdk_timers::set_timer_interval(interval, || {
+        let latest_round = LATEST_ROUND.load(Ordering::Relaxed);
+        // let _ = update_state( // temp
+        //     latest_round as u128,
+        //     latest_round as i128,
+        //     latest_round as u128,
+        //     latest_round as u128
+        // );
+        let updated_round = LATEST_ROUND.fetch_add(1, Ordering::Relaxed);
+        ic_cdk::println!("round_id is {updated_round}");
+    });
 }
 
 #[update]
