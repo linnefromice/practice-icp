@@ -1,8 +1,20 @@
 import * as dotenv from "dotenv"
+import fs from 'fs'
+import path from 'path'
 
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import { HardhatNetworkUserConfig, HttpNetworkAccountsUserConfig, NetworksUserConfig } from "hardhat/types";
+
+const loadTasks = (taskFolders: string[]): void =>
+  taskFolders.forEach((folder) => {
+    const tasksPath = path.join(__dirname, "tasks", folder);
+    fs.readdirSync(tasksPath)
+      .filter((pth) => pth.includes(".ts") || pth.includes(".js"))
+      .forEach((task) => {
+        require(`${tasksPath}/${task}`);
+      });
+  });
 
 dotenv.config()
 
@@ -10,6 +22,12 @@ const MNEMONIC = process.env.MNEMONIC || ''
 const COINMARKETCAP_KEY = process.env.COINMARKETCAP_KEY || ''
 const POLYGON_RPC = process.env.POLYGON_RPC || "https://polygon-rpc.com/"
 const POLYGON_MUMBAI_RPC = process.env.POLYGON_MUMBAI_RPC || 'https://rpc-mumbai.maticvigil.com/'
+const SKIP_LOAD = process.env.SKIP_LOAD === "true";
+const TASK_FOLDERS = ["deployment"];
+
+if (!SKIP_LOAD) {
+  loadTasks(TASK_FOLDERS);
+}
 
 const HARDHAT_CHAINID = 31337;
 const DEFAULT_BLOCK_GAS_LIMIT = 30000000;
