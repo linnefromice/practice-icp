@@ -56,13 +56,13 @@ const NETWORK_CONFIGS: NetworksUserConfig = {
   polygon: {
     chainId: 137,
     url: POLYGON_RPC,
-    gasPrice: 1 * GWEI,
+    gasPrice: 3 * GWEI,
     accounts: ACCOUNTS,
   },
   mumbai: {
     chainId: 80001,
     url: POLYGON_MUMBAI_RPC,
-    gasPrice: 1 * GWEI,
+    gasPrice: 3 * GWEI,
     accounts: ACCOUNTS,
   },
 };
