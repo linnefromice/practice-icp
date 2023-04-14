@@ -7,7 +7,8 @@ fn init(timer_interval_secs: u64) {
     let interval = std::time::Duration::from_secs(timer_interval_secs);
     ic_cdk::println!("Starting a periodic task with interval {interval:?}");
     ic_cdk_timers::set_timer_interval(interval, || {
-        COUNTER.fetch_add(1, Ordering::Relaxed);
+        let incremented = increment();
+        ic_cdk::println!("current is {incremented}");
     });
 }
 
@@ -19,4 +20,8 @@ fn post_upgrade(timer_interval_secs: u64) {
 #[ic_cdk_macros::query]
 fn counter() -> u64 {
     COUNTER.load(Ordering::Relaxed)
+}
+
+fn increment() -> u64 {
+    COUNTER.fetch_add(1, Ordering::Relaxed)
 }
