@@ -1,9 +1,10 @@
 mod utils;
 
-use std::{str::FromStr, sync::atomic::{AtomicU64, Ordering}, ops::{Mul, Div}};
+use std::{str::FromStr, ops::{Mul, Div}, cell::RefCell};
 use candid::CandidType;
-use ic_cdk::{query, update, api::management_canister::http_request::{TransformArgs, HttpResponse}};
+use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse}, self}};
 use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::Tokenize}, ic::{get_eth_addr, KeyInfo}};
+use ic_cdk_timers::TimerId;
 use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID};
 
 // Oracle
@@ -16,7 +17,20 @@ struct AccountInfo {
     pub pub_key: String
 }
 
-static LATEST_ROUND: AtomicU64 = AtomicU64::new(0);
+#[derive(Clone, Debug, Default, CandidType)]
+pub struct Round {
+    pub round_id: u128,
+    pub answer: i128,
+    pub started_at: u64,
+    pub updated_at: u64
+}
+
+thread_local! {
+    static LATEST_ROUND_ID: RefCell<u128> = RefCell::default();
+    static ROUNDS: RefCell<Vec<Round>> = RefCell::default();
+    static SYNCED_LATEST_ROUND_ID: RefCell<u128> = RefCell::default();
+    static TIMER_ID: RefCell<TimerId> = RefCell::default(); // for debug
+}
 
 #[query]
 fn transform(response: TransformArgs) -> HttpResponse {
@@ -24,26 +38,73 @@ fn transform(response: TransformArgs) -> HttpResponse {
 }
 
 #[update]
-async fn periodic_update_state() {
-    let default_timer_interval_secs = 5;
-    let interval = std::time::Duration::from_secs(default_timer_interval_secs);
-    ic_cdk::println!("Starting a periodic task with interval {interval:?}");
-
-    ic_cdk_timers::set_timer_interval(interval, || {
-        let latest_round = LATEST_ROUND.load(Ordering::Relaxed);
-        // let _ = update_state( // temp
-        //     latest_round as u128,
-        //     latest_round as i128,
-        //     latest_round as u128,
-        //     latest_round as u128
-        // );
-        let updated_round = LATEST_ROUND.fetch_add(1, Ordering::Relaxed);
-        ic_cdk::println!("round_id is {updated_round}");
+fn update_state(answer: i128) -> Round {
+    let timestamp = api::time();
+    update_state_internal(answer, timestamp, timestamp)
+}
+fn update_state_internal(answer: i128, started_at: u64, updated_at: u64) -> Round {
+    let incremented_round_id = LATEST_ROUND_ID.with(|val| {
+        let mut mut_ref = val.borrow_mut();
+        *mut_ref += 1;
+        mut_ref.clone()
     });
+    let round = Round {
+        round_id: incremented_round_id,
+        answer,
+        started_at,
+        updated_at
+    };
+    ROUNDS.with(|rounds| rounds.borrow_mut().push(round.clone()));
+    round
 }
 
 #[update]
-async fn update_state(
+async fn periodic_sync_state() {
+    periodic_sync_state_internal(10, 1)
+}
+
+fn periodic_sync_state_internal(interval_secs: u64, max_run_unit: u128) {
+    let interval = std::time::Duration::from_secs(interval_secs);
+    let max_run_unit_owned = std::sync::Arc::new(max_run_unit);
+
+    let timer_id = ic_cdk_timers::set_timer_interval(interval, move || {
+        ic_cdk::println!("[START] Synchronization");
+        let synced_latest_round_id = get_synced_latest_round_id();
+        let latest_round_id = get_latest_round_id();
+        if synced_latest_round_id == latest_round_id {
+            ic_cdk::println!("Already synced: round_id is {:?}", synced_latest_round_id);
+            return
+        }
+        let not_synced = latest_round_id - synced_latest_round_id;
+        let run_unit = if not_synced > *max_run_unit_owned { *max_run_unit_owned } else { not_synced };
+
+        for i in 0..run_unit {
+            let round = get_round(synced_latest_round_id+1+i-1);
+            ic_cdk::println!("sync round: {:?}", round);
+        }
+
+        SYNCED_LATEST_ROUND_ID.with(|value| *value.borrow_mut() += run_unit);
+        ic_cdk::println!("[FINISH] Synchronization");
+    });
+
+    TIMER_ID.with(|value| *value.borrow_mut() = timer_id);
+}
+
+fn get_latest_round_id() -> u128 {
+    LATEST_ROUND_ID.with(|value| (*value.borrow()).clone())
+}
+fn get_round(idx: u128) -> Round {
+    ROUNDS.with(|rounds| {
+        let rounds = rounds.borrow();
+        rounds[idx as usize].clone()
+    })
+}
+fn get_synced_latest_round_id() -> u128 {
+    SYNCED_LATEST_ROUND_ID.with(|value| (*value.borrow()).clone())
+}
+
+#[update]
+async fn sync_state(
     id: u128, // TODO: u256
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
@@ -54,7 +115,7 @@ async fn update_state(
 ) -> Result<String, String> {
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
-    let signed_tx = update_state_signed_tx_internal(
+    let signed_tx = sync_state_signed_tx_internal(
         w3.clone(),
         id,
         answer,
@@ -70,7 +131,7 @@ async fn update_state(
     }
 }
 
-async fn update_state_signed_tx_internal(
+async fn sync_state_signed_tx_internal(
     w3: Web3<ICHttp>,
     id: u128, // TODO: u256
     answer: i128, // TODO: i256
@@ -172,7 +233,7 @@ async fn debug_oracle_latest_round_id() -> Result<u128, String> {
         .map_err(|e| format!("query contract error: {}", e))
 }
 #[update]
-async fn debug_update_state_signed_tx(
+async fn debug_sync_state_signed_tx(
     id: u128, // TODO: u256
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
@@ -183,7 +244,7 @@ async fn debug_update_state_signed_tx(
 ) -> Result<CandidSignedTransaction, String> {
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
-    match update_state_signed_tx_internal(
+    match sync_state_signed_tx_internal(
         w3.clone(),
         id,
         answer,
@@ -206,7 +267,7 @@ async fn debug_update_state_signed_tx(
     }
 }
 #[update]
-async fn debug_update_state_estimate_gas(
+async fn debug_sync_state_estimate_gas(
     id: u128, // TODO: u256
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
@@ -326,4 +387,35 @@ async fn debug_account_info() -> Result<AccountInfo, String> {
         address: format!("0x{}", hex::encode(addr)),
         pub_key: format!("0x{}", hex::encode(pub_key)),
     })
+}
+
+#[update]
+fn debug_update_state(answer: i128, started_at: u64, updated_at: u64) -> Round {
+    update_state_internal(answer, started_at, updated_at)
+}
+
+#[query]
+fn debug_latest_round_id() -> u128 {
+    get_latest_round_id()
+}
+#[query]
+fn debug_round(idx: u128) -> Round {
+    get_round(idx)
+}
+#[query]
+fn debug_rounds_length() -> u128 {
+    ROUNDS.with(|rounds| rounds.borrow().len()) as u128
+}
+#[query]
+fn debug_synced_latest_round_id() -> u128 {
+    get_synced_latest_round_id()
+}
+#[update]
+fn debug_periodic_sync_state(interval_secs: u64, max_run_unit: u128) {
+    periodic_sync_state_internal(interval_secs, max_run_unit)
+}
+#[update]
+fn debug_stop_timer() {
+    let timer_id = TIMER_ID.with(|value| value.borrow().clone());
+    ic_cdk_timers::clear_timer(timer_id);
 }
