@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "synchronizer_v1": {
+      "type": "rust",
+      "package": "synchronizer_v1",
+      "candid": "src/synchronizer_v1/synchronizer_v1.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
