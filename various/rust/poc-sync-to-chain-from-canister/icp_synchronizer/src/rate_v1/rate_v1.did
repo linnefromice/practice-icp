@@ -1,0 +1,14 @@
+type Round = record {
+    round_id : nat;
+    answer : int;
+    started_at : nat64;
+    updated_at : nat64;
+};
+service : {
+    "update_state": (int) -> (Round);
+    "debug_update_state": (int, nat64, nat64) -> (Round);
+    "debug_latest_round_id": () -> (nat) query;
+    "debug_round": (nat) -> (Round) query;
+    "debug_rounds_length": () -> (nat) query;
+    "debug_synced_latest_round_id": () -> (nat) query;
+}
