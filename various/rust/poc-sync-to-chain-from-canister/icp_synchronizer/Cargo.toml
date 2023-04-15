@@ -1,5 +1,6 @@
 [workspace]
 members = [
     # "src/rate_v1",
-    "src/synchronizer_v0",
+    # "src/synchronizer_v0",
+    "src/synchronizer_v1",
 ]
