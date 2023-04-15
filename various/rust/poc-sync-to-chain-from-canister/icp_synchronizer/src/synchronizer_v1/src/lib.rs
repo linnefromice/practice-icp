@@ -3,7 +3,7 @@ mod utils;
 use std::{str::FromStr, sync::atomic::{AtomicU64, Ordering}};
 use candid::CandidType;
 use ic_cdk::{query, update, api::management_canister::http_request::{TransformArgs, HttpResponse}};
-use ic_web3::{Web3, types::{Address, SignedTransaction, U64}, transports::ICHttp, contract::{Contract, Options, tokens::Tokenize}, ic::{get_eth_addr, KeyInfo}};
+use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::Tokenize}, ic::{get_eth_addr, KeyInfo}};
 use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID};
 
 // Oracle
@@ -175,6 +175,70 @@ async fn debug_update_state_signed_tx(
             }),
         Err(msg) => Err(msg)
     }
+}
+#[update]
+async fn debug_balance_of_native() -> Result<String, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string())
+        .await
+        .map_err(|e| format!("get_eth_addr failed: {}", e))?;
+    let balance = w3.eth()
+        .balance(canister_addr, None)
+        .await
+        .map_err(|e| format!("get balance failed: {}", e))?;
+    Ok(balance.to_string())
+}
+#[update]
+async fn debug_transfer_native(to: String, value: u64) -> Result<String, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string()).await
+        .map_err(|e| format!("get_eth_addr failed: {}", e))?;
+
+    let tx_count = w3.eth()
+        .transaction_count(canister_addr, None)
+        .await
+        .map_err(|e| format!("get tx count error: {}", e))?;
+    let gas_price = w3.eth()
+        .gas_price()
+        .await
+        .map_err(|e| format!("get gas_price error: {}", e))?;
+    let to = Address::from_str(&to).unwrap();
+    let tx = TransactionParameters {
+        to: Some(to),
+        nonce: Some(tx_count), // remember to fetch nonce first
+        value: U256::from(value),
+        gas_price: Some(gas_price),
+        gas: U256::from(21000),
+        ..Default::default()
+    };
+    let signed_tx = w3.accounts()
+        .sign_transaction(
+            tx,
+            hex::encode(canister_addr),
+            KeyInfo { derivation_path: vec![default_derivation_key()], key_name: KEY_NAME.to_string() },
+            CHAIN_ID
+        )
+        .await
+        .map_err(|e| format!("sign tx error: {}", e))?;
+    match w3.eth().send_raw_transaction(signed_tx.raw_transaction).await {
+        Ok(txhash) => {
+            ic_cdk::println!("txhash: {}", hex::encode(txhash.0));
+            Ok(format!("{}", hex::encode(txhash.0)))
+        },
+        Err(e) => { Err(e.to_string()) },
+    }
+}
+#[update]
+async fn debug_gas_price() -> Result<String, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let gas_price = w3.eth()
+        .gas_price()
+        .await
+        .map_err(|e| format!("get gas_price error: {}", e))?;
+    Ok(gas_price.to_string())
 }
 
 #[query]

@@ -15,6 +15,9 @@ service : {
     "update_state": (nat, int, nat, nat) -> (variant { Ok : text; Err : text });
     "debug_oracle_latest_round_id": () -> (variant { Ok : nat; Err : text });
     "debug_update_state_signed_tx": (nat, int, nat, nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
+    "debug_balance_of_native": () -> (variant { Ok : text; Err : text });
+    "debug_gas_price": () -> (variant { Ok : text; Err : text });
+    "debug_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });
     "debug_rpc_endpoint": () -> (text) query;
     "debug_account_info": () -> (variant { Ok : AccountInfo; Err : text });
 }
