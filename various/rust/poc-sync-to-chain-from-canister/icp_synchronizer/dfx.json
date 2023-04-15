@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "rate_v1": {
+    "synchronizer_v0": {
       "type": "rust",
-      "package": "rate_v1",
-      "candid": "src/rate_v1/rate_v1.did"
+      "package": "synchronizer_v0",
+      "candid": "src/synchronizer_v0/synchronizer_v0.did"
     }
   },
   "defaults": {

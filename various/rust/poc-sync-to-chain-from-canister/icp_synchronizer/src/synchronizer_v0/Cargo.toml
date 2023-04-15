@@ -1,5 +1,5 @@
 [package]
-name = "synchronizer_v1"
+name = "synchronizer_v0"
 version = "0.1.0"
 edition = "2021"
 
