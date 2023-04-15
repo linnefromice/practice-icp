@@ -2,7 +2,7 @@ mod utils;
 
 use std::{str::FromStr, ops::{Mul, Div}, cell::RefCell};
 use candid::CandidType;
-use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse}, self}};
+use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse}, self}, spawn};
 use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::Tokenize}, ic::{get_eth_addr, KeyInfo}};
 use ic_cdk_timers::TimerId;
 use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID};
@@ -59,11 +59,27 @@ fn update_state_internal(answer: i128, started_at: u64, updated_at: u64) -> Roun
 }
 
 #[update]
-async fn periodic_sync_state() {
-    periodic_sync_state_internal(10, 1)
+async fn periodic_sync_state(
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>
+) {
+    periodic_sync_state_internal(
+        60,
+        1,
+        gas_coefficient_molecule,
+        gas_coefficient_denominator,
+        gas_limit
+    )
 }
 
-fn periodic_sync_state_internal(interval_secs: u64, max_run_unit: u128) {
+fn periodic_sync_state_internal(
+    interval_secs: u64,
+    max_run_unit: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>
+) {
     let interval = std::time::Duration::from_secs(interval_secs);
     let max_run_unit_owned = std::sync::Arc::new(max_run_unit);
 
@@ -80,7 +96,22 @@ fn periodic_sync_state_internal(interval_secs: u64, max_run_unit: u128) {
 
         for i in 0..run_unit {
             let round = get_round(synced_latest_round_id+1+i-1);
-            ic_cdk::println!("sync round: {:?}", round);
+            ic_cdk::println!("syncing round: {:?}", round);
+            spawn(async move {
+                let res = sync_state(
+                    round.round_id,
+                    round.answer,
+                    round.started_at.into(),
+                    round.updated_at.into(),
+                    gas_coefficient_molecule,
+                    gas_coefficient_denominator,
+                    gas_limit
+                ).await;
+                match res {
+                    Ok(hash) => ic_cdk::println!("txhash: {:?}", hash),
+                    Err(msg) => ic_cdk::println!("error msg: {:?}", msg),
+                }
+            });
         }
 
         SYNCED_LATEST_ROUND_ID.with(|value| *value.borrow_mut() += run_unit);
@@ -109,8 +140,8 @@ async fn sync_state(
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
     updated_at: u128, // TODO: u256
-    gas_coefficient_molecule: u128,
-    gas_coefficient_denominator: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
     gas_limit: Option<u128>
 ) -> Result<String, String> {
     let w3 = generate_web3_client()
@@ -137,8 +168,8 @@ async fn sync_state_signed_tx_internal(
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
     updated_at: u128, // TODO: u256
-    gas_coefficient_molecule: u128,
-    gas_coefficient_denominator: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
     gas_limit: Option<u128>,
 ) -> Result<SignedTransaction, String> {
     sign(
@@ -147,7 +178,7 @@ async fn sync_state_signed_tx_internal(
         &ORACLE_ABI,
         &"updateState",
         (id,answer,started_at,updated_at,),
-        (gas_coefficient_molecule, gas_coefficient_denominator),
+        if gas_coefficient_molecule.is_some() && gas_coefficient_denominator.is_some() { Some((gas_coefficient_molecule.unwrap(), gas_coefficient_denominator.unwrap())) } else { None },
         gas_limit
     ).await
 }
@@ -158,7 +189,7 @@ async fn sign(
     abi: &[u8],
     func: &str,
     params: impl Tokenize,
-    gas_coefficient: (u128, u128),
+    gas_coefficient: Option<(u128, u128)>,
     gas_limit: Option<u128>,
 ) -> Result<SignedTransaction, String> {
     let contract = generate_contract_client(w3.clone(), contract_addr, abi)
@@ -176,8 +207,13 @@ async fn sign(
         .map_err(|e| format!("get gas_price error: {}", e))?;
     let options = Options::with(|op| {
         op.nonce = Some(tx_count);
-        op.gas_price = Some(gas_price.mul(U256::from(gas_coefficient.0)).div(U256::from(gas_coefficient.1)));
         op.transaction_type = Some(U64::from(2)); // EIP1559_TX_ID
+        if gas_coefficient.is_some() {
+            let gas_coefficient_value = gas_coefficient.unwrap();
+            op.gas_price = Some(gas_price.mul(U256::from(gas_coefficient_value.0)).div(U256::from(gas_coefficient_value.1)));
+        } else {
+            op.gas_price = Some(gas_price);
+        }
 
         // temp
         if let Some(gas_limit_value) = gas_limit {
@@ -238,8 +274,8 @@ async fn debug_sync_state_signed_tx(
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
     updated_at: u128, // TODO: u256
-    gas_coefficient_molecule: u128,
-    gas_coefficient_denominator: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
     gas_limit: Option<u128>,
 ) -> Result<CandidSignedTransaction, String> {
     let w3 = generate_web3_client()
@@ -272,10 +308,14 @@ async fn debug_sync_state_estimate_gas(
     answer: i128, // TODO: i256
     started_at: u128, // TODO: u256
     updated_at: u128, // TODO: u256
-    gas_coefficient_molecule: u128,
-    gas_coefficient_denominator: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
 ) -> Result<String, String> {
-    let gas_coefficient = (gas_coefficient_molecule, gas_coefficient_denominator);
+    let gas_coefficient = if gas_coefficient_molecule.is_some() && gas_coefficient_denominator.is_some() {
+        Some((gas_coefficient_molecule.unwrap(), gas_coefficient_denominator.unwrap()))
+    } else {
+        None
+    };
 
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
@@ -294,8 +334,13 @@ async fn debug_sync_state_estimate_gas(
         .map_err(|e| format!("get gas_price error: {}", e))?;
     let options = Options::with(|op| {
         op.nonce = Some(tx_count);
-        op.gas_price = Some(gas_price.mul(U256::from(gas_coefficient.0)).div(U256::from(gas_coefficient.1)));
-        op.transaction_type = Some(U64::from(2)) // EIP1559_TX_ID
+        op.transaction_type = Some(U64::from(2)); // EIP1559_TX_ID
+        if gas_coefficient.is_some() {
+            let gas_coefficient_value = gas_coefficient.unwrap();
+            op.gas_price = Some(gas_price.mul(U256::from(gas_coefficient_value.0)).div(U256::from(gas_coefficient_value.1)));
+        } else {
+            op.gas_price = Some(gas_price);
+        }
     });
 
     let estimated_gas = contract.estimate_gas(&"updateState", (id,answer,started_at,updated_at,), canister_addr, options)
@@ -411,8 +456,20 @@ fn debug_synced_latest_round_id() -> u128 {
     get_synced_latest_round_id()
 }
 #[update]
-fn debug_periodic_sync_state(interval_secs: u64, max_run_unit: u128) {
-    periodic_sync_state_internal(interval_secs, max_run_unit)
+fn debug_periodic_sync_state(
+    interval_secs: u64,
+    max_run_unit: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>
+) {
+    periodic_sync_state_internal(
+        interval_secs,
+        max_run_unit,
+        gas_coefficient_molecule,
+        gas_coefficient_denominator,
+        gas_limit
+    )
 }
 #[update]
 fn debug_stop_timer() {

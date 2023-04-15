@@ -18,11 +18,11 @@ type CandidSignedTransaction = record {
 };
 service : {
     "update_state": (int) -> (Round);
-    "periodic_sync_state": () -> ();
-    "sync_state": (nat, int, nat, nat, nat, nat, opt nat) -> (variant { Ok : text; Err : text });
+    "periodic_sync_state": (opt nat, opt nat, opt nat) -> ();
+    "sync_state": (nat, int, nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
     "debug_oracle_latest_round_id": () -> (variant { Ok : nat; Err : text });
-    "debug_sync_state_signed_tx": (nat, int, nat, nat, nat, nat, opt nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
-    "debug_sync_state_estimate_gas": (nat, int, nat, nat, nat, nat) -> (variant { Ok : text; Err : text });
+    "debug_sync_state_signed_tx": (nat, int, nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
+    "debug_sync_state_estimate_gas": (nat, int, nat, nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
     "debug_balance_of_native": () -> (variant { Ok : text; Err : text });
     "debug_gas_price": () -> (variant { Ok : text; Err : text });
     "debug_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });
@@ -33,6 +33,6 @@ service : {
     "debug_round": (nat) -> (Round) query;
     "debug_rounds_length": () -> (nat) query;
     "debug_synced_latest_round_id": () -> (nat) query;
-    "debug_periodic_sync_state": (nat64, nat) -> ();
+    "debug_periodic_sync_state": (nat64, nat, opt nat, opt nat, opt nat) -> ();
     "debug_stop_timer": () -> ();
 }
