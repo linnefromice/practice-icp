@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "synchronizer_v1": {
+    "synchronizer_v2": {
       "type": "rust",
-      "package": "synchronizer_v1",
-      "candid": "src/synchronizer_v1/synchronizer_v1.did"
+      "package": "synchronizer_v2",
+      "candid": "src/synchronizer_v2/synchronizer_v2.did"
     }
   },
   "defaults": {
