@@ -1,6 +1,6 @@
 import { task } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { OracleV1__factory } from "../../typechain-types";
+import { OracleV1__factory, OracleV2__factory } from "../../typechain-types";
 
 task("deploy:oraclev1", "deploy:oraclev1")
   .addOptionalParam("deployer", "deployer")
@@ -52,7 +52,7 @@ task("deploy:oraclev2", "deploy:oraclev2")
         : (await ethers.getSigners())[0];
 
       // Deployment
-      const contract = await new OracleV1__factory(_deployer).deploy();
+      const contract = await new OracleV2__factory(_deployer).deploy();
       console.log(`deployed tx: ${contract.deployTransaction.hash}`);
       await contract.deployed();
       console.log(`deployed! address: ${contract.address}`);
