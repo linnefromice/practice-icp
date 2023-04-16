@@ -27,9 +27,7 @@ contract OracleV2 {
     uint256 public latestRoundId;
     mapping(uint256 => Round) public rounds; // roundId -> Round
 
-    function updateStates(
-        RoundArgument[] memory _rounds
-    ) public {
+    function updateStates(RoundArgument[] memory _rounds) public {
         uint256 size = _rounds.length;
         for (uint i = 0; i < size; i++) {
             RoundArgument memory _round = _rounds[i];

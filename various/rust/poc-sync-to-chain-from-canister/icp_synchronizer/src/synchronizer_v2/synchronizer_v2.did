@@ -20,9 +20,11 @@ service : {
     "update_state": (int) -> (Round);
     "periodic_sync_state": (opt nat, opt nat, opt nat) -> ();
     "sync_state": (nat, int, nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
+    "sync_state_bulk": (nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
     "debug_oracle_latest_round_id": () -> (variant { Ok : nat; Err : text });
     "debug_sync_state_signed_tx": (nat, int, nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
     "debug_sync_state_estimate_gas": (nat, int, nat, nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
+    "debug_sync_state_bulk_signed_tx": (nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
     "debug_balance_of_native": () -> (variant { Ok : text; Err : text });
     "debug_gas_price": () -> (variant { Ok : text; Err : text });
     "debug_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });

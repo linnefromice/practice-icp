@@ -3,13 +3,13 @@ mod utils;
 use std::{str::FromStr, ops::{Mul, Div}, cell::RefCell};
 use candid::CandidType;
 use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse}, self}, spawn};
-use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::Tokenize}, ic::{get_eth_addr, KeyInfo}};
+use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::{Tokenize, Tokenizable}, Error}, ic::{get_eth_addr, KeyInfo}, ethabi::Token};
 use ic_cdk_timers::TimerId;
 use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID};
 
 // Oracle
-const ORACLE_ADDR: &'static str = "af974dfd33cb1105710eddbb8f30f1ba3c994da1"; // remove 0x
-const ORACLE_ABI: &[u8] = include_bytes!("../../abi/OracleV1.json");
+const ORACLE_ADDR: &'static str = "8E7d7C9dD03f76CCaDEB1729C6B0F644145837Cb"; // remove 0x
+const ORACLE_ABI: &[u8] = include_bytes!("../../abi/OracleV2.json");
 
 #[derive(CandidType)]
 struct AccountInfo {
@@ -17,12 +17,64 @@ struct AccountInfo {
     pub pub_key: String
 }
 
-#[derive(Clone, Debug, Default, CandidType)]
+#[derive(Copy, Clone, Debug, Default, CandidType)]
 pub struct Round {
     pub round_id: u128,
     pub answer: i128,
     pub started_at: u64,
     pub updated_at: u64
+}
+
+impl Tokenizable for Round {
+    fn from_token(token: ic_web3::ethabi::Token) -> Result<Self, ic_web3::contract::Error>
+        where
+            Self: Sized {
+        match token {
+            Token::Tuple(tokens) => {
+                let round_id = tokens
+                    .get(0)
+                    .and_then(|v| { Token::into_uint(v.clone()) })
+                    .unwrap()
+                    .as_u128();
+
+                let answer = tokens
+                    .get(1)
+                    .and_then(|v| { Token::into_int(v.clone()) })
+                    .unwrap()
+                    .as_u128() as i128; // temp
+
+                let started_at = tokens
+                    .get(2)
+                    .and_then(|v| { Token::into_uint(v.clone()) })
+                    .unwrap()
+                    .as_u64();
+
+                let updated_at = tokens
+                    .get(3)
+                    .and_then(|v| { Token::into_uint(v.clone()) })
+                    .unwrap()
+                    .as_u64();
+
+                Ok(Self {
+                    round_id,
+                    answer,
+                    started_at,
+                    updated_at,
+                })
+            },
+            other => Err(Error::InvalidOutputType(format!("Expected `Tuple`, got {:?}", other))),
+        }
+
+    }
+
+    fn into_token(self) -> Token {
+        Token::Tuple(vec![
+            Token::Uint(self.round_id.into()),
+            Token::Int(self.answer.into()),
+            Token::Uint(self.started_at.into()),
+            Token::Uint(self.updated_at.into()),
+        ])
+    }
 }
 
 thread_local! {
@@ -94,6 +146,7 @@ fn periodic_sync_state_internal(
         let not_synced = latest_round_id - synced_latest_round_id;
         let run_unit = if not_synced > *max_run_unit_owned { *max_run_unit_owned } else { not_synced };
 
+        // TODO: use `sync_state_bulk`
         for i in 0..run_unit {
             let round = get_round(synced_latest_round_id+1+i-1);
             ic_cdk::println!("syncing round: {:?}", round);
@@ -183,6 +236,52 @@ async fn sync_state_signed_tx_internal(
     ).await
 }
 
+#[update]
+async fn sync_state_bulk(
+    from_id: u128,
+    count: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>
+) -> Result<String, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let signed_tx = sync_state_bulk_signed_tx_internal(
+        w3.clone(),
+        get_rounds(from_id, count),
+        gas_coefficient_molecule,
+        gas_coefficient_denominator,
+        gas_limit
+    ).await?;
+    match w3.eth().send_raw_transaction(signed_tx.raw_transaction).await {
+        Ok(v) => Ok(format!("0x{}", hex::encode(v))),
+        Err(msg) => Err(format!("send_raw_transaction failed: {}", msg))
+    }
+}
+
+async fn sync_state_bulk_signed_tx_internal(
+    w3: Web3<ICHttp>,
+    rounds: Vec<Round>,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>,
+) -> Result<SignedTransaction, String> {
+    let tokens = rounds.iter()
+        .map(|round| (*round).into_token())
+        .collect::<Vec<Token>>();
+
+    sign(
+        w3,
+        &ORACLE_ADDR,
+        &ORACLE_ABI,
+        &"updateStates",
+        Token::Array(tokens),
+        if gas_coefficient_molecule.is_some() && gas_coefficient_denominator.is_some() { Some((gas_coefficient_molecule.unwrap(), gas_coefficient_denominator.unwrap())) } else { None },
+        gas_limit
+    ).await
+}
+
+
 async fn sign(
     w3: Web3<ICHttp>,
     contract_addr: &str,
@@ -237,6 +336,15 @@ async fn sign(
         Ok(v) => Ok(v),
         Err(msg) => Err(format!("sign failed: {}", msg))
     }
+}
+
+fn get_rounds(from_id: u128, count: u128) -> Vec<Round> {
+    let mut result: Vec<Round> = Vec::<Round>::new();
+    for i in 0..count {
+        let round = get_round(from_id - 1 + i);
+        result.push(round);
+    }
+    result
 }
 
 fn generate_contract_client(w3: Web3<ICHttp>, contract_addr: &str, abi: &[u8]) -> Result<Contract<ICHttp>, String> {
@@ -350,6 +458,36 @@ async fn debug_sync_state_estimate_gas(
 }
 
 #[update]
+async fn debug_sync_state_bulk_signed_tx(
+    from_id: u128,
+    count: u128,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>,
+) -> Result<CandidSignedTransaction, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    match sync_state_bulk_signed_tx_internal(
+        w3.clone(),
+        get_rounds(from_id, count),
+        gas_coefficient_molecule,
+        gas_coefficient_denominator,
+        gas_limit
+    ).await {
+        Ok(signed_tx) =>
+            Ok(CandidSignedTransaction {
+                message_hash: format!("0x{}", hex::encode(signed_tx.message_hash)),
+                v: signed_tx.v,
+                r: format!("0x{}", hex::encode(signed_tx.r)),
+                s: format!("0x{}", hex::encode(signed_tx.s)),
+                raw_transaction: format!("0x{}", hex::encode(signed_tx.raw_transaction.0)),
+                transaction_hash: format!("0x{}", hex::encode(signed_tx.transaction_hash)),
+            }),
+        Err(msg) => Err(msg)
+    }
+}
+
+#[update]
 async fn debug_balance_of_native() -> Result<String, String> {
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
@@ -437,6 +575,10 @@ async fn debug_account_info() -> Result<AccountInfo, String> {
 #[update]
 fn debug_update_state(answer: i128, started_at: u64, updated_at: u64) -> Round {
     update_state_internal(answer, started_at, updated_at)
+}
+#[update]
+fn debug_clean_state() {
+    todo!()
 }
 
 #[query]
