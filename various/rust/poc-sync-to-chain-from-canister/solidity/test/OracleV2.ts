@@ -30,4 +30,21 @@ describe("OracleV2", () => {
     expect(round.startedAt.toString()).eq(currentTime.toString());
     expect(round.updatedAt.toString()).eq(currentTime.toString());
   });
+  it(".debug_cleanState", async () => {
+    const { oracle } = await setup();
+    const currentTime = await time.latest();
+    await oracle.updateState(1, 100, currentTime, currentTime);
+    await oracle.updateState(2, 120, currentTime + 1, currentTime + 1);
+    await oracle.updateState(3, 140, currentTime + 2, currentTime + 2);
+    expect((await oracle.latestRoundId()).toString()).eq("3");
+    expect((await oracle.rounds(1)).answer.toString()).eq("100");
+    expect((await oracle.rounds(2)).answer.toString()).eq("120");
+    expect((await oracle.rounds(3)).answer.toString()).eq("140");
+
+    await oracle.debug_cleanState();
+    expect((await oracle.latestRoundId()).toString()).eq("0");
+    expect((await oracle.rounds(1)).answer.toString()).eq("0");
+    expect((await oracle.rounds(2)).answer.toString()).eq("0");
+    expect((await oracle.rounds(3)).answer.toString()).eq("0");
+  });
 });
