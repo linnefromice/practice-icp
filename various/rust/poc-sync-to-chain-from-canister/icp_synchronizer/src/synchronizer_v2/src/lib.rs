@@ -83,25 +83,20 @@ fn periodic_sync_state_internal(
         let run_unit = if not_synced > *max_run_unit_owned { *max_run_unit_owned } else { not_synced };
 
         // TODO: use `sync_state_bulk`
-        for i in 0..run_unit {
-            let round = get_round(synced_latest_round_id+1+i-1);
-            ic_cdk::println!("syncing round: {:?}", round);
-            spawn(async move {
-                let res = sync_state(
-                    round.round_id,
-                    round.answer,
-                    round.started_at.into(),
-                    round.updated_at.into(),
-                    gas_coefficient_molecule,
-                    gas_coefficient_denominator,
-                    gas_limit
-                ).await;
-                match res {
-                    Ok(hash) => ic_cdk::println!("txhash: {:?}", hash),
-                    Err(msg) => ic_cdk::println!("error msg: {:?}", msg),
-                }
-            });
-        }
+        ic_cdk::println!("syncing rounds: from_id = {:?}, run_unit = {:?}", synced_latest_round_id + 1, run_unit);
+        spawn(async move {
+            let res = sync_state_bulk(
+                synced_latest_round_id + 1,
+                run_unit,
+                gas_coefficient_molecule,
+                gas_coefficient_denominator,
+                gas_limit
+            ).await;
+            match res {
+                Ok(hash) => ic_cdk::println!("txhash: {:?}", hash),
+                Err(msg) => ic_cdk::println!("error msg: {:?}", msg),
+            }
+        });
 
         SYNCED_LATEST_ROUND_ID.with(|value| *value.borrow_mut() += run_unit);
         ic_cdk::println!("[FINISH] Synchronization");
