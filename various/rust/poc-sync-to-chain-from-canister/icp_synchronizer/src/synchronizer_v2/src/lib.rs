@@ -514,7 +514,9 @@ fn debug_update_state(answer: i128, started_at: u64, updated_at: u64) -> Round {
 }
 #[update]
 fn debug_clean_state() {
-    todo!()
+    ROUNDS.with(|rounds| *rounds.borrow_mut() = Vec::new());
+    LATEST_ROUND_ID.with(|value| *value.borrow_mut() = 0);
+    SYNCED_LATEST_ROUND_ID.with(|value| *value.borrow_mut() = 0);
 }
 
 #[query]
