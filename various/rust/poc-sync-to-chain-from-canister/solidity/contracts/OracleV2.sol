@@ -42,4 +42,11 @@ contract OracleV2 {
             _updatedAt
         );
     }
+    
+    function debug_cleanState() public {
+        for (uint i = 0; i <= latestRoundId; i++) {
+            delete rounds[i];
+        }
+        latestRoundId = 0;
+    }
 }
