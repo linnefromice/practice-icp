@@ -30,6 +30,60 @@ describe("OracleV2", () => {
     expect(round.startedAt.toString()).eq(currentTime.toString());
     expect(round.updatedAt.toString()).eq(currentTime.toString());
   });
+  it(".updateStates", async () => {
+    const { oracle } = await setup();
+    const currentTime = await time.latest();
+
+    await oracle.updateStates([
+      {
+        roundId: 1,
+        answer: 100,
+        startedAt: currentTime,
+        updatedAt: currentTime,
+      },
+      {
+        roundId: 2,
+        answer: 120,
+        startedAt: currentTime + 1,
+        updatedAt: currentTime + 1,
+      },
+      {
+        roundId: 3,
+        answer: 140,
+        startedAt: currentTime + 2,
+        updatedAt: currentTime + 2,
+      },
+    ]);
+    expect((await oracle.latestRoundId()).toString()).eq("3");
+    expect((await oracle.rounds(1)).answer.toString()).eq("100");
+    expect((await oracle.rounds(2)).answer.toString()).eq("120");
+    expect((await oracle.rounds(3)).answer.toString()).eq("140");
+    expect((await oracle.rounds(4)).answer.toString()).eq("0");
+    expect((await oracle.rounds(5)).answer.toString()).eq("0");
+    expect((await oracle.rounds(6)).answer.toString()).eq("0");
+
+    await oracle.updateStates([
+      {
+        roundId: 4,
+        answer: 160,
+        startedAt: currentTime + 3,
+        updatedAt: currentTime + 3,
+      },
+      {
+        roundId: 5,
+        answer: 180,
+        startedAt: currentTime + 4,
+        updatedAt: currentTime + 4,
+      },
+    ]);
+    expect((await oracle.latestRoundId()).toString()).eq("5");
+    expect((await oracle.rounds(1)).answer.toString()).eq("100");
+    expect((await oracle.rounds(2)).answer.toString()).eq("120");
+    expect((await oracle.rounds(3)).answer.toString()).eq("140");
+    expect((await oracle.rounds(4)).answer.toString()).eq("160");
+    expect((await oracle.rounds(5)).answer.toString()).eq("180");
+    expect((await oracle.rounds(6)).answer.toString()).eq("0");
+  });
   it(".debug_cleanState", async () => {
     const { oracle } = await setup();
     const currentTime = await time.latest();

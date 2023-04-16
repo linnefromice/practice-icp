@@ -10,6 +10,12 @@ contract OracleV2 {
         uint256 startedAt;
         uint256 updatedAt;
     }
+    struct RoundArgument {
+        uint256 roundId;
+        int256 answer;
+        uint256 startedAt;
+        uint256 updatedAt;
+    }
 
     event UpdateState(
         uint256 roundId,
@@ -20,6 +26,21 @@ contract OracleV2 {
 
     uint256 public latestRoundId;
     mapping(uint256 => Round) public rounds; // roundId -> Round
+
+    function updateStates(
+        RoundArgument[] memory _rounds
+    ) public {
+        uint256 size = _rounds.length;
+        for (uint i = 0; i < size; i++) {
+            RoundArgument memory _round = _rounds[i];
+            updateState(
+                _round.roundId,
+                _round.answer,
+                _round.startedAt,
+                _round.updatedAt
+            );
+        }
+    }
 
     function updateState(
         uint256 _latestRoundId,
