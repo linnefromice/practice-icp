@@ -1,81 +1,17 @@
+mod types;
 mod utils;
 
 use std::{str::FromStr, ops::{Mul, Div}, cell::RefCell};
 use candid::CandidType;
 use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse}, self}, spawn};
-use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::{Tokenize, Tokenizable}, Error}, ic::{get_eth_addr, KeyInfo}, ethabi::Token};
+use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::{Tokenize, Tokenizable}}, ic::{get_eth_addr, KeyInfo}, ethabi::Token};
 use ic_cdk_timers::TimerId;
 use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID};
+use types::{AccountInfo, Round};
 
 // Oracle
 const ORACLE_ADDR: &'static str = "8E7d7C9dD03f76CCaDEB1729C6B0F644145837Cb"; // remove 0x
 const ORACLE_ABI: &[u8] = include_bytes!("../../abi/OracleV2.json");
-
-#[derive(CandidType)]
-struct AccountInfo {
-    pub address: String,
-    pub pub_key: String
-}
-
-#[derive(Copy, Clone, Debug, Default, CandidType)]
-pub struct Round {
-    pub round_id: u128,
-    pub answer: i128,
-    pub started_at: u64,
-    pub updated_at: u64
-}
-
-impl Tokenizable for Round {
-    fn from_token(token: ic_web3::ethabi::Token) -> Result<Self, ic_web3::contract::Error>
-        where
-            Self: Sized {
-        match token {
-            Token::Tuple(tokens) => {
-                let round_id = tokens
-                    .get(0)
-                    .and_then(|v| { Token::into_uint(v.clone()) })
-                    .unwrap()
-                    .as_u128();
-
-                let answer = tokens
-                    .get(1)
-                    .and_then(|v| { Token::into_int(v.clone()) })
-                    .unwrap()
-                    .as_u128() as i128; // temp
-
-                let started_at = tokens
-                    .get(2)
-                    .and_then(|v| { Token::into_uint(v.clone()) })
-                    .unwrap()
-                    .as_u64();
-
-                let updated_at = tokens
-                    .get(3)
-                    .and_then(|v| { Token::into_uint(v.clone()) })
-                    .unwrap()
-                    .as_u64();
-
-                Ok(Self {
-                    round_id,
-                    answer,
-                    started_at,
-                    updated_at,
-                })
-            },
-            other => Err(Error::InvalidOutputType(format!("Expected `Tuple`, got {:?}", other))),
-        }
-
-    }
-
-    fn into_token(self) -> Token {
-        Token::Tuple(vec![
-            Token::Uint(self.round_id.into()),
-            Token::Int(self.answer.into()),
-            Token::Uint(self.started_at.into()),
-            Token::Uint(self.updated_at.into()),
-        ])
-    }
-}
 
 thread_local! {
     static LATEST_ROUND_ID: RefCell<u128> = RefCell::default();
