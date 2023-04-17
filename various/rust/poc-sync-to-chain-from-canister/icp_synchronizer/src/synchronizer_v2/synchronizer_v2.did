@@ -38,4 +38,6 @@ service : {
     "debug_synced_latest_round_id": () -> (nat) query;
     "debug_periodic_sync_state": (nat64, nat, opt nat, opt nat, opt nat) -> ();
     "debug_stop_timer": () -> ();
+    "debug_get_oracle_addr": () -> (text) query;
+    "debug_update_oracle_addr": (text) -> (text);
 }

@@ -10,14 +10,16 @@ use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, 
 use types::{AccountInfo, Round};
 
 // Oracle
-const ORACLE_ADDR: &'static str = "8E7d7C9dD03f76CCaDEB1729C6B0F644145837Cb"; // remove 0x
+const DEFAULT_ORACLE_ADDR: &'static str = "8E7d7C9dD03f76CCaDEB1729C6B0F644145837Cb"; // remove 0x
 const ORACLE_ABI: &[u8] = include_bytes!("../../abi/OracleV2.json");
 
 thread_local! {
     static LATEST_ROUND_ID: RefCell<u128> = RefCell::default();
     static ROUNDS: RefCell<Vec<Round>> = RefCell::default();
     static SYNCED_LATEST_ROUND_ID: RefCell<u128> = RefCell::default();
-    static TIMER_ID: RefCell<TimerId> = RefCell::default(); // for debug
+     // for debug
+    static TIMER_ID: RefCell<TimerId> = RefCell::default();
+    static ORACLE_ADDR: RefCell<String> = RefCell::new(String::from(DEFAULT_ORACLE_ADDR))
 }
 
 #[query]
@@ -158,7 +160,7 @@ async fn sync_state_signed_tx_internal(
 ) -> Result<SignedTransaction, String> {
     sign(
         w3,
-        &ORACLE_ADDR,
+        &oracle_addr(),
         &ORACLE_ABI,
         &"updateState",
         (id,answer,started_at,updated_at,),
@@ -203,7 +205,7 @@ async fn sync_state_bulk_signed_tx_internal(
 
     sign(
         w3,
-        &ORACLE_ADDR,
+        &oracle_addr(),
         &ORACLE_ABI,
         &"updateStates",
         Token::Array(tokens),
@@ -287,6 +289,10 @@ fn generate_contract_client(w3: Web3<ICHttp>, contract_addr: &str, abi: &[u8]) -
     ).map_err(|e| format!("init contract failed: {}", e))
 }
 
+fn oracle_addr() -> String {
+    ORACLE_ADDR.with(|val| val.borrow().clone())
+}
+
 #[derive(CandidType)]
 struct CandidSignedTransaction {
     pub message_hash: String,
@@ -300,7 +306,7 @@ struct CandidSignedTransaction {
 async fn debug_oracle_latest_round_id() -> Result<u128, String> {
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
-    let contract = generate_contract_client(w3, ORACLE_ADDR, ORACLE_ABI)?;
+    let contract = generate_contract_client(w3, &oracle_addr(), ORACLE_ABI)?;
     
     contract
         .query("latestRoundId", (), None, Options::default(), None)
@@ -358,7 +364,7 @@ async fn debug_sync_state_estimate_gas(
 
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
-    let contract = generate_contract_client(w3.clone(), &ORACLE_ADDR, &ORACLE_ABI)
+    let contract = generate_contract_client(w3.clone(), &oracle_addr(), &ORACLE_ABI)
     .map_err(|e| format!("generate_contract_client failed: {}", e))?;
     let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string()).await
         .map_err(|e| format!("get_eth_addr failed: {}", e))?;
@@ -550,4 +556,16 @@ fn debug_periodic_sync_state(
 fn debug_stop_timer() {
     let timer_id = TIMER_ID.with(|value| value.borrow().clone());
     ic_cdk_timers::clear_timer(timer_id);
+}
+#[query]
+fn debug_get_oracle_addr() -> String {
+    oracle_addr()
+}
+#[update]
+fn debug_update_oracle_addr(addr: String) -> String {
+    ORACLE_ADDR.with(|val| {
+        let mut val_mut = val.borrow_mut();
+        *val_mut = addr;
+        val_mut.clone()
+    })
 }
