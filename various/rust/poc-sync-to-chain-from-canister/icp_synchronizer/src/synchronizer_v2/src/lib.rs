@@ -10,7 +10,7 @@ use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, 
 use types::{AccountInfo, Round};
 
 // Oracle
-const DEFAULT_ORACLE_ADDR: &'static str = "8E7d7C9dD03f76CCaDEB1729C6B0F644145837Cb"; // remove 0x
+const DEFAULT_ORACLE_ADDR: &'static str = "44BcA6B1664280A98338695911C36d478435B810"; // remove 0x
 const ORACLE_ABI: &[u8] = include_bytes!("../../abi/OracleV2.json");
 
 thread_local! {
