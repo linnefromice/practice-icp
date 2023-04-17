@@ -3,10 +3,10 @@ mod utils;
 
 use std::{str::FromStr, ops::{Mul, Div}, cell::RefCell};
 use candid::CandidType;
-use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse}, self}, spawn};
+use ic_cdk::{query, update, api::{management_canister::http_request::{TransformArgs, HttpResponse, HttpHeader}, self}, spawn};
 use ic_web3::{Web3, types::{Address, SignedTransaction, U64, U256, TransactionParameters}, transports::ICHttp, contract::{Contract, Options, tokens::{Tokenize, Tokenizable}}, ic::{get_eth_addr, KeyInfo}, ethabi::Token};
 use ic_cdk_timers::TimerId;
-use utils::{get_rpc_endpoint, KEY_NAME, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID};
+use utils::{get_rpc_endpoint, default_derivation_key, get_public_key, pubkey_to_address, generate_web3_client, CHAIN_ID, KN_IN_LOCAL, KN_IN_PROD_FOR_TEST, KN_IN_PROD};
 use types::{AccountInfo, Round};
 
 // Oracle
@@ -19,11 +19,17 @@ thread_local! {
     static SYNCED_LATEST_ROUND_ID: RefCell<u128> = RefCell::default();
      // for debug
     static TIMER_ID: RefCell<TimerId> = RefCell::default();
-    static ORACLE_ADDR: RefCell<String> = RefCell::new(String::from(DEFAULT_ORACLE_ADDR))
+    static ORACLE_ADDR: RefCell<String> = RefCell::new(String::from(DEFAULT_ORACLE_ADDR));
+    static KEY_NAME: RefCell<String> = RefCell::new(String::from(KN_IN_LOCAL));
 }
 
 #[query]
 fn transform(response: TransformArgs) -> HttpResponse {
+    // ic_cdk::println!("{}", response.response.status);
+    // let body: Value = serde_json::from_slice(&response.response.body).unwrap();
+    // ic_cdk::println!("{:?}", body);
+    // let headers : &Vec<HttpHeader> = &response.response.headers;
+    // ic_cdk::println!("{:?}", headers);
     response.response
 }
 
@@ -226,7 +232,7 @@ async fn sign(
 ) -> Result<SignedTransaction, String> {
     let contract = generate_contract_client(w3.clone(), contract_addr, abi)
         .map_err(|e| format!("generate_contract_client failed: {}", e))?;
-    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string()).await
+    let canister_addr = get_eth_addr(None, None, ecdsa_key_name()).await
         .map_err(|e| format!("get_eth_addr failed: {}", e))?;
 
     let tx_count = w3.eth()
@@ -263,7 +269,7 @@ async fn sign(
         params,
         options,
         hex::encode(canister_addr),
-        KeyInfo { derivation_path: vec![default_derivation_key()], key_name: KEY_NAME.to_string() },
+        KeyInfo { derivation_path: vec![default_derivation_key()], key_name: ecdsa_key_name() },
         CHAIN_ID // TODO: switch chain
     ).await {
         Ok(v) => Ok(v),
@@ -291,6 +297,9 @@ fn generate_contract_client(w3: Web3<ICHttp>, contract_addr: &str, abi: &[u8]) -
 
 fn oracle_addr() -> String {
     ORACLE_ADDR.with(|val| val.borrow().clone())
+}
+fn ecdsa_key_name() -> String {
+    KEY_NAME.with(|val| val.borrow().clone())
 }
 
 #[derive(CandidType)]
@@ -366,7 +375,7 @@ async fn debug_sync_state_estimate_gas(
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
     let contract = generate_contract_client(w3.clone(), &oracle_addr(), &ORACLE_ABI)
     .map_err(|e| format!("generate_contract_client failed: {}", e))?;
-    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string()).await
+    let canister_addr = get_eth_addr(None, None, ecdsa_key_name()).await
         .map_err(|e| format!("get_eth_addr failed: {}", e))?;
 
     let tx_count = w3.eth()
@@ -428,7 +437,7 @@ async fn debug_sync_state_bulk_signed_tx(
 async fn debug_balance_of_native() -> Result<String, String> {
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
-    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string())
+    let canister_addr = get_eth_addr(None, None, ecdsa_key_name())
         .await
         .map_err(|e| format!("get_eth_addr failed: {}", e))?;
     let balance = w3.eth()
@@ -441,7 +450,7 @@ async fn debug_balance_of_native() -> Result<String, String> {
 async fn debug_transfer_native(to: String, value: u64) -> Result<String, String> {
     let w3 = generate_web3_client()
         .map_err(|e| format!("generate_web3_client failed: {}", e))?;
-    let canister_addr = get_eth_addr(None, None, KEY_NAME.to_string()).await
+    let canister_addr = get_eth_addr(None, None, ecdsa_key_name()).await
         .map_err(|e| format!("get_eth_addr failed: {}", e))?;
 
     let tx_count = w3.eth()
@@ -465,7 +474,7 @@ async fn debug_transfer_native(to: String, value: u64) -> Result<String, String>
         .sign_transaction(
             tx,
             hex::encode(canister_addr),
-            KeyInfo { derivation_path: vec![default_derivation_key()], key_name: KEY_NAME.to_string() },
+            KeyInfo { derivation_path: vec![default_derivation_key()], key_name: ecdsa_key_name() },
             CHAIN_ID
         )
         .await
@@ -495,7 +504,7 @@ fn debug_rpc_endpoint() -> String {
 }
 #[update]
 async fn debug_account_info() -> Result<AccountInfo, String> {
-    let pub_key = get_public_key(None, vec![default_derivation_key()], KEY_NAME.to_string()).await;
+    let pub_key = get_public_key(None, vec![default_derivation_key()], ecdsa_key_name()).await;
     if let Err(msg) = pub_key { return Err(msg) };
     let pub_key = pub_key.unwrap();
 
@@ -568,4 +577,20 @@ fn debug_update_oracle_addr(addr: String) -> String {
         *val_mut = addr;
         val_mut.clone()
     })
+}
+#[query]
+fn debug_get_ecdsa_key_name() -> String {
+    ecdsa_key_name()
+}
+#[update]
+fn debug_use_ecdsa_key_for_local() {
+    KEY_NAME.with(|val| { *val.borrow_mut() = KN_IN_LOCAL.to_string() })
+}
+#[update]
+fn debug_use_ecdsa_key_for_test() {
+    KEY_NAME.with(|val| { *val.borrow_mut() = KN_IN_PROD_FOR_TEST.to_string() })
+}
+#[update]
+fn debug_use_ecdsa_key_for_prod() {
+    KEY_NAME.with(|val| { *val.borrow_mut() = KN_IN_PROD.to_string() })
 }

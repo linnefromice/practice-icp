@@ -17,7 +17,7 @@
   "networks": {
     "mainnet": {
       "providers": ["https://ic0.app"],
-      "wallet": "<your_wallet_canister_id>"
+      "wallet": "5naws-oiaaa-aaaal-qbxuq-cai"
     }
   }
 }
