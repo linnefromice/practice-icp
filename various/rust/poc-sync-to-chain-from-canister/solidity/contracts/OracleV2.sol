@@ -61,6 +61,22 @@ contract OracleV2 {
             _updatedAt
         );
     }
+
+    function debug_getRounds(uint256 from, uint256 count) public view returns(Round[] memory) {
+        Round[] memory _rounds = new Round[](count);
+        for (uint i = 0; i < count; i++) {
+            _rounds[i] = rounds[from + i];
+        }
+        return _rounds;
+    }
+
+    function debug_getRoundsFromIds(uint256[] memory ids) public view returns(Round[] memory) {
+        Round[] memory _rounds = new Round[](ids.length);
+        for (uint i = 0; i < ids.length; i++) {
+            _rounds[i] = rounds[ids[i]];
+        }
+        return _rounds;
+    }
     
     function debug_cleanState() public {
         for (uint i = 0; i <= latestRoundId; i++) {
