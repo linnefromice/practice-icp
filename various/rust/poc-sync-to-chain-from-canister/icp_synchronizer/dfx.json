@@ -13,5 +13,11 @@
       "args": ""
     }
   },
-  "output_env_file": ".env"
+  "output_env_file": ".env",
+  "networks": {
+    "mainnet": {
+      "providers": ["https://ic0.app"],
+      "wallet": "<your_wallet_canister_id>"
+    }
+  }
 }
