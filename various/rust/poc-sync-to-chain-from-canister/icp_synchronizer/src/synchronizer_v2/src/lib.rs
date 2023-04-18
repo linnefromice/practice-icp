@@ -30,7 +30,9 @@ fn transform(response: TransformArgs) -> HttpResponse {
     // ic_cdk::println!("{:?}", body);
     // let headers : &Vec<HttpHeader> = &response.response.headers;
     // ic_cdk::println!("{:?}", headers);
-    response.response
+    let res = response.response;
+    // remove header
+    HttpResponse { status: res.status, headers: Vec::default(), body: res.body }
 }
 
 #[update]
@@ -486,6 +488,18 @@ async fn debug_transfer_native(to: String, value: u64) -> Result<String, String>
         },
         Err(e) => { Err(e.to_string()) },
     }
+}
+#[update]
+async fn debug_tx_count() -> Result<String, String> {
+    let w3 = generate_web3_client()
+        .map_err(|e| format!("generate_web3_client failed: {}", e))?;
+    let canister_addr = get_eth_addr(None, None, ecdsa_key_name()).await
+        .map_err(|e| format!("get_eth_addr failed: {}", e))?;
+    let tx_count = w3.eth()
+        .transaction_count(canister_addr, None)
+        .await
+        .map_err(|e| format!("get tx count error: {}", e))?;
+    Ok(tx_count.to_string())
 }
 #[update]
 async fn debug_gas_price() -> Result<String, String> {

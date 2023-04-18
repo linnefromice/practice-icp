@@ -26,6 +26,7 @@ service : {
     "debug_sync_state_estimate_gas": (nat, int, nat, nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
     "debug_sync_state_bulk_signed_tx": (nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : CandidSignedTransaction; Err : text });
     "debug_balance_of_native": () -> (variant { Ok : text; Err : text });
+    "debug_tx_count": () -> (variant { Ok : text; Err : text });
     "debug_gas_price": () -> (variant { Ok : text; Err : text });
     "debug_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });
     "debug_rpc_endpoint": () -> (text) query;
