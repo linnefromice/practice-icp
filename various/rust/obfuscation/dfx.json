@@ -15,6 +15,11 @@
       "type": "rust",
       "package": "from_binary",
       "candid": "src/from_binary/interface.did"
+    },
+    "from_divided_hex_str": {
+      "type": "rust",
+      "package": "from_divided_hex_str",
+      "candid": "src/from_divided_hex_str/interface.did"
     }
   },
   "defaults": {

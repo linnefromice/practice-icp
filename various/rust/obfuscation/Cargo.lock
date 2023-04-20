@@ -302,6 +302,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "from_divided_hex_str"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "hex",
+ "ic-cdk",
+ "ic-cdk-macros",
+]
+
+[[package]]
 name = "from_hex_str"
 version = "0.1.0"
 dependencies = [

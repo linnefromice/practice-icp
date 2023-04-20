@@ -2,4 +2,6 @@ service : {
     "rpc_endpoint": () -> (text) query;
     "to_hex_str": () -> (text) query;
     "to_bytes": () -> (vec nat8) query;
+    "rpc_endpoint_from_separated": () -> (text) query;
+    "to_hex_str_separeted": () -> (text, text, text, text) query;
 }

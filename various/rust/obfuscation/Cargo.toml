@@ -3,4 +3,5 @@ members = [
     "src/raw_url",
     "src/from_hex_str",
     "src/from_binary",
+    "src/from_divided_hex_str",
 ]
