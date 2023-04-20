@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "src/default_be",
+    "src/single_state",
+    "src/double_state",
+    "src/vec_state"
+]

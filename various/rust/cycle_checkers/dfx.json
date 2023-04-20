@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "canisters": {
+    "default_01": {
+      "type": "rust",
+      "package": "default_be",
+      "candid": "src/default_be/interface.did"
+    },
+    "default_02": {
+      "type": "rust",
+      "package": "default_be",
+      "candid": "src/default_be/interface.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
