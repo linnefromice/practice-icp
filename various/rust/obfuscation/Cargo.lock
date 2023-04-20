@@ -677,6 +677,7 @@ name = "raw_url"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "hex",
  "ic-cdk",
  "ic-cdk-macros",
 ]
