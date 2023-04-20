@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "obfuscation_backend": {
+    "raw_url": {
       "type": "rust",
-      "package": "obfuscation_backend",
-      "candid": "src/obfuscation_backend/obfuscation_backend.did"
+      "package": "raw_url",
+      "candid": "src/raw_url/interface.did"
     }
   },
   "defaults": {
