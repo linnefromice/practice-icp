@@ -6,10 +6,20 @@
       "package": "default_be",
       "candid": "src/default_be/interface.did"
     },
-    "default_02": {
+    "single_state": {
       "type": "rust",
-      "package": "default_be",
-      "candid": "src/default_be/interface.did"
+      "package": "single_state",
+      "candid": "src/single_state/interface.did"
+    },
+    "multi_state": {
+      "type": "rust",
+      "package": "multi_state",
+      "candid": "src/multi_state/interface.did"
+    },
+    "vec_state": {
+      "type": "rust",
+      "package": "vec_state",
+      "candid": "src/vec_state/interface.did"
     }
   },
   "defaults": {
