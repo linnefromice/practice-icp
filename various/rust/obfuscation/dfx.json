@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "obfuscation_backend": {
+      "type": "rust",
+      "package": "obfuscation_backend",
+      "candid": "src/obfuscation_backend/obfuscation_backend.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
