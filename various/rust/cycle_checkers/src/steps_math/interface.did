@@ -1,0 +1,20 @@
+service : {
+    "query_1": () -> (nat64) query;
+    "query_1_000_000": () -> (nat64) query;
+    "query_2_000_000": () -> (nat64) query;
+    "query_3_000_000": () -> (nat64) query;
+    "query_4_000_000": () -> (nat64) query;
+    "query_1_000_000_000": () -> (nat64) query;
+    "query_2_000_000_000": () -> (nat64) query;
+    "query_3_000_000_000": () -> (nat64) query;
+    "query_4_000_000_000": () -> (nat64) query;
+    "update_1": () -> (nat64);
+    "update_1_000_000": () -> (nat64);
+    "update_2_000_000": () -> (nat64);
+    "update_3_000_000": () -> (nat64);
+    "update_4_000_000": () -> (nat64);
+    "update_1_000_000_000": () -> (nat64);
+    "update_2_000_000_000": () -> (nat64);
+    "update_3_000_000_000": () -> (nat64);
+    "update_4_000_000_000": () -> (nat64);
+}

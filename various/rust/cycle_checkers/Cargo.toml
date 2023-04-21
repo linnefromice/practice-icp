@@ -5,5 +5,7 @@ members = [
     "src/multi_state",
     "src/vec_state",
     "src/http_min",
-    "src/http_rpc"
+    "src/http_rpc",
+    "src/http_multi",
+    "src/steps_math"
 ]

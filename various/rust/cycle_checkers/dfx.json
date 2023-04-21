@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "http_min": {
+    "http_multi": {
       "type": "rust",
-      "package": "http_min",
-      "candid": "src/http_min/interface.did"
+      "package": "http_multi",
+      "candid": "src/http_multi/interface.did"
     }
   },
   "defaults": {
