@@ -1,0 +1,12 @@
+service : {
+    "call_binance_api": () -> (text);
+    "call_binance_api_no_res": () -> ();
+    "call_binance_api_three": () -> (text, text, text);
+    "call_binance_api_three_no_res": () -> ();
+    "call_randomuser_api": () -> (text);
+    "call_randomuser_api_three": () -> (text, text, text);
+    "call_eth_block_number": () -> (text);
+    "call_eth_block_number_three": () -> (text, text, text);
+    "call_eth_block_number_with_icweb3": () -> (text);
+    "call_eth_block_number_with_icweb3_three": () -> (text, text, text);
+}

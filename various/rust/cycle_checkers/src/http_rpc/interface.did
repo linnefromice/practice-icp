@@ -1,0 +1,5 @@
+service : {
+    "chain_id": () -> (variant { Ok : text; Err : text });
+    "block_number": () -> (variant { Ok : text; Err : text });
+    "gas_price": () -> (variant { Ok : text; Err : text });
+}

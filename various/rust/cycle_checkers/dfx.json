@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "etc_http_max_res": {
+      "type": "rust",
+      "package": "etc_http_max_res",
+      "candid": "src/etc_http_max_res/interface.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}

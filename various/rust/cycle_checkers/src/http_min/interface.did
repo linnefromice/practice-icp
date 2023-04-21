@@ -1,0 +1,9 @@
+service : {
+    "simple_query": (text) -> (text) query;
+    "simple_update": (text) -> (text);
+    "state_query": () -> (text) query;
+    "state_update": (text) -> ();
+    "call_binance_api": () -> (text);
+    "call_randomuser_api": () -> (text);
+    "call_eth_block_number": () -> (text);
+}

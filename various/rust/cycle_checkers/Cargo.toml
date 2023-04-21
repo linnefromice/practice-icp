@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "src/default_be",
+    "src/single_state",
+    "src/multi_state",
+    "src/vec_state",
+    "src/http_min",
+    "src/http_rpc",
+    "src/http_multi",
+    "src/http_settings",
+    "src/steps_math",
+    "src/etc_http_max_res"
+]
