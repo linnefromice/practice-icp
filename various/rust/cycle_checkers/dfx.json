@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "http_multi": {
+    "http_settings": {
       "type": "rust",
-      "package": "http_multi",
-      "candid": "src/http_multi/interface.did"
+      "package": "http_settings",
+      "candid": "src/http_settings/interface.did"
     }
   },
   "defaults": {

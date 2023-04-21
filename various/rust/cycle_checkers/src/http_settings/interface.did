@@ -1,0 +1,15 @@
+service : {
+    "call_default": () -> (text);
+    "call_max_50000_default": () -> (text);
+    "call_max_25000_default": () -> (text);
+    "call_max_5000_default": () -> (text);
+    "call_same_icweb3_default": () -> (text);
+    "call_without_header": () -> (text);
+    "call_without_header_max_50000": () -> (text);
+    "call_without_header_max_25000": () -> (text);
+    "call_without_header_max_5000": () -> (text);
+    "call_default_with_icweb3": () -> (text);
+    "call_max_50000_with_icweb3": () -> (text);
+    "call_max_25000_with_icweb3": () -> (text);
+    "call_max_5000_with_icweb3": () -> (text);
+}

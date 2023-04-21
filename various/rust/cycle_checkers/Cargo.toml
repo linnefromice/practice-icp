@@ -7,5 +7,6 @@ members = [
     "src/http_min",
     "src/http_rpc",
     "src/http_multi",
+    "src/http_settings",
     "src/steps_math"
 ]

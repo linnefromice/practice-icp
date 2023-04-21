@@ -638,6 +638,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "http_settings"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "ic-web3",
+ "serde_json",
+]
+
+[[package]]
 name = "ic-cdk"
 version = "0.6.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
