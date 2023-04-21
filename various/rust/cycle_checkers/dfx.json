@@ -1,25 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "default_01": {
+    "http_rpc": {
       "type": "rust",
-      "package": "default_be",
-      "candid": "src/default_be/interface.did"
-    },
-    "single_state": {
-      "type": "rust",
-      "package": "single_state",
-      "candid": "src/single_state/interface.did"
-    },
-    "multi_state": {
-      "type": "rust",
-      "package": "multi_state",
-      "candid": "src/multi_state/interface.did"
-    },
-    "vec_state": {
-      "type": "rust",
-      "package": "vec_state",
-      "candid": "src/vec_state/interface.did"
+      "package": "http_rpc",
+      "candid": "src/http_rpc/interface.did"
     }
   },
   "defaults": {
