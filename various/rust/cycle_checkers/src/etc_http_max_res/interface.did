@@ -1,0 +1,3 @@
+service : {
+    "call_eth_block_number": (nat64) -> (text);
+}

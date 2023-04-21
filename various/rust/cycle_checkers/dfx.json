@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "http_settings": {
+    "etc_http_max_res": {
       "type": "rust",
-      "package": "http_settings",
-      "candid": "src/http_settings/interface.did"
+      "package": "etc_http_max_res",
+      "candid": "src/etc_http_max_res/interface.did"
     }
   },
   "defaults": {
