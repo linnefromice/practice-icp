@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "http_rpc": {
+    "http_min": {
       "type": "rust",
-      "package": "http_rpc",
-      "candid": "src/http_rpc/interface.did"
+      "package": "http_min",
+      "candid": "src/http_min/interface.did"
     }
   },
   "defaults": {

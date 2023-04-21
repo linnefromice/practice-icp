@@ -4,5 +4,6 @@ members = [
     "src/single_state",
     "src/multi_state",
     "src/vec_state",
+    "src/http_min",
     "src/http_rpc"
 ]

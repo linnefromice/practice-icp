@@ -607,6 +607,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "http_min"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "ic-cdk",
+ "ic-cdk-macros",
+ "serde_json",
+]
+
+[[package]]
 name = "http_rpc"
 version = "0.1.0"
 dependencies = [
