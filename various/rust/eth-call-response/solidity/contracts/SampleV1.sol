@@ -60,8 +60,13 @@ contract SampleV1 {
         return _transfers;
     }
 
-    function addTransfer(address from, address to, uint value) public  {
+    function addTransfer(address from, address to, uint value) public {
         transfers.push(Transfer(from, to, value));
+    }
+    function addTransfers(Transfer[] memory inputs) public {
+        for (uint i = 0; i < inputs.length; i++) {
+            transfers.push(inputs[i]);
+        }
     }
     function getTransferCount() public view returns (uint) {
         return transfers.length;

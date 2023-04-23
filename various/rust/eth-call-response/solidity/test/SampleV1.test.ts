@@ -71,8 +71,13 @@ describe("SampleV1", () => {
     await contract.addTransfer(ethers.constants.AddressZero, returnedAddr, 100);
     await contract.addTransfer(ethers.constants.AddressZero, returnedAddr, 200);
     await contract.addTransfer(ethers.constants.AddressZero, returnedAddr, 300);
-    expect((await contract.getTransferCount()).toString()).equal("3");
-    contract.getTransfers(0, 3).then((values) => {
+    await contract.addTransfers([
+      { from: ethers.constants.AddressZero, to: returnedAddr, value: 400 },
+      { from: ethers.constants.AddressZero, to: returnedAddr, value: 500 },
+      { from: ethers.constants.AddressZero, to: returnedAddr, value: 600 },
+    ])
+    expect((await contract.getTransferCount()).toString()).equal("6");
+    contract.getTransfers(0, 6).then((values) => {
       for (const [idx, v] of values.entries()) {
         expect(v.from).to(ethers.constants.AddressZero);
         expect(v.to).to(returnedAddr);
