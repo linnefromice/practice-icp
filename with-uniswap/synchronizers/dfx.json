@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "canisters": {
+    "synchronizers_backend": {
+      "type": "rust",
+      "package": "synchronizers_backend",
+      "candid": "src/synchronizers_backend/synchronizers_backend.did"
+    },
+    "synchronizers_frontend": {
+      "type": "assets",
+      "source": [
+        "src/synchronizers_frontend/assets"
+      ],
+      "dependencies": [
+        "synchronizers_backend"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
