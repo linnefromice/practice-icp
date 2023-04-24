@@ -1,0 +1,13 @@
+type CandidSlot0 = record {
+    sqrt_price_x96: text;
+    tick: int32;
+    observation_index: nat16;
+    observation_cardinality: nat16;
+    observation_cardinality_next: nat16;
+    fee_protocol: nat8;
+    unlocked: bool;
+}
+
+service : {
+    "get_exchange_rate": (text, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
+}
