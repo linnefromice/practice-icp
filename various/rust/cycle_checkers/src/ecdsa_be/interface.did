@@ -1,0 +1,13 @@
+type AccountInfo = record {
+    address : text;
+};
+service : {
+    "get_ethereum_address": () -> (variant { Ok : AccountInfo; Err : text });
+    "get_ethereum_address_omitted": () -> (variant { Ok : AccountInfo; Err : text });
+    "get_ecdsa_public_key": () -> (variant { Ok : vec nat8; Err : text });
+    "get_transaction_count": (opt text) -> (variant { Ok : text; Err : text });
+    "get_gas_price": () -> (variant { Ok : text; Err : text });
+    "sign_message": (text) -> (vec nat8);
+    "sign_transfer_native": (text, nat64, nat, nat, nat64) -> (variant { Ok : text; Err : text });
+    "transfer_native": (text, nat64, nat, nat, nat64) -> (variant { Ok : text; Err : text });
+}

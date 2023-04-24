@@ -9,5 +9,6 @@ members = [
     "src/http_multi",
     "src/http_settings",
     "src/steps_math",
-    "src/etc_http_max_res"
+    "src/etc_http_max_res",
+    "src/ecdsa_be"
 ]
