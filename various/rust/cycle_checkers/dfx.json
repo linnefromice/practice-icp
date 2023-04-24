@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "etc_http_max_res": {
+    "ecdsa_be": {
       "type": "rust",
-      "package": "etc_http_max_res",
-      "candid": "src/etc_http_max_res/interface.did"
+      "package": "ecdsa_be",
+      "candid": "src/ecdsa_be/interface.did"
     }
   },
   "defaults": {
