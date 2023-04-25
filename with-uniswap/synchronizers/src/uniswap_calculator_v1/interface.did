@@ -1,0 +1,5 @@
+service : {
+    "greet": (text) -> (text) query;
+    "register_reader": (principal) -> ();
+    "debug_rpcs": () -> (vec record { text; text });
+}

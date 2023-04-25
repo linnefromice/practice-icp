@@ -10,6 +10,11 @@
       "type": "rust",
       "package": "uniswap_reader_v1",
       "candid": "src/uniswap_reader_v1/interface.did"
+    },
+    "calculator": {
+      "type": "rust",
+      "package": "uniswap_calculator_v1",
+      "candid": "src/uniswap_calculator_v1/interface.did"
     }
   },
   "defaults": {
