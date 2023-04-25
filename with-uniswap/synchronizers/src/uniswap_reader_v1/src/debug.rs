@@ -1,9 +1,9 @@
 use crate::{
     call_observation, call_slot0,
-    constants::DEFAULT_POOL_ADDR,
-    last_price, price, prices_length, round_timestamp,
+    constants::{DEFAULT_POOL_ADDR, INDEXED_TIME_UNIT_BY_SEC},
+    last_price, price, price_index, prices_length, round_timestamp,
     types::{CandidObservation, CandidPrice, CandidSlot0},
-    PRICE_INDEXES,
+    TIMER_ID,
 };
 use ic_cdk_macros::{query, update};
 
@@ -57,18 +57,22 @@ fn debug_get_price(idx: u64) -> Option<CandidPrice> {
     price(idx).map(|v| v.to_candid())
 }
 #[query]
-fn debug_last_price_timestamp_by_day() -> u32 {
-    round_timestamp(last_price().unwrap().block_timestamp, 24 * 60 * 60)
-}
-#[query]
 fn debug_last_price_timestamp_by_hour() -> u32 {
     round_timestamp(last_price().unwrap().block_timestamp, 60 * 60)
 }
 #[query]
-fn debug_last_price_timestamp_by_five_minites() -> u32 {
-    round_timestamp(last_price().unwrap().block_timestamp, 5 * 60)
+fn debug_last_price_timestamp_by_indexed_time_unit() -> u32 {
+    round_timestamp(
+        last_price().unwrap().block_timestamp,
+        INDEXED_TIME_UNIT_BY_SEC,
+    )
 }
 #[query]
 fn debug_price_index(timestamp: u32) -> Option<u64> {
-    PRICE_INDEXES.with(|vals| vals.borrow().get(&timestamp).cloned())
+    price_index(timestamp)
+}
+#[update]
+fn debug_stop_periodic_save_prices() {
+    let timer_id = TIMER_ID.with(|value| *value.borrow());
+    ic_cdk_timers::clear_timer(timer_id);
 }

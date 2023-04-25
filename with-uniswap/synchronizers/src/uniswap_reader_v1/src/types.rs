@@ -91,7 +91,7 @@ pub struct CandidObservation {
     pub initialized: bool,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Price {
     pub sqrt_price_x96: U256,
     pub observation_index: u16,
@@ -106,7 +106,7 @@ impl Price {
         }
     }
 }
-#[derive(CandidType)]
+#[derive(CandidType, Debug, PartialEq)]
 pub struct CandidPrice {
     pub sqrt_price_x96: String,
     pub observation_index: u16,
