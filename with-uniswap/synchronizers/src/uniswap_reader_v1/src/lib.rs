@@ -4,7 +4,7 @@ mod types;
 mod utils;
 
 use candid::CandidType;
-use constants::UNISWAPV3_POOL_ABI;
+use constants::{DEFAULT_POOL_ADDR, UNISWAPV3_POOL_ABI};
 use ic_cdk::api::management_canister::http_request::{HttpResponse, TransformArgs};
 use ic_cdk_macros::{query, update};
 use ic_web3::contract::Options;
@@ -29,10 +29,15 @@ pub struct ResponseLatestExchangeRate {
 }
 #[update]
 async fn get_latest_exchange_rate(
-    pool_address: String,
+    pool_address: Option<String>,
     max_resp: Option<u64>,
     cycles: Option<u64>,
 ) -> Result<ResponseLatestExchangeRate, String> {
+    let pool_address = if pool_address.is_some() {
+        pool_address.unwrap()
+    } else {
+        DEFAULT_POOL_ADDR.to_string()
+    };
     let slot0 = call_slot0(pool_address.clone(), max_resp, cycles).await?;
     let observation = call_observation(pool_address.clone(), slot0.2, max_resp, cycles).await?;
     Ok(ResponseLatestExchangeRate {

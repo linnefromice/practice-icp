@@ -19,7 +19,7 @@ type ResponseLatestExchangeRate = record {
     block_timestamp: nat32;
 };
 service : {
-    "get_latest_exchange_rate": (text, opt nat64, opt nat64) -> (variant { Ok : ResponseLatestExchangeRate; Err : text });
+    "get_latest_exchange_rate": (opt text, opt nat64, opt nat64) -> (variant { Ok : ResponseLatestExchangeRate; Err : text });
     "debug_get_slot0": (text, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
     "debug_get_observation": (text, nat16, opt nat64, opt nat64) -> (variant { Ok : CandidObservation; Err : text });
 }
