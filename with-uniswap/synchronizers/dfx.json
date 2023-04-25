@@ -1,7 +1,12 @@
 {
   "version": 1,
   "canisters": {
-    "uniswap_reader_v1": {
+    "reader_mainnet": {
+      "type": "rust",
+      "package": "uniswap_reader_v1",
+      "candid": "src/uniswap_reader_v1/interface.did"
+    },
+    "reader_polygon": {
       "type": "rust",
       "package": "uniswap_reader_v1",
       "candid": "src/uniswap_reader_v1/interface.did"

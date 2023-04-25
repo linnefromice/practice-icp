@@ -18,9 +18,11 @@ type CandidPrice = record {
     observation_index: nat16;
     block_timestamp: nat32;
 };
-service : {
+service : (text, text) -> {
     "periodic_save_prices": (opt nat64, opt nat64, opt nat64) -> ();
     "get_prices": (opt nat32, opt nat32) -> (vec CandidPrice);
+    "debug_get_rpc_url": () -> (text);
+    "debug_get_pool_address": () -> (text);
     "debug_get_slot0": (text, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
     "debug_get_observation": (text, nat16, opt nat64, opt nat64) -> (variant { Ok : CandidObservation; Err : text });
     "debug_get_prices_length": () -> (nat64);

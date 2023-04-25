@@ -1,7 +1,7 @@
 use crate::{
     call_observation, call_slot0,
-    constants::{DEFAULT_POOL_ADDR, INDEXED_TIME_UNIT_BY_SEC},
-    last_price, price, price_index, prices_length, round_timestamp,
+    constants::INDEXED_TIME_UNIT_BY_SEC,
+    last_price, pool_address, price, price_index, prices_length, round_timestamp, rpc_url,
     types::{CandidObservation, CandidPrice, CandidSlot0},
     TIMER_ID,
 };
@@ -30,17 +30,17 @@ async fn debug_fetch_observation(
 
 #[update]
 async fn debug_fetch_price(
-    pool_address: Option<String>,
+    pool_addr: Option<String>,
     max_resp: Option<u64>,
     cycles: Option<u64>,
 ) -> Result<CandidPrice, String> {
-    let pool_address = if pool_address.is_some() {
-        pool_address.unwrap()
+    let pool_addr = if pool_addr.is_some() {
+        pool_addr.unwrap()
     } else {
-        DEFAULT_POOL_ADDR.to_string()
+        pool_address()
     };
-    let slot0 = call_slot0(pool_address.clone(), max_resp, cycles).await?;
-    let observation = call_observation(pool_address.clone(), slot0.2, max_resp, cycles).await?;
+    let slot0 = call_slot0(pool_addr.clone(), max_resp, cycles).await?;
+    let observation = call_observation(pool_addr.clone(), slot0.2, max_resp, cycles).await?;
     Ok(CandidPrice {
         sqrt_price_x96: slot0.0.to_string(),
         observation_index: slot0.2,
@@ -48,6 +48,14 @@ async fn debug_fetch_price(
     })
 }
 
+#[query]
+fn debug_get_rpc_url() -> String {
+    rpc_url()
+}
+#[query]
+fn debug_get_pool_address() -> String {
+    pool_address()
+}
 #[query]
 fn debug_get_prices_length() -> u64 {
     prices_length()

@@ -3,11 +3,9 @@ mod debug;
 mod types;
 mod utils;
 
-use constants::{
-    DEFAULT_FETCH_INTERVAL_BY_SEC, DEFAULT_POOL_ADDR, INDEXED_TIME_UNIT_BY_SEC, UNISWAPV3_POOL_ABI,
-};
+use constants::{DEFAULT_FETCH_INTERVAL_BY_SEC, INDEXED_TIME_UNIT_BY_SEC, UNISWAPV3_POOL_ABI};
 use ic_cdk::api::management_canister::http_request::{HttpResponse, TransformArgs};
-use ic_cdk_macros::{query, update};
+use ic_cdk_macros::{init, query, update};
 use ic_cdk_timers::TimerId;
 use ic_web3::contract::Options;
 use std::{cell::RefCell, collections::HashMap};
@@ -18,6 +16,14 @@ thread_local! {
     static PRICE_INDEXES: RefCell<HashMap<u32,u64>> = RefCell::new(HashMap::new());
     static PRICES: RefCell<Vec<Price>> = RefCell::default();
     static TIMER_ID: RefCell<TimerId> = RefCell::default();
+    static RPC_URL: RefCell<String> = RefCell::default();
+    static POOL_ADDRESS: RefCell<String> = RefCell::default();
+}
+
+#[init]
+fn init(url: String, pool_addr: String) {
+    RPC_URL.with(|value| *value.borrow_mut() = url);
+    POOL_ADDRESS.with(|value| *value.borrow_mut() = pool_addr);
 }
 
 #[query]
@@ -87,9 +93,9 @@ async fn save_prices(
     max_resp: Option<u64>,
     cycles: Option<u64>,
 ) -> Result<(Price, Option<u32>), String> {
-    let pool_address = DEFAULT_POOL_ADDR.to_string();
-    let slot0 = call_slot0(pool_address.clone(), max_resp, cycles).await?;
-    let observation = call_observation(pool_address.clone(), slot0.2, max_resp, cycles).await?;
+    let pool_addr = pool_address();
+    let slot0 = call_slot0(pool_addr.clone(), max_resp, cycles).await?;
+    let observation = call_observation(pool_addr.clone(), slot0.2, max_resp, cycles).await?;
 
     let price = Price {
         sqrt_price_x96: slot0.0,
@@ -173,6 +179,12 @@ async fn call_observation(
         .map_err(|e| format!("query contract error: {}", e))
 }
 
+fn rpc_url() -> String {
+    RPC_URL.with(|value| (value.borrow()).clone())
+}
+fn pool_address() -> String {
+    POOL_ADDRESS.with(|value| (value.borrow()).clone())
+}
 fn last_price() -> Option<Price> {
     PRICES.with(|val| val.borrow().last().cloned())
 }
