@@ -4,7 +4,15 @@ use ic_web3::{
     ethabi::Token,
     types::U256,
 };
-pub struct Slot0(U256, i32, u16, u16, u16, u8, bool);
+pub struct Slot0(
+    pub U256,
+    pub i32,
+    pub u16,
+    pub u16,
+    pub u16,
+    pub u8,
+    pub bool,
+);
 
 impl Detokenize for Slot0 {
     fn from_tokens(tokens: Vec<Token>) -> Result<Self, Error>
@@ -48,7 +56,7 @@ pub struct CandidSlot0 {
     unlocked: bool,
 }
 
-pub struct Observation(u32, i64, U256, bool);
+pub struct Observation(pub u32, pub i64, pub U256, pub bool);
 
 impl Detokenize for Observation {
     fn from_tokens(tokens: Vec<Token>) -> Result<Self, Error>
