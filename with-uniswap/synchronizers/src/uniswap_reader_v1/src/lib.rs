@@ -47,6 +47,11 @@ async fn call_slot0(
     max_resp: Option<u64>,
     cycles: Option<u64>,
 ) -> Result<Slot0, String> {
+    let max_resp = if max_resp.is_some() {
+        max_resp
+    } else {
+        Some(700) // default
+    };
     let w3 = generate_web3_client(max_resp, cycles)?;
     let contract = generate_uniswapv3pool_client(w3, pool_address.as_str(), UNISWAPV3_POOL_ABI)?;
     contract
@@ -61,6 +66,11 @@ async fn call_observation(
     max_resp: Option<u64>,
     cycles: Option<u64>,
 ) -> Result<Observation, String> {
+    let max_resp = if max_resp.is_some() {
+        max_resp
+    } else {
+        Some(550) // default
+    };
     let w3 = generate_web3_client(max_resp, cycles)?;
     let contract = generate_uniswapv3pool_client(w3, pool_address.as_str(), UNISWAPV3_POOL_ABI)?;
     contract
