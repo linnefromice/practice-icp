@@ -90,3 +90,25 @@ pub struct CandidObservation {
     pub liquidity_cumulative: String,
     pub initialized: bool,
 }
+
+#[derive(Clone)]
+pub struct Price {
+    pub sqrt_price_x96: U256,
+    pub observation_index: u16,
+    pub block_timestamp: u32,
+}
+impl Price {
+    pub fn to_candid(&self) -> CandidPrice {
+        CandidPrice {
+            sqrt_price_x96: self.sqrt_price_x96.to_string(),
+            observation_index: self.observation_index,
+            block_timestamp: self.block_timestamp,
+        }
+    }
+}
+#[derive(CandidType)]
+pub struct CandidPrice {
+    pub sqrt_price_x96: String,
+    pub observation_index: u16,
+    pub block_timestamp: u32,
+}
