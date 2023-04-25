@@ -47,3 +47,38 @@ pub struct CandidSlot0 {
     fee_protocol: u8,
     unlocked: bool,
 }
+
+pub struct Observation(u32, i64, U256, bool);
+
+impl Detokenize for Observation {
+    fn from_tokens(tokens: Vec<Token>) -> Result<Self, Error>
+    where
+        Self: Sized,
+    {
+        Ok(Self(
+            tokens.get(0).unwrap().clone().into_uint().unwrap().as_u32(),
+            tokens.get(1).unwrap().clone().into_int().unwrap().as_u128() as i64,
+            tokens.get(2).unwrap().clone().into_uint().unwrap(),
+            tokens.get(3).unwrap().clone().into_bool().unwrap(),
+        ))
+    }
+}
+
+impl Observation {
+    pub fn to_candid(&self) -> CandidObservation {
+        CandidObservation {
+            block_timestamp: self.0,
+            tick_cumulative: self.1,
+            liquidity_cumulative: self.2.to_string(),
+            initialized: self.3,
+        }
+    }
+}
+
+#[derive(CandidType)]
+pub struct CandidObservation {
+    pub block_timestamp: u32,
+    pub tick_cumulative: i64,
+    pub liquidity_cumulative: String,
+    pub initialized: bool,
+}

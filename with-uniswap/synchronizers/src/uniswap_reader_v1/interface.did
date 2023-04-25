@@ -6,8 +6,14 @@ type CandidSlot0 = record {
     observation_cardinality_next: nat16;
     fee_protocol: nat8;
     unlocked: bool;
-}
-
+};
+type CandidObservation = record {
+    block_timestamp: nat32;
+    tick_cumulative: int64;
+    liquidity_cumulative: text;
+    initialized: bool;
+};
 service : {
     "get_exchange_rate": (text, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
+    "get_observation": (text, nat16, opt nat64, opt nat64) -> (variant { Ok : CandidObservation; Err : text });
 }
