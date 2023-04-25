@@ -67,6 +67,7 @@ async fn periodic_save_prices(
 fn get_prices(from: Option<u32>, to: Option<u32>) -> Vec<CandidPrice> {
     let prices = PRICES.with(|prices| {
         let prices = prices.borrow().clone();
+        // TODO: impl validations to check data counts
         match (from, to) {
             (Some(from_ts), Some(to_ts)) => {
                 let from = price_index(from_ts).unwrap();
