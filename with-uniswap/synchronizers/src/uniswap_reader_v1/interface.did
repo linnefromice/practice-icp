@@ -30,6 +30,6 @@ service : (text, text) -> {
     "debug_last_price_timestamp_by_hour": () -> (nat32);
     "debug_last_price_timestamp_by_indexed_time_unit": () -> (nat32);
     "debug_price_index": (nat32) -> (opt nat64);
-    "debug_get_price_indexes": () -> (vec { nat32; nat64 });
+    "debug_get_price_indexes": () -> (vec record { nat32; nat64 });
     "debug_stop_periodic_save_prices": () -> ();
 }
