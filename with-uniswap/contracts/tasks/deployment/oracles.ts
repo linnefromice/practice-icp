@@ -30,8 +30,8 @@ task("deploy:oraclev1", "deploy:oraclev1")
 
       // Check after deploying
       console.log(`Check phase`);
-      const latestRoundId = await contract.latestRoundId();
-      console.log(`> latestRoundId: ${latestRoundId.toString()}`);
+      const stateLength = await contract.getStateLength();
+      console.log(`> stateLength: ${stateLength.toString()}`);
 
       console.log(`[deploy:oraclev1] END`);
     }
