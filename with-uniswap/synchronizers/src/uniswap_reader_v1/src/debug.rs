@@ -79,6 +79,20 @@ fn debug_last_price_timestamp_by_indexed_time_unit() -> u32 {
 fn debug_price_index(timestamp: u32) -> Option<u64> {
     price_index(timestamp)
 }
+#[query]
+fn debug_get_price_indexes() -> Vec<(u32, u64)> {
+    let mut result = Vec::new();
+    let mut last_indexed_time = debug_last_price_timestamp_by_indexed_time_unit();
+    loop {
+        let price_index = price_index(last_indexed_time);
+        result.push((last_indexed_time, price_index.unwrap()));
+        if let None | Some(0) = price_index {
+            break;
+        }
+        last_indexed_time -= INDEXED_TIME_UNIT_BY_SEC;
+    }
+    result
+}
 #[update]
 fn debug_stop_periodic_save_prices() {
     let timer_id = TIMER_ID.with(|value| *value.borrow());
