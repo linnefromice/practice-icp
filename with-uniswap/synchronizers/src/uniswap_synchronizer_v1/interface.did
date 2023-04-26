@@ -1,7 +1,12 @@
-service : {
+service : (text, nat64, text, principal) -> {
     "debug_greet": (text) -> (text) query;
-    "debug_get_rpc_url": () -> (text);
-    "debug_get_oracle_address": () -> (text);
-    "debug_get_indexer_canister_id": () -> (text);
+    "debug_get_rpc_url": () -> (text) query;
+    "debug_get_oracle_address": () -> (text) query;
+    "debug_get_indexer_canister_id": () -> (text) query;
+    "debug_ethereum_address_and_public_key": () -> (variant { Ok : record { text; text }; Err : text });
     "debug_call_calculate_average_exchange_rate": (opt nat32, opt nat32, nat8) -> (text);
+    "debug_call_rpc_tx_count": () -> (variant { Ok : text; Err : text });
+    "debug_call_rpc_gas_price": () -> (variant { Ok : text; Err : text });
+    "debug_call_balance_of_native": () -> (variant { Ok : text; Err : text });
+    "debug_call_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });
 }
