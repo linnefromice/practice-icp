@@ -15,152 +15,49 @@ describe("OracleV1", () => {
 
   it("initialize", async () => {
     const { oracle } = await setup();
-    expect((await oracle.latestRoundId()).toString()).equal("0");
+    expect((await oracle.getStateLength()).toString()).equal("0");
   });
   it(".updateState", async () => {
     const { oracle } = await setup();
     const currentTime = await time.latest();
-    await expect(oracle.updateState(1, 100, currentTime, currentTime))
-      .to.be.emit(oracle, "UpdateState")
-      .withArgs("1", "100", currentTime.toString(), currentTime.toString());
+    await expect(oracle.updateState({
+      rate: 100,
+      fromTime: currentTime,
+      toTime: currentTime,
+    }))
+      .to.be.emit(oracle, "AddRate")
+      .withArgs("0", "100", currentTime.toString(), currentTime.toString());
 
-    expect((await oracle.latestRoundId()).toString()).eq("1");
-    const round = await oracle.rounds(1);
-    expect(round.answer.toString()).eq("100");
-    expect(round.startedAt.toString()).eq(currentTime.toString());
-    expect(round.updatedAt.toString()).eq(currentTime.toString());
+    expect((await oracle.getStateLength()).toString()).eq("1");
+    const round = await oracle.rates(0);
+    expect(round.rate.toString()).eq("100");
+    expect(round.fromTime.toString()).eq(currentTime.toString());
+    expect(round.toTime.toString()).eq(currentTime.toString());
   });
-  it(".updateStates", async () => {
+  it(".debug_cleanExchangeRates", async () => {
     const { oracle } = await setup();
     const currentTime = await time.latest();
+    await oracle.updateState({
+      rate: 100,
+      fromTime: currentTime,
+      toTime: currentTime,
+    });
+    await oracle.updateState({
+      rate: 120,
+      fromTime: currentTime + 1,
+      toTime: currentTime + 1,
+    });
+    await oracle.updateState({
+      rate: 140,
+      fromTime: currentTime + 2,
+      toTime: currentTime + 2,
+    });
+    expect((await oracle.getStateLength()).toString()).eq("3");
+    expect((await oracle.rates(0)).rate.toString()).eq("100");
+    expect((await oracle.rates(1)).rate.toString()).eq("120");
+    expect((await oracle.rates(2)).rate.toString()).eq("140");
 
-    await oracle.updateStates([
-      {
-        roundId: 1,
-        answer: 100,
-        startedAt: currentTime,
-        updatedAt: currentTime,
-      },
-      {
-        roundId: 2,
-        answer: 120,
-        startedAt: currentTime + 1,
-        updatedAt: currentTime + 1,
-      },
-      {
-        roundId: 3,
-        answer: 140,
-        startedAt: currentTime + 2,
-        updatedAt: currentTime + 2,
-      },
-    ]);
-    expect((await oracle.latestRoundId()).toString()).eq("3");
-    expect((await oracle.rounds(1)).answer.toString()).eq("100");
-    expect((await oracle.rounds(2)).answer.toString()).eq("120");
-    expect((await oracle.rounds(3)).answer.toString()).eq("140");
-    expect((await oracle.rounds(4)).answer.toString()).eq("0");
-    expect((await oracle.rounds(5)).answer.toString()).eq("0");
-    expect((await oracle.rounds(6)).answer.toString()).eq("0");
-
-    await oracle.updateStates([
-      {
-        roundId: 4,
-        answer: 160,
-        startedAt: currentTime + 3,
-        updatedAt: currentTime + 3,
-      },
-      {
-        roundId: 5,
-        answer: 180,
-        startedAt: currentTime + 4,
-        updatedAt: currentTime + 4,
-      },
-    ]);
-    expect((await oracle.latestRoundId()).toString()).eq("5");
-    expect((await oracle.rounds(1)).answer.toString()).eq("100");
-    expect((await oracle.rounds(2)).answer.toString()).eq("120");
-    expect((await oracle.rounds(3)).answer.toString()).eq("140");
-    expect((await oracle.rounds(4)).answer.toString()).eq("160");
-    expect((await oracle.rounds(5)).answer.toString()).eq("180");
-    expect((await oracle.rounds(6)).answer.toString()).eq("0");
-  });
-  it(".debug_cleanState", async () => {
-    const { oracle } = await setup();
-    const currentTime = await time.latest();
-    await oracle.updateState(1, 100, currentTime, currentTime);
-    await oracle.updateState(2, 120, currentTime + 1, currentTime + 1);
-    await oracle.updateState(3, 140, currentTime + 2, currentTime + 2);
-    expect((await oracle.latestRoundId()).toString()).eq("3");
-    expect((await oracle.rounds(1)).answer.toString()).eq("100");
-    expect((await oracle.rounds(2)).answer.toString()).eq("120");
-    expect((await oracle.rounds(3)).answer.toString()).eq("140");
-
-    await oracle.debug_cleanState();
-    expect((await oracle.latestRoundId()).toString()).eq("0");
-    expect((await oracle.rounds(1)).answer.toString()).eq("0");
-    expect((await oracle.rounds(2)).answer.toString()).eq("0");
-    expect((await oracle.rounds(3)).answer.toString()).eq("0");
-  });
-  it(".debug_getRounds", async () => {
-    const { oracle } = await setup();
-    const currentTime = await time.latest();
-
-    await oracle.updateStates([
-      {
-        roundId: 1,
-        answer: 100,
-        startedAt: currentTime,
-        updatedAt: currentTime,
-      },
-      {
-        roundId: 2,
-        answer: 120,
-        startedAt: currentTime + 1,
-        updatedAt: currentTime + 1,
-      },
-      {
-        roundId: 3,
-        answer: 140,
-        startedAt: currentTime + 2,
-        updatedAt: currentTime + 2,
-      },
-      {
-        roundId: 4,
-        answer: 160,
-        startedAt: currentTime + 3,
-        updatedAt: currentTime + 3,
-      },
-      {
-        roundId: 5,
-        answer: 180,
-        startedAt: currentTime + 4,
-        updatedAt: currentTime + 4,
-      },
-      {
-        roundId: 6,
-        answer: 200,
-        startedAt: currentTime + 5,
-        updatedAt: currentTime + 5,
-      },
-      {
-        roundId: 7,
-        answer: 220,
-        startedAt: currentTime + 6,
-        updatedAt: currentTime + 6,
-      },
-    ]);
-
-    const rounds = await oracle.debug_getRounds(3, 3);
-    expect(rounds.length).eq(3);
-    expect(rounds[0].answer.toString()).eq("140");
-    expect(rounds[1].answer.toString()).eq("160");
-    expect(rounds[2].answer.toString()).eq("180");
-
-    const roundsFromIds = await oracle.debug_getRoundsFromIds([1, 3, 5, 7]);
-    expect(roundsFromIds.length).eq(4);
-    expect(roundsFromIds[0].answer.toString()).eq("100");
-    expect(roundsFromIds[1].answer.toString()).eq("140");
-    expect(roundsFromIds[2].answer.toString()).eq("180");
-    expect(roundsFromIds[3].answer.toString()).eq("220");
+    await oracle.debug_cleanExchangeRates();
+    expect((await oracle.getStateLength()).toString()).eq("0");
   });
 });
