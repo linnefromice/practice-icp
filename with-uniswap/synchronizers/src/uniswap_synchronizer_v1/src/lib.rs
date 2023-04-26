@@ -1,4 +1,5 @@
 mod debug;
+mod types;
 mod utils;
 
 use candid::Principal;
@@ -11,12 +12,15 @@ use ic_cdk::{
 };
 use ic_web3::{
     transports::ICHttp,
-    types::{Address, U256},
+    types::{Address, SignedTransaction, U256},
     Web3,
 };
 use std::cell::RefCell;
+use types::ExchangeRate;
+use utils::{generate_web3_client, sign};
 
 const KEY_NAME: &str = "dfx_test_key";
+const ORACLE_ABI: &[u8] = include_bytes!("../../abi/Oracle.json");
 
 thread_local! {
     static RPC_URL: RefCell<String>  = RefCell::default();
@@ -87,4 +91,57 @@ async fn eth_gas_price(w3: Web3<ICHttp>) -> Result<U256, String> {
         .gas_price()
         .await
         .map_err(|e| format!("get gas_price error: {}", e))
+}
+
+async fn sync_state_internal(
+    exchange_rate: ExchangeRate,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>,
+) -> Result<String, String> {
+    let w3 = generate_web3_client(Some(300), None)?;
+    let signed_tx = sync_state_signed_tx_internal(
+        w3,
+        exchange_rate,
+        gas_coefficient_molecule,
+        gas_coefficient_denominator,
+        gas_limit,
+    )
+    .await?;
+
+    let w3 = generate_web3_client(Some(500), None)?;
+    match w3
+        .eth()
+        .send_raw_transaction(signed_tx.raw_transaction)
+        .await
+    {
+        Ok(v) => Ok(format!("0x{}", hex::encode(v))),
+        Err(msg) => Err(format!("send_raw_transaction failed: {}", msg)),
+    }
+}
+
+async fn sync_state_signed_tx_internal(
+    w3: Web3<ICHttp>,
+    exchange_rate: ExchangeRate,
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>,
+) -> Result<SignedTransaction, String> {
+    sign(
+        w3,
+        &oracle_address(),
+        ORACLE_ABI,
+        "updateState",
+        exchange_rate,
+        if gas_coefficient_molecule.is_some() && gas_coefficient_denominator.is_some() {
+            Some((
+                gas_coefficient_molecule.unwrap(),
+                gas_coefficient_denominator.unwrap(),
+            ))
+        } else {
+            None
+        },
+        gas_limit,
+    )
+    .await
 }

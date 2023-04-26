@@ -1,0 +1,189 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rate",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "fromTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "toTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "AddRate",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "debug_cleanExchangeRates",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "from",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "count",
+        "type": "uint256"
+      }
+    ],
+    "name": "debug_getExchangeRates",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct OracleV1.ExchangeRate[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "idxs",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "debug_getExchangeRatesFromIdxs",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct OracleV1.ExchangeRate[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getStateLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "rates",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "rate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fromTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "toTime",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toTime",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct OracleV1.ExchangeRate",
+        "name": "_rate",
+        "type": "tuple"
+      }
+    ],
+    "name": "updateState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

@@ -9,4 +9,5 @@ service : (text, nat64, text, principal) -> {
     "debug_call_rpc_gas_price": () -> (variant { Ok : text; Err : text });
     "debug_call_balance_of_native": () -> (variant { Ok : text; Err : text });
     "debug_call_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });
+    "debug_sync_state": (nat, nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
 }

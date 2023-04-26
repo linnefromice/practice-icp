@@ -6,7 +6,7 @@ dfx deploy reader_polygon \
 dfx deploy calculator \
     --argument '(6, 18)'
 dfx deploy synchronizer \
-    --argument "(\"https://polygon-mumbai.g.alchemy.com/v2/6GLIzI5pL0n4bp4c3jESZTRfXxE5XJ_Z\", 80001, \"0000000000000000000000000000000000000000\", principal \"$(dfx canister id calculator)\")"
+    --argument "(\"https://polygon-mumbai.g.alchemy.com/v2/6GLIzI5pL0n4bp4c3jESZTRfXxE5XJ_Z\", 80001, \"5d666338118763ca0cF6719F479491B76bc88131\", principal \"$(dfx canister id calculator)\")"
 dfx canister call reader_mainnet periodic_save_prices "(null,null,null)"
 dfx canister call reader_polygon periodic_save_prices "(null,null,null)"
 dfx canister call calculator register_reader "(principal \"$(dfx canister id reader_mainnet)\")"

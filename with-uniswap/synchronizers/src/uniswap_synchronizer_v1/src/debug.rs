@@ -8,7 +8,8 @@ use ic_web3::{
 
 use crate::{
     call_calculate_average_exchange_rate, chain_id, eth_gas_price, eth_tx_count,
-    indexer_canister_id, oracle_address, rpc_url,
+    indexer_canister_id, oracle_address, rpc_url, sync_state_internal,
+    types::ExchangeRate,
     utils::{
         default_derivation_key, ethereum_address, generate_web3_client, public_key,
         to_ethereum_address,
@@ -127,4 +128,26 @@ async fn debug_call_transfer_native(to: String, value: u64) -> Result<String, St
         }
         Err(e) => Err(e.to_string()),
     }
+}
+
+#[update]
+async fn debug_sync_state(
+    rate: u128,
+    from_time: u128, // TODO: u256
+    to_time: u128,   // TODO: u256
+    gas_coefficient_molecule: Option<u128>,
+    gas_coefficient_denominator: Option<u128>,
+    gas_limit: Option<u128>,
+) -> Result<String, String> {
+    sync_state_internal(
+        ExchangeRate {
+            rate,
+            from_time,
+            to_time,
+        },
+        gas_coefficient_molecule,
+        gas_coefficient_denominator,
+        gas_limit,
+    )
+    .await
 }
