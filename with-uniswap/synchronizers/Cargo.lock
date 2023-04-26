@@ -1637,6 +1637,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "uniswap_synchronizer_v1"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "hex",
+ "ic-cdk 0.6.10",
+ "ic-cdk-macros",
+ "ic-web3",
+ "serde_json",
+]
+
+[[package]]
 name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
