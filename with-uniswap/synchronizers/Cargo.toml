@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "src/uniswap_reader_v1",
+    "src/uniswap_calculator_v1",
+    "src/uniswap_synchronizer_v1",
+]

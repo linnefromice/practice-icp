@@ -1,0 +1,17 @@
+service : (text, nat64, text, principal) -> {
+    "periodic_sync_state": (opt nat64, opt nat32, opt nat, opt nat, opt nat) -> ();
+    "debug_get_rpc_url": () -> (text) query;
+    "debug_get_oracle_address": () -> (text) query;
+    "debug_get_indexer_canister_id": () -> (text) query;
+    "debug_get_syncing_from": () -> (nat32) query;
+    "debug_ethereum_address_and_public_key": () -> (variant { Ok : record { text; text }; Err : text });
+    "debug_call_calculate_average_exchange_rate": (opt nat32, opt nat32, nat8) -> (text);
+    "debug_call_rpc_tx_count": () -> (variant { Ok : text; Err : text });
+    "debug_call_rpc_gas_price": () -> (variant { Ok : text; Err : text });
+    "debug_call_balance_of_native": () -> (variant { Ok : text; Err : text });
+    "debug_call_transfer_native": (text, nat64) -> (variant { Ok : text; Err : text });
+    "debug_sync_state": (nat, nat, nat, opt nat, opt nat, opt nat) -> (variant { Ok : text; Err : text });
+    "debug_stop_periodic_task": () -> ();
+    "debug_current_icp_time": () -> (nat64) query;
+    "debug_calculate_from_from_current_icp_time": () -> (nat64) query;
+}

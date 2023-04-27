@@ -1,0 +1,14 @@
+type CandidPrice = record {
+    sqrt_price_x96: text;
+    observation_index: nat16;
+    block_timestamp: nat32;
+};
+service : (nat8, nat8) -> {
+    "register_reader": (principal) -> ();
+    "calculate_average_exchange_rate": (opt nat32, opt nat32, nat8) -> (text);
+    "debug_rpcs": () -> (vec record { text; text });
+    "debug_tokens_decimals": () -> (record { nat8; nat8 });
+    "debug_get_prices_from_all_registered": (opt nat32, opt nat32) -> (vec vec CandidPrice);
+    "debug_call_get_prices_in_reader": (principal, opt nat32, opt nat32) -> (vec CandidPrice);
+    "debug_calculate_exchange_rate": (text, nat8) -> (text);
+}
