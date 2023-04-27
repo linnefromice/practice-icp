@@ -1,26 +1,24 @@
 use std::str::FromStr;
 
-use ic_cdk::{query, update};
+use ic_cdk::{api::time, query, update};
 use ic_web3::{
     ic::KeyInfo,
     types::{Address, TransactionParameters, U256},
 };
 
 use crate::{
-    call_calculate_average_exchange_rate, chain_id, eth_gas_price, eth_tx_count,
-    indexer_canister_id, oracle_address, rpc_url, sync_state_internal,
+    call_calculate_average_exchange_rate, chain_id,
+    constants::DEFAULT_FETCH_INTERVAL_BY_SEC,
+    eth_gas_price, eth_tx_count, indexer_canister_id, oracle_address, rpc_url, sync_state_internal,
+    syncing_from,
     types::ExchangeRate,
     utils::{
         default_derivation_key, ethereum_address, generate_web3_client, public_key,
         to_ethereum_address,
     },
-    KEY_NAME,
+    KEY_NAME, TIMER_ID,
 };
 
-#[query]
-fn debug_greet(text: String) -> String {
-    format!("Hello, world!, Hello, {}", text)
-}
 #[query]
 fn debug_get_rpc_url() -> String {
     rpc_url()
@@ -32,6 +30,10 @@ fn debug_get_oracle_address() -> String {
 #[query]
 fn debug_get_indexer_canister_id() -> String {
     indexer_canister_id().to_string()
+}
+#[query]
+fn debug_get_syncing_from() -> u32 {
+    syncing_from()
 }
 #[update]
 async fn debug_ethereum_address_and_public_key() -> Result<(String, String), String> {
@@ -150,4 +152,20 @@ async fn debug_sync_state(
         gas_limit,
     )
     .await
+}
+
+#[update]
+fn debug_stop_periodic_task() {
+    let timer_id = TIMER_ID.with(|value| *value.borrow());
+    ic_cdk_timers::clear_timer(timer_id);
+}
+#[query]
+fn debug_current_icp_time() -> u64 {
+    ic_cdk::api::time()
+}
+#[query]
+fn debug_calculate_from_from_current_icp_time() -> u64 {
+    let interval_sec = DEFAULT_FETCH_INTERVAL_BY_SEC;
+    let current_time_sec = time() / (1000 * 1000000);
+    current_time_sec / interval_sec * interval_sec - interval_sec
 }

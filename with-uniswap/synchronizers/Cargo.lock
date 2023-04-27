@@ -1644,6 +1644,7 @@ dependencies = [
  "hex",
  "ic-cdk 0.6.10",
  "ic-cdk-macros",
+ "ic-cdk-timers",
  "ic-web3",
  "serde_json",
 ]
