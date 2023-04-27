@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "measurer": {
+      "type": "rust",
+      "package": "measurer",
+      "candid": "src/measurer/interface.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
