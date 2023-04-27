@@ -22,7 +22,3 @@ pub fn generate_web3_client(
         Err(e) => Err(e.to_string()),
     }
 }
-
-pub fn default_derivation_key() -> Vec<u8> {
-    ic_cdk::id().as_slice().to_vec()
-}

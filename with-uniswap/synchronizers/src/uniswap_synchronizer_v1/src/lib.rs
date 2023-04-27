@@ -51,7 +51,7 @@ fn rpc_url() -> String {
     RPC_URL.with(|value| (value.borrow()).clone())
 }
 fn chain_id() -> u64 {
-    CHAIN_ID.with(|value| (value.borrow()).clone())
+    CHAIN_ID.with(|value| *value.borrow())
 }
 fn oracle_address() -> String {
     ORACLE_ADDRESS.with(|value| (value.borrow()).clone())
