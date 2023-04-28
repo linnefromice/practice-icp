@@ -4,7 +4,11 @@
     "measurer": {
       "type": "rust",
       "package": "measurer",
-      "candid": "src/measurer/interface.did"
+      "candid": "src/measurer/interface.did",
+      "declarations": {
+        "node_compatibility": true,
+        "env_override": ""
+      }
     }
   },
   "defaults": {
