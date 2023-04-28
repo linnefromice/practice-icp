@@ -7,6 +7,10 @@ service : {
     "get_transaction_count": (opt text) -> (variant { Ok : text; Err : text });
     "get_gas_price": () -> (variant { Ok : text; Err : text });
     "sign_message": (text) -> (vec nat8);
-    "sign_transfer_native": (text, nat64, nat, nat, nat64) -> (variant { Ok : text; Err : text });
-    "transfer_native": (text, nat64, nat, nat, nat64) -> (variant { Ok : text; Err : text });
+    "balance_of_native": () -> (variant { Ok : text; Err : text });
+    "sign_transfer_native": (text, nat64, opt nat, opt nat, nat64) -> (variant { Ok : text; Err : text });
+    "transfer_native": (text, nat64, opt nat, opt nat, nat64) -> (variant { Ok : text; Err : text });
+    "balance_of_erc20": (text, opt text, opt text) -> (variant { Ok : text; Err : text });
+    "sign_transfer_erc20": (text, text, nat64, opt nat, opt nat, nat64) -> (variant { Ok : text; Err : text });
+    "transfer_erc20": (text, text, nat64, opt nat, opt nat, nat64) -> (variant { Ok : text; Err : text });
 }
