@@ -4,6 +4,8 @@ use candid::Principal;
 use ic_web3::{types::Address, ic::{get_public_key as get_public_key_internal, pubkey_to_address as pubkey_to_address_internal }, transports::ICHttp, Web3, contract::Contract};
 
 pub const KN_IN_LOCAL: &str = "dfx_test_key";
+pub const KN_IN_PROD_FOR_TEST: &str = "test_key_1";
+pub const KN_IN_PROD: &str = "key_1";
 
 const BASE_URL: &'static str = "polygon-mumbai.g.alchemy.com";
 const PATH: &'static str = "/v2/6GLIzI5pL0n4bp4c3jESZTRfXxE5XJ_Z";

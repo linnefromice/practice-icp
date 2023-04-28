@@ -17,5 +17,11 @@
       "args": ""
     }
   },
-  "output_env_file": ".env"
+  "output_env_file": ".env",
+  "networks": {
+    "mainnet": {
+      "providers": ["https://ic0.app"],
+      "wallet": "5naws-oiaaa-aaaal-qbxuq-cai"
+    }
+  }
 }
