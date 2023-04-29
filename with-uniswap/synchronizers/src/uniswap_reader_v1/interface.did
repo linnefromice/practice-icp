@@ -21,10 +21,12 @@ type CandidPrice = record {
 service : (text, text) -> {
     "periodic_save_prices": (opt nat64, opt nat64, opt nat64) -> ();
     "get_prices": (opt nat32, opt nat32) -> (vec CandidPrice);
+    "debug_save_prices": (opt nat64, opt nat64) -> (variant { Ok : record { CandidPrice; opt nat32 }; Err : text });
+    "debug_fetch_slot0": (text, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
+    "debug_fetch_observation": (text, nat16, opt nat64, opt nat64) -> (variant { Ok : CandidObservation; Err : text });
+    "debug_fetch_price": (opt text, opt nat64, opt nat64) -> (variant { Ok : CandidPrice; Err : text });
     "debug_get_rpc_url": () -> (text);
     "debug_get_pool_address": () -> (text);
-    "debug_get_slot0": (text, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
-    "debug_get_observation": (text, nat16, opt nat64, opt nat64) -> (variant { Ok : CandidObservation; Err : text });
     "debug_get_prices_length": () -> (nat64);
     "debug_get_price": (nat64) -> (opt CandidPrice);
     "debug_last_price_timestamp_by_hour": () -> (nat32);

@@ -2,6 +2,7 @@ use crate::{
     call_observation, call_slot0,
     constants::INDEXED_TIME_UNIT_BY_SEC,
     last_price, pool_address, price, price_index, prices_length, round_timestamp, rpc_url,
+    save_prices,
     types::{CandidObservation, CandidPrice, CandidSlot0},
     TIMER_ID,
 };
@@ -46,6 +47,15 @@ async fn debug_fetch_price(
         observation_index: slot0.2,
         block_timestamp: observation.0,
     })
+}
+#[update]
+async fn debug_save_prices(
+    max_resp: Option<u64>,
+    cycles: Option<u64>,
+) -> Result<(CandidPrice, Option<u32>), String> {
+    save_prices(max_resp, cycles)
+        .await
+        .map(|(price, index)| (price.to_candid(), index))
 }
 
 #[query]

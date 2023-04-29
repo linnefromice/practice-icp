@@ -83,11 +83,6 @@ pub async fn sign(
             op.gas = Some(U256::from(gas_limit_value))
         }
     });
-    // TODO: consider gas_limit
-    // let estimated_gas = contract.estimate_gas(func, params.clone(), canister_addr, options)
-    //     .await
-    //     .map_err(|e| format!("estimate_gas error: {}", e))?;
-    // options.gas = Some(estimated_gas);
 
     match contract
         .sign(
