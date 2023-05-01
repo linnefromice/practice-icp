@@ -1,5 +1,6 @@
 mod constants;
 mod debug;
+mod store;
 mod types;
 mod utils;
 
@@ -9,26 +10,20 @@ use constants::{
 };
 use ic_cdk::api::management_canister::http_request::{HttpResponse, TransformArgs};
 use ic_cdk_macros::{init, query, update};
-use ic_cdk_timers::TimerId;
 use ic_web3::{
     contract::Options,
     types::{BlockId, BlockNumber, U64},
 };
-use std::cell::RefCell;
+use store::{
+    add_price, get_pool_address, last_price, prices, set_pool_address, set_rpc_url, set_timer_id,
+};
 use types::{CandidPrice, Observation, Price, Slot0};
 use utils::{generate_uniswapv3pool_client, generate_web3_client};
 
-thread_local! {
-    static PRICES: RefCell<Vec<Price>> = RefCell::default();
-    static TIMER_ID: RefCell<TimerId> = RefCell::default();
-    static RPC_URL: RefCell<String> = RefCell::default();
-    static POOL_ADDRESS: RefCell<String> = RefCell::default();
-}
-
 #[init]
 fn init(url: String, pool_addr: String) {
-    RPC_URL.with(|value| *value.borrow_mut() = url);
-    POOL_ADDRESS.with(|value| *value.borrow_mut() = pool_addr);
+    set_rpc_url(url);
+    set_pool_address(pool_addr);
 }
 
 #[query]
@@ -65,12 +60,12 @@ async fn periodic_save_prices(
             }
         });
     });
-    TIMER_ID.with(|value| *value.borrow_mut() = timer_id);
+    set_timer_id(timer_id);
 }
 
 #[query]
 fn get_prices() -> Vec<CandidPrice> {
-    let prices = PRICES.with(|prices| prices.borrow().clone());
+    let prices = prices();
     prices.iter().map(|price| price.to_candid()).collect()
 }
 
@@ -79,7 +74,7 @@ async fn save_prices(
     max_resp: Option<u64>,
     cycles: Option<u64>,
 ) -> Result<(Price, Option<u32>), String> {
-    let pool_addr = pool_address();
+    let pool_addr = get_pool_address();
     let slot0 = call_slot0(pool_addr.clone(), block_number, max_resp, cycles).await?;
     let observation =
         call_observation(pool_addr.clone(), slot0.2, block_number, max_resp, cycles).await?;
@@ -104,9 +99,7 @@ fn update_states(price: Price) -> Result<(Price, Option<u32>), String> {
     }
 
     // save price
-    PRICES.with(|prices| {
-        prices.borrow_mut().push(price.clone());
-    });
+    add_price(price.clone());
 
     Ok((price, None))
 }
@@ -159,20 +152,4 @@ async fn call_observation(
         )
         .await
         .map_err(|e| format!("query contract error: {}", e))
-}
-
-fn rpc_url() -> String {
-    RPC_URL.with(|value| (value.borrow()).clone())
-}
-fn pool_address() -> String {
-    POOL_ADDRESS.with(|value| (value.borrow()).clone())
-}
-fn last_price() -> Option<Price> {
-    PRICES.with(|val| val.borrow().last().cloned())
-}
-fn prices_length() -> u64 {
-    PRICES.with(|val| val.borrow().len()) as u64
-}
-fn price(idx: u64) -> Option<Price> {
-    PRICES.with(|val| val.borrow().get(idx as usize).cloned())
 }

@@ -1,10 +1,10 @@
 use crate::{
     call_observation, call_slot0,
     constants::{BASE_MAX_RESP_BYTES_FOR_HEADER, MAX_RESP_BYTES_ONE_SLOT},
-    pool_address, price, prices_length, rpc_url, save_prices,
+    save_prices,
+    store::{get_pool_address, get_rpc_url, get_timer_id, price, prices_length},
     types::{CandidObservation, CandidPrice, CandidSlot0},
     utils::generate_web3_client,
-    TIMER_ID,
 };
 use ic_cdk_macros::{query, update};
 
@@ -48,7 +48,7 @@ async fn debug_fetch_price(
     let pool_addr = if pool_addr.is_some() {
         pool_addr.unwrap()
     } else {
-        pool_address()
+        get_pool_address()
     };
     let slot0 = call_slot0(pool_addr.clone(), block_number, max_resp, cycles).await?;
     let observation =
@@ -72,11 +72,11 @@ async fn debug_save_prices(
 
 #[query]
 fn debug_get_rpc_url() -> String {
-    rpc_url()
+    get_rpc_url()
 }
 #[query]
 fn debug_get_pool_address() -> String {
-    pool_address()
+    get_pool_address()
 }
 #[query]
 fn debug_get_prices_length() -> u64 {
@@ -88,8 +88,7 @@ fn debug_get_price(idx: u64) -> Option<CandidPrice> {
 }
 #[update]
 fn debug_stop_periodic_save_prices() {
-    let timer_id = TIMER_ID.with(|value| *value.borrow());
-    ic_cdk_timers::clear_timer(timer_id);
+    ic_cdk_timers::clear_timer(get_timer_id());
 }
 #[update]
 async fn debug_fetch_block_number() -> Result<u64, String> {
