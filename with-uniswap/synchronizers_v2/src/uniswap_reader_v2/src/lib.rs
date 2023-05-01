@@ -69,6 +69,22 @@ fn get_prices() -> Vec<CandidPrice> {
     prices.iter().map(|price| price.to_candid()).collect()
 }
 
+#[update]
+async fn bulk_save_prices(block_numbers: Vec<u64>, max_resp: Option<u64>, cycles: Option<u64>) {
+    ic_cdk::println!("START: sync when deployed");
+    for bn in &block_numbers {
+        let res = save_prices(Some(*bn), max_resp, cycles).await;
+        match res {
+            Ok((price, indexed_timestamp)) => {
+                ic_cdk::println!("price: {:?}", price);
+                ic_cdk::println!("indexed_timestamp: {:?}", indexed_timestamp);
+            }
+            Err(msg) => ic_cdk::println!("error msg: {:?}", msg),
+        }
+    }
+    ic_cdk::println!("END: sync when deployed");
+}
+
 async fn save_prices(
     block_number: Option<u64>,
     max_resp: Option<u64>,

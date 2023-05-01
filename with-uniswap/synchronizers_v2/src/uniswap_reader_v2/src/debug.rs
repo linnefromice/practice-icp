@@ -2,7 +2,7 @@ use crate::{
     call_observation, call_slot0,
     constants::{BASE_MAX_RESP_BYTES_FOR_HEADER, MAX_RESP_BYTES_ONE_SLOT},
     save_prices,
-    store::{get_pool_address, get_rpc_url, get_timer_id, price, prices_length},
+    store::{get_pool_address, get_rpc_url, get_timer_id, price, prices, prices_length},
     types::{CandidObservation, CandidPrice, CandidSlot0},
     utils::generate_web3_client,
 };
@@ -85,6 +85,10 @@ fn debug_get_prices_length() -> u64 {
 #[query]
 fn debug_get_price(idx: u64) -> Option<CandidPrice> {
     price(idx).map(|v| v.to_candid())
+}
+#[query]
+fn debug_get_prices() -> Vec<CandidPrice> {
+    prices().iter().map(|v| v.to_candid()).collect()
 }
 #[update]
 fn debug_stop_periodic_save_prices() {
