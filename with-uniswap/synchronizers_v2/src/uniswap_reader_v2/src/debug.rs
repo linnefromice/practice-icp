@@ -1,5 +1,7 @@
 use crate::{
-    call_observation, call_slot0, pool_address, price, prices_length, rpc_url, save_prices,
+    call_observation, call_slot0,
+    constants::{BASE_MAX_RESP_BYTES_FOR_HEADER, MAX_RESP_BYTES_ONE_SLOT},
+    pool_address, price, prices_length, rpc_url, save_prices,
     types::{CandidObservation, CandidPrice, CandidSlot0},
     utils::generate_web3_client,
     TIMER_ID,
@@ -91,7 +93,10 @@ fn debug_stop_periodic_save_prices() {
 }
 #[update]
 async fn debug_fetch_block_number() -> Result<u64, String> {
-    let w3 = generate_web3_client(Some(300), None)?;
+    let w3 = generate_web3_client(
+        Some(BASE_MAX_RESP_BYTES_FOR_HEADER + MAX_RESP_BYTES_ONE_SLOT),
+        None,
+    )?;
     match w3.eth().block_number().await {
         Ok(v) => Ok(v.as_u64()),
         Err(e) => Err(e.to_string()),

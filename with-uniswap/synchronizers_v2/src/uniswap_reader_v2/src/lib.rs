@@ -3,7 +3,10 @@ mod debug;
 mod types;
 mod utils;
 
-use constants::{DEFAULT_FETCH_INTERVAL_BY_SEC, UNISWAPV3_POOL_ABI};
+use constants::{
+    BASE_MAX_RESP_BYTES_FOR_HEADER, DEFAULT_FETCH_INTERVAL_BY_SEC,
+    MAX_RESP_BYTES_TO_CALL_OBSERVATION, MAX_RESP_BYTES_TO_CALL_SLOT0, UNISWAPV3_POOL_ABI,
+};
 use ic_cdk::api::management_canister::http_request::{HttpResponse, TransformArgs};
 use ic_cdk_macros::{init, query, update};
 use ic_cdk_timers::TimerId;
@@ -117,7 +120,7 @@ async fn call_slot0(
     let max_resp = if max_resp.is_some() {
         max_resp
     } else {
-        Some(700) // default
+        Some(BASE_MAX_RESP_BYTES_FOR_HEADER + MAX_RESP_BYTES_TO_CALL_SLOT0) // default
     };
     let w3 = generate_web3_client(max_resp, cycles)?;
     let contract = generate_uniswapv3pool_client(w3, pool_address.as_str(), UNISWAPV3_POOL_ABI)?;
@@ -139,7 +142,8 @@ async fn call_observation(
     let max_resp = if max_resp.is_some() {
         max_resp
     } else {
-        Some(550) // default
+        Some(BASE_MAX_RESP_BYTES_FOR_HEADER + MAX_RESP_BYTES_TO_CALL_OBSERVATION)
+        // default
     };
     let w3 = generate_web3_client(max_resp, cycles)?;
     let contract = generate_uniswapv3pool_client(w3, pool_address.as_str(), UNISWAPV3_POOL_ABI)?;
