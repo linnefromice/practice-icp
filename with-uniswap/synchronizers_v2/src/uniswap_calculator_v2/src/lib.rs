@@ -4,9 +4,32 @@ mod utils;
 
 use candid::Principal;
 use ic_cdk::api::call;
+use ic_cdk_macros::update;
 use ic_web3::types::U256;
 use types::CandidPrice;
 use utils::calculate_realized_volatility;
+
+#[update]
+async fn sync_realized_volatility(
+    canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    from: Option<u32>,
+    to: Option<u32>,
+) -> Result<String, String> {
+    let canister_id = Principal::from_text(canister_id).unwrap();
+    let result = calculate_realized_volatility_for_prices(
+        canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        from,
+        to,
+    )
+    .await?;
+    Ok(result.to_string())
+}
 
 async fn calculate_realized_volatility_for_prices(
     canister_id: Principal,

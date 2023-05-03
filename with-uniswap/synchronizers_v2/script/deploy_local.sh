@@ -35,10 +35,10 @@ dfx canister call reader_v2 get_prices "(opt 1683118740, null)"
 dfx canister call reader_v2 get_prices "(null, opt 1683118740)"
 dfx canister call reader_v2 get_prices "(opt 1_683_111_540, opt 1683118740)"
 
-dfx canister call calculator_v2 debug_calculate_realized_volatility '(vec {"100"; "200"; "300"; "400"; "500"})'
+dfx canister call calculator_v2 debug_calculate_realized_volatility_by_setted_prices '(vec {"100"; "200"; "300"; "400"; "500"})'
 dfx canister call calculator_v2 debug_call_prices "(\"$(dfx canister id reader_v2)\", null, null)"
 dfx canister call calculator_v2 debug_call_prices "(\"$(dfx canister id reader_v2)\", null, opt 1683118740)"
 dfx canister call calculator_v2 debug_calculate_exchange_rates_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
 dfx canister call calculator_v2 debug_calculate_exchange_rates_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"
-dfx canister call calculator_v2 debug_calculate_realized_volatility_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
-dfx canister call calculator_v2 debug_calculate_realized_volatility_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"
+dfx canister call calculator_v2 sync_realized_volatility "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
+dfx canister call calculator_v2 sync_realized_volatility "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"

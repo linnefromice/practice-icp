@@ -4,8 +4,8 @@ type CandidPrice = record {
     block_timestamp: nat32;
 };
 service : {
+    "sync_realized_volatility": (text, nat8, nat8, nat8, opt nat32, opt nat32) -> (variant { Ok : text; Err : text });
     "debug_call_prices": (text, opt nat32, opt nat32) -> (variant { Ok : vec CandidPrice; Err : text });
     "debug_calculate_exchange_rates_for_prices": (text, nat8, nat8, nat8, opt nat32, opt nat32) -> (variant { Ok : vec text; Err : text });
-    "debug_calculate_realized_volatility": (vec text) -> (variant { Ok : text; Err : text });
-    "debug_calculate_realized_volatility_for_prices": (text, nat8, nat8, nat8, opt nat32, opt nat32) -> (variant { Ok : text; Err : text });
+    "debug_calculate_realized_volatility_by_setted_prices": (vec text) -> (variant { Ok : text; Err : text });
 }
