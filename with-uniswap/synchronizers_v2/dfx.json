@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "canisters": {
+    "reader_v2": {
+      "type": "rust",
+      "package": "uniswap_reader_v2",
+      "candid": "src/uniswap_reader_v2/interface.did"
+    },
+    "calculator_v2": {
+      "type": "rust",
+      "package": "uniswap_calculator_v2",
+      "candid": "src/uniswap_calculator_v2/interface.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}

@@ -1,0 +1,40 @@
+type CandidSlot0 = record {
+    sqrt_price_x96: text;
+    tick: int32;
+    observation_index: nat16;
+    observation_cardinality: nat16;
+    observation_cardinality_next: nat16;
+    fee_protocol: nat8;
+    unlocked: bool;
+};
+type CandidObservation = record {
+    block_timestamp: nat32;
+    tick_cumulative: int64;
+    liquidity_cumulative: text;
+    initialized: bool;
+};
+type CandidPrice = record {
+    sqrt_price_x96: text;
+    observation_index: nat16;
+    block_timestamp: nat32;
+};
+service : (text, text, opt nat32) -> {
+    "periodic_save_prices": (opt nat32, opt nat64, opt nat64) -> ();
+    "get_prices": (opt nat32, opt nat32) -> (vec CandidPrice) query;
+    "get_price_indexes": (bool) -> (vec record { nat32; nat64 });
+    "get_filtered_price_indexes": (bool) -> (vec record { nat32; nat64 });
+    "bulk_save_prices": (vec nat64, opt nat64, opt nat64) -> ();
+    "debug_save_prices": (opt nat64, opt nat64) -> (variant { Ok : record { CandidPrice; opt nat32 }; Err : text });
+    "debug_fetch_slot0": (text, opt nat64, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
+    "debug_fetch_observation": (text, nat16, opt nat64, opt nat64, opt nat64) -> (variant { Ok : CandidObservation; Err : text });
+    "debug_fetch_price": (opt text, opt nat64, opt nat64, opt nat64) -> (variant { Ok : CandidPrice; Err : text });
+    "debug_get_rpc_url": () -> (text);
+    "debug_get_pool_address": () -> (text);
+    "debug_get_from_synced_timestamp": () -> (nat32);
+    "debug_get_from_past_synced_timestamp": () -> (nat32);
+    "debug_get_prices_length": () -> (nat64);
+    "debug_get_price": (nat64) -> (opt CandidPrice);
+    "debug_get_prices": () -> (vec CandidPrice);
+    "debug_stop_periodic_save_prices": () -> ();
+    "debug_fetch_block_number": () -> (variant { Ok : nat64; Err : text });
+}
