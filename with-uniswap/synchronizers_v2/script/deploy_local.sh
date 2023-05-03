@@ -9,9 +9,10 @@ dfx deploy reader_v2 \
 
 dfx canister call reader_v2 bulk_save_prices '(
     vec {
+        17179465;
         17179759;
         17180054;
-        17180352
+        17180352;
     },
     null,
     null
@@ -23,8 +24,21 @@ dfx canister call reader_v2 periodic_save_prices '(
     null
 )'
 
-dfx canister call reader_v2 get_prices "(null, null)"
+
 dfx canister call reader_v2 get_price_indexes "(false)"
 dfx canister call reader_v2 get_price_indexes "(true)"
 dfx canister call reader_v2 get_filtered_price_indexes "(false)"
 dfx canister call reader_v2 get_filtered_price_indexes "(true)"
+
+dfx canister call reader_v2 get_prices "(null, null)"
+dfx canister call reader_v2 get_prices "(opt 1683118740, null)"
+dfx canister call reader_v2 get_prices "(null, opt 1683118740)"
+dfx canister call reader_v2 get_prices "(opt 1_683_111_540, opt 1683118740)"
+
+dfx canister call calculator_v2 debug_calculate_realized_volatility '(vec {"100"; "200"; "300"; "400"; "500"})'
+dfx canister call calculator_v2 debug_call_prices "(\"$(dfx canister id reader_v2)\", null, null)"
+dfx canister call calculator_v2 debug_call_prices "(\"$(dfx canister id reader_v2)\", null, opt 1683118740)"
+dfx canister call calculator_v2 debug_calculate_exchange_rates_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
+dfx canister call calculator_v2 debug_calculate_exchange_rates_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"
+dfx canister call calculator_v2 debug_calculate_realized_volatility_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
+dfx canister call calculator_v2 debug_calculate_realized_volatility_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"
