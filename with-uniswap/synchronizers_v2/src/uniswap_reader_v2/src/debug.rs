@@ -1,8 +1,11 @@
 use crate::{
     call_observation, call_slot0,
     constants::{BASE_MAX_RESP_BYTES_FOR_HEADER, MAX_RESP_BYTES_ONE_SLOT},
-    save_prices,
-    store::{get_pool_address, get_rpc_url, get_timer_id, price, prices, prices_length},
+    get_last_price_timestamp_by_indexed_time_unit, save_prices,
+    store::{
+        get_from_past_synced_timestamp, get_from_synced_timestamp, get_pool_address, get_rpc_url,
+        get_timer_id, price, prices, prices_length,
+    },
     types::{CandidObservation, CandidPrice, CandidSlot0},
     utils::generate_web3_client,
 };
@@ -79,6 +82,14 @@ fn debug_get_pool_address() -> String {
     get_pool_address()
 }
 #[query]
+fn debug_get_from_synced_timestamp() -> u32 {
+    get_from_synced_timestamp()
+}
+#[query]
+fn debug_get_from_past_synced_timestamp() -> u32 {
+    get_from_past_synced_timestamp()
+}
+#[query]
 fn debug_get_prices_length() -> u64 {
     prices_length()
 }
@@ -93,6 +104,10 @@ fn debug_get_prices() -> Vec<CandidPrice> {
 #[update]
 fn debug_stop_periodic_save_prices() {
     ic_cdk_timers::clear_timer(get_timer_id());
+}
+#[query]
+fn debug_last_price_timestamp_by_indexed_time_unit() -> u32 {
+    get_last_price_timestamp_by_indexed_time_unit()
 }
 #[update]
 async fn debug_fetch_block_number() -> Result<u64, String> {

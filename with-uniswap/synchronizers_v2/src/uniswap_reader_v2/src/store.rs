@@ -1,13 +1,62 @@
 use ic_cdk_timers::TimerId;
 use std::cell::RefCell;
+use std::collections::HashMap;
 
 use crate::types::Price;
 
 thread_local! {
     static PRICES: RefCell<Vec<Price>> = RefCell::default();
+    static PRICE_INDEXES: RefCell<HashMap<u32,u64>> = RefCell::new(HashMap::new());
+    static PRICE_INDEX_INTERVAL_SEC: RefCell<u32> = RefCell::default();
+    static FROM_SYNCED_TIMESTAMP: RefCell<u32> = RefCell::default();
+    static FROM_PAST_SYNCED_TIMESTAMP: RefCell<u32> = RefCell::default();
     static TIMER_ID: RefCell<TimerId> = RefCell::default();
     static RPC_URL: RefCell<String> = RefCell::default();
     static POOL_ADDRESS: RefCell<String> = RefCell::default();
+}
+
+pub fn prices() -> Vec<Price> {
+    PRICES.with(|val| val.borrow().clone())
+}
+pub fn last_price() -> Option<Price> {
+    PRICES.with(|val| val.borrow().last().cloned())
+}
+pub fn prices_length() -> u64 {
+    PRICES.with(|val| val.borrow().len()) as u64
+}
+pub fn price(idx: u64) -> Option<Price> {
+    PRICES.with(|val| val.borrow().get(idx as usize).cloned())
+}
+pub fn add_price(price: Price) {
+    PRICES.with(|val| val.borrow_mut().push(price));
+}
+
+pub fn get_price_index(timestamp: u32) -> Option<u64> {
+    PRICE_INDEXES.with(|val| val.borrow().get(&timestamp).cloned())
+}
+pub fn insert_price_index(timestamp: u32, index: u64) {
+    PRICE_INDEXES.with(|val| val.borrow_mut().insert(timestamp, index));
+}
+
+pub fn get_price_index_interval_sec() -> u32 {
+    PRICE_INDEX_INTERVAL_SEC.with(|val| *val.borrow())
+}
+pub fn set_price_index_interval_sec(value: u32) {
+    PRICE_INDEX_INTERVAL_SEC.with(|val| *val.borrow_mut() = value);
+}
+
+pub fn get_from_synced_timestamp() -> u32 {
+    FROM_SYNCED_TIMESTAMP.with(|val| *val.borrow())
+}
+pub fn set_from_synced_timestamp(value: u32) {
+    FROM_SYNCED_TIMESTAMP.with(|val| *val.borrow_mut() = value);
+}
+
+pub fn get_from_past_synced_timestamp() -> u32 {
+    FROM_PAST_SYNCED_TIMESTAMP.with(|val| *val.borrow())
+}
+pub fn set_from_past_synced_timestamp(value: u32) {
+    FROM_PAST_SYNCED_TIMESTAMP.with(|val| *val.borrow_mut() = value);
 }
 
 pub fn get_timer_id() -> TimerId {
@@ -29,20 +78,4 @@ pub fn get_pool_address() -> String {
 }
 pub fn set_pool_address(pool_addr: String) {
     POOL_ADDRESS.with(|value| *value.borrow_mut() = pool_addr);
-}
-
-pub fn prices() -> Vec<Price> {
-    PRICES.with(|val| val.borrow().clone())
-}
-pub fn last_price() -> Option<Price> {
-    PRICES.with(|val| val.borrow().last().cloned())
-}
-pub fn prices_length() -> u64 {
-    PRICES.with(|val| val.borrow().len()) as u64
-}
-pub fn price(idx: u64) -> Option<Price> {
-    PRICES.with(|val| val.borrow().get(idx as usize).cloned())
-}
-pub fn add_price(price: Price) {
-    PRICES.with(|val| val.borrow_mut().push(price));
 }

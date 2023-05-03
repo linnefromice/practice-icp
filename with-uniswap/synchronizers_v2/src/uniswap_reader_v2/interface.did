@@ -18,9 +18,11 @@ type CandidPrice = record {
     observation_index: nat16;
     block_timestamp: nat32;
 };
-service : (text, text) -> {
-    "periodic_save_prices": (opt nat64, opt nat64, opt nat64) -> ();
-    "get_prices": () -> (vec CandidPrice) query;
+service : (text, text, opt nat32) -> {
+    "periodic_save_prices": (opt nat32, opt nat64, opt nat64) -> ();
+    "get_prices": (opt nat64, opt nat64) -> (vec CandidPrice) query;
+    "get_price_indexes": (bool) -> (vec record { nat32; nat64 });
+    "get_filtered_price_indexes": (bool) -> (vec record { nat32; nat64 });
     "bulk_save_prices": (vec nat64, opt nat64, opt nat64) -> ();
     "debug_save_prices": (opt nat64, opt nat64) -> (variant { Ok : record { CandidPrice; opt nat32 }; Err : text });
     "debug_fetch_slot0": (text, opt nat64, opt nat64, opt nat64) -> (variant { Ok : CandidSlot0; Err : text });
@@ -28,6 +30,8 @@ service : (text, text) -> {
     "debug_fetch_price": (opt text, opt nat64, opt nat64, opt nat64) -> (variant { Ok : CandidPrice; Err : text });
     "debug_get_rpc_url": () -> (text);
     "debug_get_pool_address": () -> (text);
+    "debug_get_from_synced_timestamp": () -> (nat32);
+    "debug_get_from_past_synced_timestamp": () -> (nat32);
     "debug_get_prices_length": () -> (nat64);
     "debug_get_price": (nat64) -> (opt CandidPrice);
     "debug_get_prices": () -> (vec CandidPrice);
