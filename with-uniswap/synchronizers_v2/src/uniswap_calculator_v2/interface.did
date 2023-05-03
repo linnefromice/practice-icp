@@ -1,3 +1,11 @@
+type CandidPrice = record {
+    sqrt_price_x96: text;
+    observation_index: nat16;
+    block_timestamp: nat32;
+};
 service : {
-    "greet": (text) -> (text) query;
+    "debug_call_prices": (text) -> (variant { Ok : vec CandidPrice; Err : text });
+    "debug_calculate_exchange_rates_for_prices": (text, nat8, nat8, nat8) -> (variant { Ok : vec text; Err : text });
+    "debug_calculate_realized_volatility": (vec text) -> (variant { Ok : text; Err : text });
+    "debug_calculate_realized_volatility_for_prices": (text, nat8, nat8, nat8) -> (variant { Ok : text; Err : text });
 }

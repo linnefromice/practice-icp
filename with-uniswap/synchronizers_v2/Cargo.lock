@@ -1618,6 +1618,8 @@ dependencies = [
  "candid",
  "ic-cdk 0.6.10",
  "ic-cdk-macros",
+ "ic-web3",
+ "serde",
 ]
 
 [[package]]

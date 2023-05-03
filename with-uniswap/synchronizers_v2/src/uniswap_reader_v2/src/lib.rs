@@ -71,7 +71,7 @@ fn get_prices() -> Vec<CandidPrice> {
 
 #[update]
 async fn bulk_save_prices(block_numbers: Vec<u64>, max_resp: Option<u64>, cycles: Option<u64>) {
-    ic_cdk::println!("START: sync when deployed");
+    ic_cdk::println!("START: bulk save prices");
     for bn in &block_numbers {
         let res = save_prices(Some(*bn), max_resp, cycles).await;
         match res {
@@ -82,7 +82,7 @@ async fn bulk_save_prices(block_numbers: Vec<u64>, max_resp: Option<u64>, cycles
             Err(msg) => ic_cdk::println!("error msg: {:?}", msg),
         }
     }
-    ic_cdk::println!("END: sync when deployed");
+    ic_cdk::println!("END: bulk save prices");
 }
 
 async fn save_prices(
