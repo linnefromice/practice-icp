@@ -1637,6 +1637,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "uniswap_relayer_v2"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "ic-cdk 0.6.10",
+ "ic-cdk-macros",
+]
+
+[[package]]
 name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
