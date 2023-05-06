@@ -1,3 +1,33 @@
+type HttpHeader = record { value : text; name : text };
+type HttpResponse = record {
+  status : nat;
+  body : vec nat8;
+  headers : vec HttpHeader;
+};
+type Metrics = record { balance : nat };
+type Result = variant { Ok : text; Err : text };
+type Result_1 = variant { Ok : nat; Err : text };
+type TransformArgs = record { context : vec nat8; response : HttpResponse };
 service : {
-    "greet": (text) -> (text) query;
+  debug_call_balance_of_native : () -> (Result);
+  debug_call_hhi_of_top_n : () -> (Result_1);
+  debug_call_transfer_native : (text, nat64) -> (Result);
+  debug_get_chain_id : () -> (nat64) query;
+  debug_get_key_name : () -> (text) query;
+  debug_get_mapper : () -> (text) query;
+  debug_get_oracle_address : () -> (text) query;
+  debug_get_rpc_url : () -> (text) query;
+  debug_set_chain_id : (nat64) -> ();
+  debug_set_ecdsa_key_for_local : () -> ();
+  debug_set_ecdsa_key_for_prod : () -> ();
+  debug_set_ecdsa_key_for_test : () -> ();
+  debug_set_hhi_canister : (text) -> ();
+  debug_set_mapper : (text) -> ();
+  debug_set_oracle_address : (text) -> ();
+  debug_set_rpc_url : (text) -> ();
+  debug_stop_task : () -> ();
+  debug_sync_state : (nat, opt nat, opt nat, opt nat) -> (Result);
+  get_ethereum_address : () -> (text);
+  setup : (text, text, text, nat64, text) -> ();
+  transform : (TransformArgs) -> (HttpResponse) query;
 }
