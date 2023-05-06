@@ -1,43 +1,63 @@
 use std::str::FromStr;
 
-use candid::candid_method;
-use ic_cdk::{api::call::CallResult, query, update};
+use candid::{candid_method, Principal};
+use ic_cdk::{query, update};
 use ic_web3::{
     ic::KeyInfo,
     types::{Address, TransactionParameters, U256},
 };
 
 use crate::{
+    call_get_last_4week_realized_volatility, call_get_last_day_realized_volatility,
     env::EcdsaKeyEnvs,
     eth::{eth_gas_price, eth_tx_count, generate_web3_client},
     store::{
-        chain_id, hhi_canister, key_name, mapper, oracle_address, rpc_url, set_chain_id,
-        set_hhi_canister, set_key_name, set_mapper, set_oracle_address, set_rpc_url, timer_id,
+        get_call_canister_args, get_chain_id, get_oracle_address, get_rpc_url, get_target_canister,
+        key_name, set_call_canister_args, set_chain_id, set_key_name, set_oracle_address,
+        set_rpc_url, set_target_canister, timer_id,
     },
-    sync_state_internal,
+    sync_state, sync_state_internal,
+    types::CallCanisterArgs,
     utils::{default_derivation_key, ethereum_address},
-    MAX_RESP_TO_READ_SCALAR, MAX_RESP_TO_SEND_TX, TOP_N_FOR_HHI,
+    MAX_RESP_TO_READ_SCALAR, MAX_RESP_TO_SEND_TX, PRECISION_FOR_ORACLE,
 };
 
 #[update]
 #[candid_method(update)]
-fn debug_set_hhi_canister(hhi_canister_id: String) {
-    set_hhi_canister(hhi_canister_id)
-}
-#[query]
-#[candid_method(query)]
-fn debug_get_mapper() -> String {
-    mapper()
+fn debug_get_target_canister() -> String {
+    get_target_canister().to_string()
 }
 #[update]
 #[candid_method(update)]
-fn debug_set_mapper(mapper_canister_id: String) {
-    set_mapper(mapper_canister_id)
+fn debug_set_target_canister(value: String) {
+    set_target_canister(Principal::from_text(value).unwrap())
+}
+#[query]
+#[candid_method(query)]
+fn debug_get_call_canister_args() -> CallCanisterArgs {
+    get_call_canister_args()
+}
+#[update]
+#[candid_method(update)]
+fn debug_set_call_canister_args(
+    data_resource_canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) {
+    set_call_canister_args(CallCanisterArgs {
+        data_resource_canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        back_terms,
+    })
 }
 #[query]
 #[candid_method(query)]
 fn debug_get_rpc_url() -> String {
-    rpc_url()
+    get_rpc_url()
 }
 #[update]
 #[candid_method(update)]
@@ -47,7 +67,7 @@ fn debug_set_rpc_url(rpc_url: String) {
 #[query]
 #[candid_method(query)]
 fn debug_get_chain_id() -> u64 {
-    chain_id()
+    get_chain_id()
 }
 #[update]
 #[candid_method(update)]
@@ -57,7 +77,7 @@ fn debug_set_chain_id(chain_id: u64) {
 #[query]
 #[candid_method(query)]
 fn debug_get_oracle_address() -> String {
-    oracle_address()
+    get_oracle_address()
 }
 #[update]
 #[candid_method(update)]
@@ -143,7 +163,7 @@ async fn debug_call_transfer_native(to: String, value: u64) -> Result<String, St
                 key_name: key_name(),
                 // ecdsa_sign_cycles: None, // for latest repo
             },
-            chain_id(),
+            get_chain_id(),
         )
         .await
         .map_err(|e| format!("sign tx error: {}", e))?;
@@ -163,6 +183,32 @@ async fn debug_call_transfer_native(to: String, value: u64) -> Result<String, St
 #[update]
 #[candid_method(update)]
 async fn debug_sync_state(
+    target_canister_id: String,
+    data_resource_canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+    precision_to_sync: Option<u8>,
+) -> Result<String, String> {
+    let target_canister_id = Principal::from_text(target_canister_id).unwrap();
+    sync_state(
+        target_canister_id,
+        CallCanisterArgs {
+            data_resource_canister_id,
+            token0_decimals,
+            token1_decimals,
+            precision,
+            back_terms,
+        },
+        precision_to_sync.unwrap_or(PRECISION_FOR_ORACLE),
+    )
+    .await
+}
+
+#[update]
+#[candid_method(update)]
+async fn debug_sync_state_internal(
     value: u128,
     gas_coefficient_molecule: Option<u128>,
     gas_coefficient_denominator: Option<u128>,
@@ -179,11 +225,48 @@ async fn debug_sync_state(
 
 #[update]
 #[candid_method(update)]
-async fn debug_call_hhi_of_top_n() -> Result<u128, String> {
-    let result: CallResult<(u128,)> =
-        ic_cdk::api::call::call(hhi_canister(), "hhi_of_top_n", (mapper(), TOP_N_FOR_HHI)).await;
-    match result {
-        Ok((hhi,)) => Ok(hhi),
-        Err(e) => Err(format!("error msg by calling hhi_of_top_n: {:?}", e)),
-    }
+async fn debug_call_get_last_4week_realized_volatility(
+    target_canister_id: String,
+    data_resource_canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) -> Result<String, String> {
+    let target_canister_id = Principal::from_text(target_canister_id).unwrap();
+    call_get_last_4week_realized_volatility(
+        target_canister_id,
+        CallCanisterArgs {
+            data_resource_canister_id,
+            token0_decimals,
+            token1_decimals,
+            precision,
+            back_terms,
+        },
+    )
+    .await
+}
+
+#[update]
+#[candid_method(update)]
+async fn debug_call_get_last_day_realized_volatility(
+    target_canister_id: String,
+    data_resource_canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) -> Result<String, String> {
+    let target_canister_id = Principal::from_text(target_canister_id).unwrap();
+    call_get_last_day_realized_volatility(
+        target_canister_id,
+        CallCanisterArgs {
+            data_resource_canister_id,
+            token0_decimals,
+            token1_decimals,
+            precision,
+            back_terms,
+        },
+    )
+    .await
 }

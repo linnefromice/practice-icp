@@ -8,11 +8,11 @@ use ic_web3::{
 use std::ops::{Div, Mul};
 use std::str::FromStr;
 
-use crate::store::{chain_id, key_name, rpc_url};
+use crate::store::{get_chain_id, key_name, get_rpc_url};
 use crate::utils::{default_derivation_key, ethereum_address};
 
 pub fn generate_web3_client(max_resp: Option<u64>) -> Result<Web3<ICHttp>, String> {
-    match ICHttp::new(rpc_url().as_str(), max_resp, None) {
+    match ICHttp::new(get_rpc_url().as_str(), max_resp, None) {
         Ok(v) => Ok(Web3::new(v)),
         Err(e) => Err(e.to_string()),
     }
@@ -90,7 +90,7 @@ pub async fn sign(
                 key_name: key_name().to_string(),
                 // ecdsa_sign_cycles: None, // use default (is there a problem with prod_key?)
             },
-            chain_id(),
+            get_chain_id(),
         )
         .await
     {
