@@ -20,7 +20,7 @@ type CandidPrice = record {
 };
 service : (text, text, opt nat32) -> {
     "periodic_save_prices": (opt nat32, opt nat64, opt nat64) -> ();
-    "get_prices": (opt nat32, opt nat32) -> (vec CandidPrice) query;
+    "get_prices": (opt nat32, opt nat32) -> (variant { Ok : vec CandidPrice; Err : text }) query;
     "get_price_indexes": (bool) -> (vec record { nat32; nat64 });
     "get_filtered_price_indexes": (bool) -> (vec record { nat32; nat64 });
     "bulk_save_prices": (vec nat64, opt nat64, opt nat64) -> ();

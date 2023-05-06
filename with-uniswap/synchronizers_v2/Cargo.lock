@@ -1641,8 +1641,11 @@ name = "uniswap_relayer_v2"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "hex",
  "ic-cdk 0.6.10",
  "ic-cdk-macros",
+ "ic-cdk-timers",
+ "ic-web3",
 ]
 
 [[package]]

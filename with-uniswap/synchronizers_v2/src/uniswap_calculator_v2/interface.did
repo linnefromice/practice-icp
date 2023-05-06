@@ -3,9 +3,24 @@ type CandidPrice = record {
     observation_index: nat16;
     block_timestamp: nat32;
 };
+type CandidTimestamps = record {
+    from: nat32;
+    to: nat32;
+};
 service : {
-    "sync_realized_volatility": (text, nat8, nat8, nat8, opt nat32, opt nat32) -> (variant { Ok : text; Err : text });
+    "get_realized_volatility": (text, nat8, nat8, nat8, opt nat32, opt nat32) -> (variant { Ok : text; Err : text });
+    "get_last_4week_realized_volatility": (text, nat8, nat8, nat8, opt nat8) -> (variant { Ok : text; Err : text });
+    "get_last_day_realized_volatility": (text, nat8, nat8, nat8, opt nat8) -> (variant { Ok : text; Err : text });
+    "get_last_hour_realized_volatility": (text, nat8, nat8, nat8, opt nat8) -> (variant { Ok : text; Err : text });
     "debug_call_prices": (text, opt nat32, opt nat32) -> (variant { Ok : vec CandidPrice; Err : text });
     "debug_calculate_exchange_rates_for_prices": (text, nat8, nat8, nat8, opt nat32, opt nat32) -> (variant { Ok : vec text; Err : text });
     "debug_calculate_realized_volatility_by_setted_prices": (vec text) -> (variant { Ok : text; Err : text });
+    "debug_get_last_30minites_realized_volatility": (text, nat8, nat8, nat8, opt nat8) -> (variant { Ok : text; Err : text });
+    "debug_get_last_10minites_realized_volatility": (text, nat8, nat8, nat8, opt nat8) -> (variant { Ok : text; Err : text });
+    "debug_get_last_5minites_realized_volatility": (text, nat8, nat8, nat8, opt nat8) -> (variant { Ok : text; Err : text });
+    "debug_last_4week": (opt nat8) -> (CandidTimestamps) query;
+    "debug_last_1day": (opt nat8) -> (CandidTimestamps) query;
+    "debug_last_30min": (opt nat8) -> (CandidTimestamps) query;
+    "debug_last_10min": (opt nat8) -> (CandidTimestamps) query;
+    "debug_last_5min": (opt nat8) -> (CandidTimestamps) query;
 }

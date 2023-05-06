@@ -44,5 +44,5 @@ dfx canister call calculator_v2 debug_call_prices "(\"$(dfx canister id reader_v
 dfx canister call calculator_v2 debug_call_prices "(\"$(dfx canister id reader_v2)\", null, opt 1683118740)"
 dfx canister call calculator_v2 debug_calculate_exchange_rates_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
 dfx canister call calculator_v2 debug_calculate_exchange_rates_for_prices "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"
-dfx canister call calculator_v2 sync_realized_volatility "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
-dfx canister call calculator_v2 sync_realized_volatility "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"
+dfx canister call calculator_v2 get_realized_volatility "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, null)"
+dfx canister call calculator_v2 get_realized_volatility "(\"$(dfx canister id reader_v2)\", 6, 18, 10, null, opt 1683118740)"

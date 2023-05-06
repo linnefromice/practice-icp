@@ -19,9 +19,10 @@ use ic_web3::{
     types::{BlockId, BlockNumber, U64},
 };
 use store::{
-    add_price, get_from_past_synced_timestamp, get_from_synced_timestamp, get_pool_address,
-    get_price_index, get_price_index_interval_sec, insert_price_index, last_price, prices,
-    prices_length, set_pool_address, set_price_index_interval_sec, set_rpc_url, set_timer_id,
+    add_price, get_closest_high_price_index, get_closest_low_price_index,
+    get_from_past_synced_timestamp, get_from_synced_timestamp, get_pool_address, get_price_index,
+    get_price_index_interval_sec, insert_price_index, last_price, prices, prices_length,
+    set_pool_address, set_price_index_interval_sec, set_rpc_url, set_timer_id,
 };
 use types::{CandidPrice, Observation, Price, Slot0};
 use utils::{generate_uniswapv3pool_client, generate_web3_client, round_timestamp};
@@ -122,31 +123,31 @@ async fn periodic_save_prices(
 }
 
 #[query]
-fn get_prices(from: Option<u32>, to: Option<u32>) -> Vec<CandidPrice> {
+fn get_prices(from: Option<u32>, to: Option<u32>) -> Result<Vec<CandidPrice>, String> {
     let price_data = prices();
     // TODO: impl validations to check data counts
     let filtered_prices = match (from, to) {
         (Some(from_ts), Some(to_ts)) => {
-            let from = get_price_index(from_ts).unwrap();
-            let to = get_price_index(to_ts).unwrap();
+            let from = get_closest_high_price_index(from_ts, to_ts)?;
+            let to = get_closest_low_price_index(to_ts, from_ts)?;
             price_data[(from as usize)..(to as usize)].to_vec()
         }
         (Some(from_ts), None) => {
-            let from = get_price_index(from_ts).unwrap();
+            let from = get_closest_high_price_index(from_ts, u32::MAX)?; // temp: u32::MAX
             let (_, slice_from_index) = price_data.split_at(from as usize);
             slice_from_index.to_vec()
         }
         (None, Some(to_ts)) => {
-            let to = get_price_index(to_ts).unwrap();
+            let to = get_closest_low_price_index(to_ts, u32::MIN)?; // temp: u32::MIN
             let (slice_up_to_index, _) = price_data.split_at(to as usize);
             slice_up_to_index.to_vec()
         }
         _ => price_data,
     };
-    filtered_prices
+    Ok(filtered_prices
         .iter()
         .map(|price| price.to_candid())
-        .collect()
+        .collect())
 }
 
 #[query]
@@ -182,7 +183,9 @@ fn get_filtered_price_indexes(from_past: bool) -> Vec<(u32, u64)> {
     if filtered.len() <= 1 {
         return filtered;
     };
-    filtered.push(*result.last().unwrap());
+    if from_past {
+        filtered.push(*result.last().unwrap());
+    }
     filtered
 }
 
@@ -249,7 +252,7 @@ async fn save_prices(
 fn update_states(price: Price) -> Result<(Price, Option<u32>), String> {
     // validations
     let last_price = last_price();
-    if let Some(value) = last_price {
+    if let Some(value) = last_price.clone() {
         if value.block_timestamp == price.block_timestamp {
             return Err(format!(
                 "Already fetched: timestamp={}",
@@ -262,14 +265,27 @@ fn update_states(price: Price) -> Result<(Price, Option<u32>), String> {
     add_price(price.clone());
 
     // save index
-    let rounded_timestamp = round_timestamp(price.block_timestamp, get_price_index_interval_sec());
+    let price_index_interval_sec = get_price_index_interval_sec();
+    let rounded_timestamp = round_timestamp(price.block_timestamp, price_index_interval_sec);
     let last_index = get_price_index(rounded_timestamp);
     if last_index.is_some() {
         return Ok((price, None));
     }
     let saved_latest_index = prices_length() - 1;
     insert_price_index(rounded_timestamp, saved_latest_index);
-    // TODO: consider remaining price between
+    //// consider remaining price between
+    // if let Some(value) = last_price {
+    //     let last_rounded_timestamp =
+    //         round_timestamp(value.block_timestamp, price_index_interval_sec);
+    //     let mut price_index_timestamp_in_middle = last_rounded_timestamp;
+    //     loop {
+    //         price_index_timestamp_in_middle += price_index_interval_sec;
+    //         if price_index_timestamp_in_middle >= rounded_timestamp {
+    //             break;
+    //         }
+    //         insert_price_index(price_index_timestamp_in_middle, saved_latest_index - 1);
+    //     }
+    // }
 
     Ok((price, Some(rounded_timestamp)))
 }
