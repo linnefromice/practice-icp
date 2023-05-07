@@ -1,5 +1,6 @@
 use std::ops::{Div, Mul};
 
+use ic_cdk::api::time;
 use ic_web3::types::U256;
 
 fn pow10(n: U256) -> U256 {
@@ -40,4 +41,12 @@ pub fn calculate_realized_volatility(prices: &[U256]) -> f64 {
     // Calculate the realized volatility
     let sum_of_squared_r = all_squared_r.iter().sum::<f64>();
     (sum_of_squared_r / (prices_len - 1) as f64).sqrt() * 100.0
+}
+
+pub fn current_time_sec() -> u32 {
+    (time() / (1000 * 1000000)) as u32
+}
+
+pub fn round_timestamp(timestamp: u32, unit: u32) -> u32 {
+    timestamp / unit * unit
 }

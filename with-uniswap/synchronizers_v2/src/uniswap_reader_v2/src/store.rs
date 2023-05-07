@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 
 use crate::types::Price;
+use crate::utils::round_timestamp;
 
 thread_local! {
     static PRICES: RefCell<Vec<Price>> = RefCell::default();
@@ -33,6 +34,52 @@ pub fn add_price(price: Price) {
 
 pub fn get_price_index(timestamp: u32) -> Option<u64> {
     PRICE_INDEXES.with(|val| val.borrow().get(&timestamp).cloned())
+}
+pub fn get_closest_high_price_index(ts: u32, max: u32) -> Result<u64, String> {
+    // at first, specified ts is used for key
+    if let Some(value) = get_price_index(ts) {
+        return Ok(value);
+    }
+
+    let index_interval = get_price_index_interval_sec();
+    let mut current_ts = round_timestamp(ts + index_interval, index_interval);
+    loop {
+        let index = get_price_index(current_ts);
+        if let Some(value) = index {
+            return Ok(value);
+        }
+        current_ts += index_interval;
+        if current_ts > max {
+            break;
+        }
+    }
+    Err(format!(
+        "No price index found for timestamp {} - {}",
+        ts, current_ts
+    ))
+}
+pub fn get_closest_low_price_index(ts: u32, min: u32) -> Result<u64, String> {
+    // at first, specified ts is used for key
+    if let Some(value) = get_price_index(ts) {
+        return Ok(value);
+    }
+
+    let index_interval = get_price_index_interval_sec();
+    let mut current_ts = round_timestamp(ts, index_interval);
+    loop {
+        let index = get_price_index(current_ts);
+        if let Some(value) = index {
+            return Ok(value);
+        }
+        current_ts -= index_interval;
+        if current_ts < min {
+            break;
+        }
+    }
+    Err(format!(
+        "No price index found for timestamp {} - {}",
+        ts, current_ts
+    ))
 }
 pub fn insert_price_index(timestamp: u32, index: u64) {
     PRICE_INDEXES.with(|val| val.borrow_mut().insert(timestamp, index));

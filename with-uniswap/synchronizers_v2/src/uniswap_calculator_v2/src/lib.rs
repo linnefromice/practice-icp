@@ -1,16 +1,18 @@
+mod constants;
 mod debug;
 mod types;
 mod utils;
 
 use candid::Principal;
+use constants::{DAY_SECONDS, HOUR_SECONDS, WEEK_SECONDS};
 use ic_cdk::api::call;
 use ic_cdk_macros::update;
 use ic_web3::types::U256;
 use types::CandidPrice;
-use utils::calculate_realized_volatility;
+use utils::{calculate_realized_volatility, current_time_sec, round_timestamp};
 
 #[update]
-async fn sync_realized_volatility(
+async fn get_realized_volatility(
     canister_id: String,
     token0_decimals: u8,
     token1_decimals: u8,
@@ -29,6 +31,88 @@ async fn sync_realized_volatility(
     )
     .await?;
     Ok(result.to_string())
+}
+
+#[update]
+async fn get_last_4week_realized_volatility(
+    canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) -> Result<String, String> {
+    calculate_last_xxx_realized_volatility(
+        canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        4 * WEEK_SECONDS,
+        back_terms,
+    )
+    .await
+}
+
+#[update]
+async fn get_last_day_realized_volatility(
+    canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) -> Result<String, String> {
+    calculate_last_xxx_realized_volatility(
+        canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        DAY_SECONDS,
+        back_terms,
+    )
+    .await
+}
+
+#[update]
+async fn get_last_hour_realized_volatility(
+    canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) -> Result<String, String> {
+    calculate_last_xxx_realized_volatility(
+        canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        HOUR_SECONDS,
+        back_terms,
+    )
+    .await
+}
+
+async fn calculate_last_xxx_realized_volatility(
+    canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    time_unit: u32,
+    back_terms: Option<u8>,
+) -> Result<String, String> {
+    let mut rounded_current_time = round_timestamp(current_time_sec(), time_unit);
+    if let Some(value) = back_terms {
+        rounded_current_time -= value as u32 * time_unit;
+    }
+    ic_cdk::println!("from: {}", rounded_current_time - time_unit);
+    ic_cdk::println!("to: {}", rounded_current_time);
+    get_realized_volatility(
+        canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        Some(rounded_current_time - time_unit),
+        Some(rounded_current_time),
+    )
+    .await
 }
 
 async fn calculate_realized_volatility_for_prices(
@@ -88,8 +172,10 @@ async fn call_prices(
     from: Option<u32>,
     to: Option<u32>,
 ) -> Result<Vec<CandidPrice>, String> {
-    call::call::<_, (Vec<CandidPrice>,)>(canister_id, "get_prices", (from, to))
-        .await
-        .map(|v| v.0)
+    let res =
+        call::call::<_, (Result<Vec<CandidPrice>, String>,)>(canister_id, "get_prices", (from, to))
+            .await
+            .map_err(|e| format!("Error calling get_prices: {:?}", e))?;
+    res.0
         .map_err(|e| format!("Error calling get_prices: {:?}", e))
 }
