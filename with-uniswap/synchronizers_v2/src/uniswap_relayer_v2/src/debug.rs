@@ -22,8 +22,8 @@ use crate::{
     MAX_RESP_TO_READ_SCALAR, MAX_RESP_TO_SEND_TX, PRECISION_FOR_ORACLE,
 };
 
-#[update]
-#[candid_method(update)]
+#[query]
+#[candid_method(query)]
 fn debug_get_target_canister() -> String {
     get_target_canister().to_string()
 }

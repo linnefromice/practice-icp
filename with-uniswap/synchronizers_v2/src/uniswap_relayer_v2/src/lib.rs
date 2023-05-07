@@ -5,12 +5,13 @@ mod store;
 mod types;
 mod utils;
 
-use std::time::Duration;
-
 use candid::{candid_method, Principal};
 use eth::{generate_web3_client, sign};
 use ic_cdk::{
-    api::management_canister::http_request::{HttpResponse, TransformArgs},
+    api::{
+        management_canister::http_request::{HttpResponse, TransformArgs},
+        time,
+    },
     query, update,
 };
 use ic_web3::{transports::ICHttp, types::SignedTransaction, Web3};
@@ -19,6 +20,7 @@ use store::{
     set_chain_id, set_oracle_address, set_rpc_url, set_target_canister, set_timer_id,
 };
 use types::CallCanisterArgs;
+use utils::round_timestamp;
 
 const ORACLE_ABI: &[u8] = include_bytes!("../../abi/Oracle.json");
 const ORACLE_FUNC_NAME: &str = "updateState";
@@ -26,7 +28,8 @@ const ORACLE_FUNC_NAME: &str = "updateState";
 // parameters
 const MAX_RESP_TO_READ_SCALAR: u64 = 300;
 const MAX_RESP_TO_SEND_TX: u64 = 500;
-const TASK_INTERVAL_SECS: u64 = 60 * 60;
+const TASK_INTERVAL_SECS: u32 = 24 * 60 * 60;
+const SECS_TO_DELAY: u32 = 5 * 60;
 const PRECISION_FOR_ORACLE: u8 = 18;
 
 #[update]
@@ -52,15 +55,53 @@ fn transform(response: TransformArgs) -> HttpResponse {
 
 #[update]
 #[candid_method(update)]
-async fn setup(target_canister_id: String, rpc_url: String, chain_id: u64, oracle_addr: String) {
-    set_target_canister(Principal::from_text(target_canister_id).unwrap());
-    set_call_canister_args(CallCanisterArgs::default()); // TODO
+fn setup(
+    rpc_url: String,
+    chain_id: u64,
+    oracle_addr: String,
+    target_canister_id: String,
+    data_resource_canister_id: String,
+    token0_decimals: u8,
+    token1_decimals: u8,
+    precision: u8,
+    back_terms: Option<u8>,
+) {
     set_rpc_url(rpc_url);
     set_chain_id(chain_id);
     set_oracle_address(oracle_addr);
-    let timer_id =
-        ic_cdk_timers::set_timer_interval(Duration::from_secs(TASK_INTERVAL_SECS), || {
+
+    set_target_canister(Principal::from_text(target_canister_id).unwrap());
+    set_call_canister_args(CallCanisterArgs {
+        data_resource_canister_id,
+        token0_decimals,
+        token1_decimals,
+        precision,
+        back_terms,
+    });
+}
+
+#[update]
+#[candid_method(update)]
+async fn set_task(task_interval_secs: Option<u32>, secs_to_delay: Option<u32>) {
+    let task_interval_secs = task_interval_secs.unwrap_or(TASK_INTERVAL_SECS);
+    let secs_to_delay = secs_to_delay.unwrap_or(SECS_TO_DELAY);
+
+    let current_time_sec = (time() / (1000 * 1000000)) as u32;
+    let delay =
+        round_timestamp(current_time_sec, task_interval_secs) + task_interval_secs + secs_to_delay
+            - current_time_sec;
+    let interval = std::time::Duration::from_secs(task_interval_secs as u64);
+    ic_cdk::println!("START: set_timer for set_timer_interval");
+    ic_cdk::println!("{}", current_time_sec);
+    ic_cdk_timers::set_timer(std::time::Duration::from_secs(delay as u64), move || {
+        ic_cdk::println!("START: set_timer_interval for call sync_state");
+        ic_cdk::println!("{}", (time() / (1000 * 1000000)));
+
+        // set scheduled executions timer for 2nd and later
+        let timer_id = ic_cdk_timers::set_timer_interval(interval, || {
             ic_cdk::spawn(async {
+                ic_cdk::println!("START: execute sync_state by timer");
+                ic_cdk::println!("{}", (time() / (1000 * 1000000)));
                 match sync_state(
                     get_target_canister(),
                     get_call_canister_args(),
@@ -70,11 +111,26 @@ async fn setup(target_canister_id: String, rpc_url: String, chain_id: u64, oracl
                 {
                     Ok(msg) => ic_cdk::println!("ok: {:?}", msg),
                     Err(msg) => ic_cdk::println!("err: {:?}", msg),
-                }
+                };
+                ic_cdk::println!("FINISH: execute sync_state by timer");
             });
         });
-    set_timer_id(timer_id);
-    ic_cdk::println!("start task: timer_id={:?}", timer_id);
+        set_timer_id(timer_id);
+
+        // for 1st
+        ic_cdk::spawn(async {
+            match sync_state(
+                get_target_canister(),
+                get_call_canister_args(),
+                PRECISION_FOR_ORACLE,
+            )
+            .await
+            {
+                Ok(msg) => ic_cdk::println!("ok: {:?}", msg),
+                Err(msg) => ic_cdk::println!("err: {:?}", msg),
+            };
+        });
+    });
 }
 
 async fn sync_state(

@@ -1,4 +1,7 @@
-use ic_web3::{ic::{get_public_key, pubkey_to_address}, types::Address};
+use ic_web3::{
+    ic::{get_public_key, pubkey_to_address},
+    types::Address,
+};
 
 use crate::store::key_name;
 
@@ -17,4 +20,8 @@ fn to_ethereum_address(pub_key: Vec<u8>) -> Result<Address, String> {
 pub async fn ethereum_address() -> Result<Address, String> {
     let pub_key = public_key().await?;
     to_ethereum_address(pub_key)
+}
+
+pub fn round_timestamp(timestamp: u32, unit: u32) -> u32 {
+    timestamp / unit * unit
 }

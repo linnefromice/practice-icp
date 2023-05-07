@@ -13,7 +13,7 @@ use ic_cdk::api::{
     management_canister::http_request::{HttpResponse, TransformArgs},
     time,
 };
-use ic_cdk_macros::{init, query, update};
+use ic_cdk_macros::{query, update};
 use ic_web3::{
     contract::Options,
     types::{BlockId, BlockNumber, U64},
@@ -29,19 +29,6 @@ use utils::{generate_uniswapv3pool_client, generate_web3_client, round_timestamp
 
 use crate::store::{set_from_past_synced_timestamp, set_from_synced_timestamp};
 
-#[init]
-fn init(url: String, pool_addr: String, price_index_interval_secs: Option<u32>) {
-    set_rpc_url(url);
-    set_pool_address(pool_addr);
-
-    let price_index_interval_secs = if let Some(value) = price_index_interval_secs {
-        value
-    } else {
-        DEFAULT_PRICE_INDEX_INTERVAL_SEC
-    };
-    set_price_index_interval_sec(price_index_interval_secs);
-}
-
 #[query]
 fn transform(response: TransformArgs) -> HttpResponse {
     let res = response.response;
@@ -53,22 +40,27 @@ fn transform(response: TransformArgs) -> HttpResponse {
 }
 
 #[update]
-async fn periodic_save_prices(
-    interval_secs: Option<u32>,
-    max_resp: Option<u64>,
-    cycles: Option<u64>,
-) {
+fn setup(url: String, pool_addr: String, price_index_interval_secs: Option<u32>) {
+    set_rpc_url(url);
+    set_pool_address(pool_addr);
+
+    let price_index_interval_secs = if let Some(value) = price_index_interval_secs {
+        value
+    } else {
+        DEFAULT_PRICE_INDEX_INTERVAL_SEC
+    };
+    set_price_index_interval_sec(price_index_interval_secs);
+}
+
+#[update]
+async fn set_task(interval_secs: Option<u32>, max_resp: Option<u64>, cycles: Option<u64>) {
     // TODO: check to call bulk_save_prices
     // if !get_initialized_past_prices() {
     //     ic_cdk::println!("Not initialized yet");
     //     return;
     // }
     // TODO: check timer_id registered
-    let interval_secs = if let Some(value) = interval_secs {
-        value
-    } else {
-        DEFAULT_FETCH_INTERVAL_BY_SEC
-    };
+    let interval_secs = interval_secs.unwrap_or(DEFAULT_FETCH_INTERVAL_BY_SEC);
     let price_index_interval_secs = get_price_index_interval_sec();
     if interval_secs >= price_index_interval_secs {
         ic_cdk::println!("interval_secs must be less than price_index_interval_secs: interval_secs={}, price_index_interval_secs={}", interval_secs, price_index_interval_secs);

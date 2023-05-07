@@ -37,6 +37,7 @@ service : {
   debug_sync_state : (text, text, nat8, nat8, nat8, opt nat8, opt nat8) -> (Result);
   debug_sync_state_internal : (nat, opt nat, opt nat, opt nat) -> (Result);
   get_ethereum_address : () -> (text);
-  setup : (text, text, text, nat64, text) -> ();
+  setup : (text, nat64, text, text, text, nat8, nat8, nat8, opt nat8) -> ();
+  set_task : (opt nat32, opt nat32) -> ();
   transform : (TransformArgs) -> (HttpResponse) query;
 }
