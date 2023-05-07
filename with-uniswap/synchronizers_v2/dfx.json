@@ -1,10 +1,10 @@
 {
   "version": 1,
   "canisters": {
-    "reader_v2": {
+    "snapshotter_v2": {
       "type": "rust",
-      "package": "uniswap_reader_v2",
-      "candid": "src/uniswap_reader_v2/interface.did"
+      "package": "uniswap_snapshotter_v2",
+      "candid": "src/uniswap_snapshotter_v2/interface.did"
     },
     "calculator_v2": {
       "type": "rust",

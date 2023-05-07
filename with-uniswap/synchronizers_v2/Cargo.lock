@@ -1623,20 +1623,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "uniswap_reader_v2"
-version = "0.1.0"
-dependencies = [
- "candid",
- "hex",
- "ic-cdk 0.6.10",
- "ic-cdk-macros",
- "ic-cdk-timers",
- "ic-web3",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "uniswap_relayer_v2"
 version = "0.1.0"
 dependencies = [
@@ -1647,6 +1633,20 @@ dependencies = [
  "ic-cdk-timers",
  "ic-web3",
  "serde",
+]
+
+[[package]]
+name = "uniswap_snapshotter_v2"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "hex",
+ "ic-cdk 0.6.10",
+ "ic-cdk-macros",
+ "ic-cdk-timers",
+ "ic-web3",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
