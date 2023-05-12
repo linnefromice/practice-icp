@@ -66,10 +66,6 @@ pub fn current_time_sec() -> u32 {
     (time() / (1000 * 1000000)) as u32
 }
 
-pub fn round_timestamp(timestamp: u32, unit: u32) -> u32 {
-    timestamp / unit * unit
-}
-
 #[cfg(test)]
 mod test_mod {
     use super::*;

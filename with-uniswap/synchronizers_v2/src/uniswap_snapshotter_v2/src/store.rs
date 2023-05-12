@@ -1,9 +1,9 @@
+use common::utils::round_timestamp;
 use ic_cdk_timers::TimerId;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
 use crate::types::Price;
-use crate::utils::round_timestamp;
 
 thread_local! {
     static PRICES: RefCell<Vec<Price>> = RefCell::default();

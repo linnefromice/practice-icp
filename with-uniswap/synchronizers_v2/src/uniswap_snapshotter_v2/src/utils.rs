@@ -22,7 +22,3 @@ pub fn generate_web3_client(
         Err(e) => Err(e.to_string()),
     }
 }
-
-pub fn round_timestamp(timestamp: u32, unit: u32) -> u32 {
-    timestamp / unit * unit
-}

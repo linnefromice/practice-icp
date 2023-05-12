@@ -16,3 +16,5 @@ ic-cdk-macros = "0.6.0"
 ic-web3 = "0.1.7"
 ic-cdk-timers = "0.1.2"
 serde = "1.0.162"
+
+common = { path = "../common" }

@@ -4,7 +4,7 @@ mod store;
 mod types;
 mod utils;
 
-use common::types::CandidPrice;
+use common::{types::CandidPrice, utils::round_timestamp};
 use constants::{
     BASE_MAX_RESP_BYTES_FOR_HEADER, DEFAULT_FETCH_INTERVAL_BY_SEC,
     DEFAULT_PRICE_INDEX_INTERVAL_SEC, MAX_RESP_BYTES_TO_CALL_OBSERVATION,
@@ -26,7 +26,7 @@ use store::{
     set_pool_address, set_price_index_interval_sec, set_rpc_url, set_timer_id,
 };
 use types::{Observation, Price, Slot0};
-use utils::{generate_uniswapv3pool_client, generate_web3_client, round_timestamp};
+use utils::{generate_uniswapv3pool_client, generate_web3_client};
 
 use crate::store::{set_from_past_synced_timestamp, set_from_synced_timestamp};
 

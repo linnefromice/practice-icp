@@ -21,7 +21,3 @@ pub async fn ethereum_address() -> Result<Address, String> {
     let pub_key = public_key().await?;
     to_ethereum_address(pub_key)
 }
-
-pub fn round_timestamp(timestamp: u32, unit: u32) -> u32 {
-    timestamp / unit * unit
-}
