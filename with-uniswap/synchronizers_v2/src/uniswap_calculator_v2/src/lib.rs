@@ -1,14 +1,13 @@
 mod constants;
 mod debug;
-mod types;
 mod utils;
 
 use candid::Principal;
+use common::types::CandidPrice;
 use constants::{DAY_SECONDS, HOUR_SECONDS, WEEK_SECONDS};
 use ic_cdk::api::call;
 use ic_cdk_macros::update;
 use ic_web3::types::U256;
-use types::CandidPrice;
 use utils::{calculate_realized_volatility, current_time_sec, round_timestamp};
 
 #[update]

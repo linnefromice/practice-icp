@@ -1,10 +1,10 @@
 use candid::{CandidType, Principal};
+use common::types::CandidPrice;
 use ic_cdk::{query, update};
 use ic_web3::types::U256;
 
 use crate::{
     calculate_exchange_rates_for_prices, calculate_last_xxx_realized_volatility, call_prices,
-    types::CandidPrice,
     utils::{calculate_realized_volatility, current_time_sec, round_timestamp},
 };
 

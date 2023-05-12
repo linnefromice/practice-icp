@@ -6,9 +6,10 @@ use crate::{
         get_from_past_synced_timestamp, get_from_synced_timestamp, get_pool_address, get_rpc_url,
         get_timer_id, price, prices, prices_length,
     },
-    types::{CandidObservation, CandidPrice, CandidSlot0},
+    types::{CandidObservation, CandidSlot0},
     utils::generate_web3_client,
 };
+use common::types::CandidPrice;
 use ic_cdk_macros::{query, update};
 
 #[update]
