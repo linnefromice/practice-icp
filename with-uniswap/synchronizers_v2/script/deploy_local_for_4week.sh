@@ -22,7 +22,7 @@ dfx canister call snapshotter_v2 bulk_save_prices '(
     null,
     null
 )'
-# dfx canister call reader_v2 set_task '(
+# dfx canister call snapshotter_v2 set_task '(
 #     opt 60,
 #     null,
 #     null
