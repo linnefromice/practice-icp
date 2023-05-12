@@ -1,4 +1,5 @@
 use candid::CandidType;
+use common::types::CandidPrice;
 use ic_web3::{
     contract::{tokens::Detokenize, Error},
     ethabi::Token,
@@ -105,10 +106,4 @@ impl Price {
             block_timestamp: self.block_timestamp,
         }
     }
-}
-#[derive(CandidType, Debug, PartialEq)]
-pub struct CandidPrice {
-    pub sqrt_price_x96: String,
-    pub observation_index: u16,
-    pub block_timestamp: u32,
 }

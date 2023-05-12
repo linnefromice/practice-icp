@@ -6,6 +6,7 @@ mod types;
 mod utils;
 
 use candid::{candid_method, Principal};
+use common::utils::round_timestamp;
 use eth::{generate_web3_client, sign};
 use ic_cdk::{
     api::{
@@ -20,7 +21,6 @@ use store::{
     set_chain_id, set_oracle_address, set_rpc_url, set_target_canister, set_timer_id,
 };
 use types::CallCanisterArgs;
-use utils::round_timestamp;
 
 const ORACLE_ABI: &[u8] = include_bytes!("../../abi/Oracle.json");
 const ORACLE_FUNC_NAME: &str = "updateState";
