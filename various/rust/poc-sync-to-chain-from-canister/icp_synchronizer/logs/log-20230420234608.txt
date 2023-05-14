@@ -1,0 +1,9 @@
+Apr 20 14:46:12.104 INFO Canister status call result for synchronizer_v2.
+Status: Running
+Controllers: 5naws-oiaaa-aaaal-qbxuq-cai k245a-2cvyi-rcnzj-cpq6h-dcy7o-qrg4b-325bv-5c3om-jfceo-ikmjz-aqe
+Memory allocation: 0
+Compute allocation: 0
+Freezing threshold: 2_592_000
+Memory Size: Nat(9222917)
+Balance: 1_622_401_352_520 Cycles
+Module hash: 0x92b623d5ecd2452a354c0f7fc422251c1c93fddf3a4db954d7b1a7262e8d9477, version: 0.13.1
