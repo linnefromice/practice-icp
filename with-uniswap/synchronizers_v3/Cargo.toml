@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "src/uniswap_snapshotter",
+    "src/uniswap_calculator",
+    "src/uniswap_relayer",
+    "src/snapshot_indexer",
+    "src/core",
+    "src/common",
+    "src/chainsight-generate"
+]
