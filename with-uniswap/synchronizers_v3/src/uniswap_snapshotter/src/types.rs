@@ -1,3 +1,4 @@
+use std::ops::Sub;
 use candid::CandidType;
 use ic_web3::{
     contract::{tokens::Detokenize, Error},
@@ -19,9 +20,16 @@ impl Detokenize for Slot0 {
     where
         Self: Sized,
     {
+        let tick_u256 = tokens.get(1).unwrap().clone().into_int().unwrap();
+        let tick = if tick_u256 > U256::from(u32::MAX) {
+            -((U256::max_value().sub(tick_u256).as_u32()) as i32)
+        } else {
+            tick_u256.as_u32() as i32
+        };
+
         Ok(Self(
             tokens.get(0).unwrap().clone().into_uint().unwrap(),
-            tokens.get(1).unwrap().clone().into_int().unwrap().as_u128() as i32,
+            tick,
             tokens.get(2).unwrap().clone().into_uint().unwrap().as_u32() as u16,
             tokens.get(3).unwrap().clone().into_uint().unwrap().as_u32() as u16,
             tokens.get(4).unwrap().clone().into_uint().unwrap().as_u32() as u16,
@@ -63,9 +71,16 @@ impl Detokenize for Observation {
     where
         Self: Sized,
     {
+        let tick_cumulative_u256 = tokens.get(1).unwrap().clone().into_int().unwrap();
+        let tick_cumulative = if tick_cumulative_u256 > U256::from(u64::MAX) {
+            -((U256::max_value().sub(tick_cumulative_u256).as_u64()) as i64)
+        } else {
+            tick_cumulative_u256.as_u64() as i64
+        };
+
         Ok(Self(
             tokens.get(0).unwrap().clone().into_uint().unwrap().as_u32(),
-            tokens.get(1).unwrap().clone().into_int().unwrap().as_u128() as i64,
+            tick_cumulative,
             tokens.get(2).unwrap().clone().into_uint().unwrap(),
             tokens.get(3).unwrap().clone().into_bool().unwrap(),
         ))
