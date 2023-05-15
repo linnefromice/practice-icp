@@ -24,10 +24,17 @@ dotenv.config();
 
 const MNEMONIC = process.env.MNEMONIC || "";
 const COINMARKETCAP_KEY = process.env.COINMARKETCAP_KEY || "";
+
 const POLYGON_RPC = process.env.POLYGON_RPC || "https://polygon-rpc.com/";
 const POLYGON_MUMBAI_RPC =
   process.env.POLYGON_MUMBAI_RPC || "https://rpc-mumbai.maticvigil.com/";
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "";
+
+const OPTIMISM_RPC = process.env.OPTIMISM_RPC || "https://mainnet.optimism.io";
+const OPTIMISM_GOERLI_RPC =
+  process.env.OPTIMISM_GOERLI_RPC || "https://goerli.optimism.io";
+const OPTIMISM_ETHERSCAN_KEY = process.env.OPTIMISM_ETHERSCAN_KEY || "";
+
 const SKIP_LOAD = process.env.SKIP_LOAD === "true";
 const TASK_FOLDERS = ["deployment", "utils"];
 
@@ -66,6 +73,18 @@ const NETWORK_CONFIGS: NetworksUserConfig = {
     gasPrice: 3 * GWEI,
     accounts: ACCOUNTS,
   },
+  optimism: {
+    chainId: 10,
+    url: OPTIMISM_RPC,
+    gasPrice: 3 * GWEI,
+    accounts: ACCOUNTS,
+  },
+  optimism_goerli: {
+    chainId: 420,
+    url: OPTIMISM_GOERLI_RPC,
+    gasPrice: 3 * GWEI,
+    accounts: ACCOUNTS,
+  },
 };
 
 const config: HardhatUserConfig = {
@@ -95,9 +114,13 @@ const config: HardhatUserConfig = {
     showMethodSig: true,
   },
   etherscan: {
+    // NOTE: Here is the command to check
+    // `npx hardhat verify --list-networks`
     apiKey: {
       polygon: POLYGONSCAN_API_KEY,
       polygonMumbai: POLYGONSCAN_API_KEY,
+      optimisticEthereum: OPTIMISM_ETHERSCAN_KEY,
+      optimisticGoerli: OPTIMISM_ETHERSCAN_KEY,
     },
   },
 };
