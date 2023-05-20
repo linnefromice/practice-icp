@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "src/sample_ic_web3_macros_backend",
+]
