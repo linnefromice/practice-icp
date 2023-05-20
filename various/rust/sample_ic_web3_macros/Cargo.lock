@@ -461,6 +461,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-web3-macros"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "ic-cdk",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.16",
+]
+
+[[package]]
 name = "ic0"
 version = "0.18.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -849,6 +860,7 @@ dependencies = [
  "candid",
  "ic-cdk",
  "ic-cdk-timers",
+ "ic-web3-macros",
 ]
 
 [[package]]
