@@ -1,3 +1,4 @@
+mod functions;
 mod states;
 mod utils;
 
@@ -6,6 +7,11 @@ use proc_macro::TokenStream;
 #[proc_macro]
 pub fn cross_canister_call_func(input: TokenStream) -> TokenStream {
     utils::cross_canister_call_func(input)
+}
+
+#[proc_macro]
+pub fn setup_func(input: TokenStream) -> TokenStream {
+    functions::setup_func(input)
 }
 
 #[proc_macro]
