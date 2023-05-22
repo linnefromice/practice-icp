@@ -76,16 +76,22 @@ pub fn timer_task_func(input: TokenStream) -> TokenStream {
         _ => panic!("Expected a string literal for the variable name"),
     };
 
+    let timer_state_name = format!("timer_task_{}", called_func_name);
+    let set_timer_state_name = syn::Ident::new(&format!("set_timer_task_{}", called_func_name), called_func_name.span());
+
     let output = quote! {
+        ic_web3_macros::manage_single_state!(#timer_state_name, ic_cdk_timers::TimerId)
+
         #[ic_cdk::update]
         pub fn #func_name(task_interval_secs: u32, delay_secs: u32) {
             let current_time_sec = (ic_cdk::api::time() / (1000 * 1000000)) as u32;
             let round_timestamp = |ts: u32, unit: u32| ts / unit * unit;
             let delay = round_timestamp(current_time_sec, task_interval_secs) + task_interval_secs + delay_secs;
             ic_cdk_timers::set_timer(std::time::Duration::from_secs(delay), || {
-                let _ = ic_cdk_timers::set_timer_interval(std::time::Duration::from_secs(task_interval_secs), || {
+                let timer_id = ic_cdk_timers::set_timer_interval(std::time::Duration::from_secs(task_interval_secs), || {
                     #called_func_name();
                 });
+                #set_timer_state_name(timer_id);
             });
         }
     };
