@@ -15,6 +15,11 @@ pub fn setup_func(input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro]
+pub fn timer_task_func(input: TokenStream) -> TokenStream {
+    functions::timer_task_func(input)
+}
+
+#[proc_macro]
 pub fn manage_single_state(input: TokenStream) -> TokenStream {
     states::manage_single_state(input)
 }

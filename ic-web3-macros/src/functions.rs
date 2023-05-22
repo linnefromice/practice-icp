@@ -1,6 +1,7 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::parse::{Parse, ParseStream};
+use syn::parse::{Parse, ParseStream, Parser};
+use syn::{parse_macro_input, LitStr};
 use syn::{braced, Result, Ident, Type, Token, punctuated::Punctuated};
 
 struct SetupArgs {
@@ -47,4 +48,45 @@ pub fn setup_func(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(expanded)
+}
+
+pub fn timer_task_func(input: TokenStream) -> TokenStream {
+    let parser = syn::punctuated::Punctuated::<syn::Expr, syn::Token![,]>::parse_terminated;
+    let args = parser.parse(input).expect("Failed to parse input");
+    if args.len() != 2 {
+        panic!("Expected 2 arguments");
+    }
+
+    let func_name = match &args[0] {
+        syn::Expr::Lit(lit) => {
+            if let syn::Lit::Str(lit_str) = &lit.lit {
+                syn::Ident::new(&format!("{}", lit_str.value()), lit_str.span())
+            } else {
+                panic!("Expected a string literal for the variable name");
+            }
+        }
+        _ => panic!("Expected a string literal for the variable name"),
+    };
+    let called_func_name = match &args[1] {
+        syn::Expr::Lit(lit) => {
+            if let syn::Lit::Str(lit_str) = &lit.lit {
+                syn::Ident::new(&format!("{}", lit_str.value()), lit_str.span())
+            } else {
+                panic!("Expected a string literal for the variable name");
+            }
+        }
+        _ => panic!("Expected a string literal for the variable name"),
+    };
+
+    let output = quote! {
+        #[ic_cdk::update]
+        pub fn #func_name(task_interval_secs: u64) {
+            let interval = std::time::Duration::from_secs(task_interval_secs);
+            let _ = ic_cdk_timers::set_timer_interval(interval, || {
+                #called_func_name();
+            });
+        }
+    };
+
+    output.into()
 }
