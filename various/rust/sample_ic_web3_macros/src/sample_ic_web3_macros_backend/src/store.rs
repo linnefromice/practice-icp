@@ -6,6 +6,7 @@ manage_vec_state!("vec_result", String);
 manage_map_state!("balance", String, u64);
 manage_map_state!("username", u64, String);
 
+#[cfg(test)]
 mod test_store {
     use super::*;
 
