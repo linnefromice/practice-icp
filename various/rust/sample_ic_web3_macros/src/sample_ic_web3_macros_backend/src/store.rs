@@ -1,6 +1,3 @@
-use std::cell::RefCell;
-use std::collections::HashMap;
-
 use ic_web3_macros::{manage_single_state, manage_vec_state, manage_map_state};
 
 manage_single_state!("last_timestamp", u64, 100);
@@ -28,12 +25,12 @@ mod test_store {
 
     #[test]
     fn test_vec_results() {
-        assert_eq!(get_vec_results().len(), 0);
+        assert_eq!(vec_results_len(), 0);
         let datum1 = String::from("RESULT1"); 
         let datum2 = String::from("RESULT2");
         set_vec_result(datum1.clone());
         set_vec_result(datum2.clone());
-        assert_eq!(get_vec_results().len(), 2);
+        assert_eq!(vec_results_len(), 2);
         assert_eq!(get_vec_results(), vec![datum1.clone(), datum2.clone()]);
         assert_eq!(get_vec_result(0), datum1.clone());
         assert_eq!(get_vec_result(1), datum2.clone());

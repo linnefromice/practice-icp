@@ -121,6 +121,7 @@ pub fn manage_vec_state(input: TokenStream) -> TokenStream {
     let state_name = name.value();
     let state_upper_name = syn::Ident::new(&format!("{}S", state_name.to_uppercase()), name.span());
     let get_vec_func = syn::Ident::new(&format!("get_{}s", state_name), name.span());
+    let get_len_func = syn::Ident::new(&format!("{}s_len", state_name), name.span());
     let get_elem_func = syn::Ident::new(&format!("get_{}", state_name), name.span());
     let set_elem_func = syn::Ident::new(&format!("set_{}", state_name), name.span());
 
@@ -131,6 +132,10 @@ pub fn manage_vec_state(input: TokenStream) -> TokenStream {
 
         pub fn #get_vec_func() -> Vec<#ty> {
             #state_upper_name.with(|state| state.borrow().clone())
+        }
+
+        pub fn #get_len_func() -> usize {
+            #state_upper_name.with(|state| state.borrow().len())
         }
 
         pub fn #get_elem_func(idx: usize) -> #ty {
