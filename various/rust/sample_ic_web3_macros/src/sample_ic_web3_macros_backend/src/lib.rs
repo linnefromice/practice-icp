@@ -1,19 +1,7 @@
+mod store;
+
 use candid::Principal;
 use ic_web3_macros::cross_canister_call_func;
-
-// async fn call_greet(
-//     canister_id: Principal,
-//     call_args: CallCanisterArgs,
-// ) -> CallCanisterResponse {
-//     let res = ic_cdk::api::call::call::<_, (CallCanisterResponse,)>(
-//         canister_id,
-//         "greet",
-//         call_args
-//     )
-//         .await
-//         .map_err(|e| format!("call error: {:?}", e))?;
-//     res.0
-// }
 
 type CallCanisterArgs = (String, String);
 type CallCanisterResponse = Result<String, String>;
