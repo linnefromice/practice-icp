@@ -1,8 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::parse::{Parse, ParseStream, Parser};
-use syn::{parse_macro_input, LitStr};
-use syn::{braced, Result, Ident, Type, Token, punctuated::Punctuated};
+use syn::{braced, Result, Ident, Type, Token, punctuated::Punctuated, parse::{Parse, ParseStream, Parser}};
 
 struct SetupArgs {
     fields: Punctuated<NamedField, Token![,]>,

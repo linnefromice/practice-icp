@@ -1,5 +1,5 @@
 use candid::Principal;
-use ic_web3_macros::{cross_canister_call_func, manage_single_state, manage_vec_state, manage_map_state, setup_func};
+use ic_web3_macros::{cross_canister_call_func, manage_single_state, manage_vec_state, manage_map_state, setup_func, timer_task_func};
 
 #[ic_cdk::update]
 async fn call(canister_id: String, name: String, msg: String) -> Result<String, String> {
@@ -40,20 +40,14 @@ setup_func!({
 // timer task
 manage_vec_state!("hello_ts", u64);
 manage_map_state!("hello_msg", u64, String);
-const HELLO: fn() -> () = || {
+static HELLO: fn() -> () = || {
     let current_ts = ic_cdk::api::time();
     let msg = format!("Hello, {}!", current_ts);
     set_hello_ts(current_ts);
     set_hello_msg(current_ts, msg.clone());
     ic_cdk::println!("key={}, value={}", current_ts, msg);
 };
-#[ic_cdk::update]
-fn set_task(task_interval_secs: u64) {
-    let interval = std::time::Duration::from_secs(task_interval_secs);
-    let _ = ic_cdk_timers::set_timer_interval(interval, || {
-        HELLO();
-    });
-}
+timer_task_func!("set_task", "HELLO");
 #[ic_cdk::query]
 fn view_get_hello_tss() -> Vec<u64> {
     get_hello_tss()
