@@ -72,7 +72,7 @@ pub fn manage_single_state(input: TokenStream) -> TokenStream {
         quote! { std::default::Default::default() }
     };
 
-    let var_ident = proc_macro2::Ident::new(&var_name, proc_macro2::Span::call_site());
+    let var_ident = proc_macro2::Ident::new(&var_name.to_uppercase(), proc_macro2::Span::call_site());
     let get_ident = proc_macro2::Ident::new(&format!("get_{}", var_name), proc_macro2::Span::call_site());
     let set_ident = proc_macro2::Ident::new(&format!("set_{}", var_name), proc_macro2::Span::call_site());
 
@@ -117,27 +117,28 @@ impl syn::parse::Parse for ManageVecArgs {
 #[proc_macro]
 pub fn manage_vec_state(input: TokenStream) -> TokenStream {
     let ManageVecArgs { name, ty } = parse_macro_input!(input as ManageVecArgs);
-
-    let state_name = syn::Ident::new(&name.value(), name.span());
+    
+    let state_name = name.value();
+    let state_upper_name = syn::Ident::new(&format!("{}S", state_name.to_uppercase()), name.span());
     let get_vec_func = syn::Ident::new(&format!("get_{}s", state_name), name.span());
     let get_elem_func = syn::Ident::new(&format!("get_{}", state_name), name.span());
     let set_elem_func = syn::Ident::new(&format!("set_{}", state_name), name.span());
 
     let expanded = quote! {
         thread_local! {
-            static #state_name: std::cell::RefCell<Vec<#ty>> = std::cell::RefCell::new(Vec::new());
+            static #state_upper_name: std::cell::RefCell<Vec<#ty>> = std::cell::RefCell::new(Vec::new());
         }
 
         pub fn #get_vec_func() -> Vec<#ty> {
-            #state_name.with(|state| state.borrow().clone())
+            #state_upper_name.with(|state| state.borrow().clone())
         }
 
         pub fn #get_elem_func(idx: usize) -> #ty {
-            #state_name.with(|state| state.borrow()[idx].clone())
+            #state_upper_name.with(|state| state.borrow()[idx].clone())
         }
 
         pub fn #set_elem_func(value: #ty) {
-            #state_name.with(|state| state.borrow_mut().push(value));
+            #state_upper_name.with(|state| state.borrow_mut().push(value));
         }
     };
 
@@ -163,26 +164,27 @@ impl syn::parse::Parse for ManageMapArgs {
 pub fn manage_map_state(input: TokenStream) -> TokenStream {
     let ManageMapArgs { name, key_ty, val_ty } = parse_macro_input!(input as ManageMapArgs);
 
-    let state_name = syn::Ident::new(&name.value(), name.span());
+    let state_name = name.value();
+    let state_upper_name = syn::Ident::new(&format!("{}S", state_name.to_uppercase()), name.span());
     let get_len_func = syn::Ident::new(&format!("{}s_len", state_name), name.span());
     let get_elem_func = syn::Ident::new(&format!("get_{}", state_name), name.span());
     let set_elem_func = syn::Ident::new(&format!("set_{}", state_name), name.span());
 
     let expanded = quote! {
         thread_local! {
-            static #state_name: std::cell::RefCell<std::collections::HashMap<#key_ty, #val_ty>> = std::cell::RefCell::new(std::collections::HashMap::new());
+            static #state_upper_name: std::cell::RefCell<std::collections::HashMap<#key_ty, #val_ty>> = std::cell::RefCell::new(std::collections::HashMap::new());
         }
 
         pub fn #get_len_func() -> usize {
-            #state_name.with(|state| state.borrow().len())
+            #state_upper_name.with(|state| state.borrow().len())
         }
 
         pub fn #get_elem_func(key: #key_ty) -> #val_ty {
-            #state_name.with(|state| state.borrow().get(&key).cloned().expect("key not found"))
+            #state_upper_name.with(|state| state.borrow().get(&key).cloned().expect("key not found"))
         }
 
         pub fn #set_elem_func(key: #key_ty, value: #val_ty) {
-            #state_name.with(|state| state.borrow_mut().insert(key, value));
+            #state_upper_name.with(|state| state.borrow_mut().insert(key, value));
         }
     };
 
