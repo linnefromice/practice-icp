@@ -466,6 +466,7 @@ version = "0.1.0"
 dependencies = [
  "candid",
  "ic-cdk",
+ "ic-cdk-timers",
  "proc-macro2",
  "quote",
  "syn 2.0.16",

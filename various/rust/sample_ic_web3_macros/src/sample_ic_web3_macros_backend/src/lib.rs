@@ -40,14 +40,15 @@ setup_func!({
 // timer task
 manage_vec_state!("hello_ts", u64);
 manage_map_state!("hello_msg", u64, String);
-static HELLO: fn() -> () = || {
+static hello: fn() -> () = || {
     let current_ts = ic_cdk::api::time();
     let msg = format!("Hello, {}!", current_ts);
     set_hello_ts(current_ts);
     set_hello_msg(current_ts, msg.clone());
     ic_cdk::println!("key={}, value={}", current_ts, msg);
 };
-timer_task_func!("set_task", "HELLO");
+timer_task_func!("set_task", "hello");
+
 #[ic_cdk::query]
 fn view_get_hello_tss() -> Vec<u64> {
     get_hello_tss()
