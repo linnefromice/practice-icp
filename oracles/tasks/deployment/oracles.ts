@@ -1,6 +1,6 @@
 import { task } from "hardhat/config";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { OracleV1__factory } from "../../typechain-types";
+import { OracleV1, OracleV1__factory } from "../../typechain-types";
 
 task("deploy:oraclev1", "deploy:oraclev1")
   .addOptionalParam("deployer", "deployer")
@@ -9,7 +9,7 @@ task("deploy:oraclev1", "deploy:oraclev1")
       { deployer }: { deployer: string },
       hre: HardhatRuntimeEnvironment
     ) => {
-      const { ethers, network } = hre;
+      const { ethers, network, upgrades } = hre;
       console.log(`[deploy:oraclev1] START - ${network.name}`);
 
       const _deployer = deployer
@@ -17,21 +17,24 @@ task("deploy:oraclev1", "deploy:oraclev1")
         : (await ethers.getSigners())[0];
 
       // Deployment
-      const contract = await new OracleV1__factory(_deployer).deploy();
+      const contract = (await upgrades.deployProxy(
+        new OracleV1__factory(_deployer)
+      )) as OracleV1;
       console.log(`deployed tx: ${contract.deployTransaction.hash}`);
-      await contract.deployed();
+      await contract.deployTransaction.wait();
       console.log(`deployed! address: ${contract.address}`);
-
-      // Verification
-      await hre.run("verify:verify", {
-        address: contract.address,
-        constructorArguments: [],
-      });
 
       // Check after deploying
       console.log(`Check phase`);
-      const stateLength = await contract.getStateLength();
-      console.log(`> stateLength: ${stateLength.toString()}`);
+      console.log(`> version: ${(await contract.version()).toString()}`);
+
+      // Verification
+      if (network.name !== "hardhat") {
+        await hre.run("verify:verify", {
+          address: contract.address,
+          constructorArguments: [],
+        });
+      }
 
       console.log(`[deploy:oraclev1] END`);
     }

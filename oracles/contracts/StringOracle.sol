@@ -3,8 +3,8 @@ pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract OracleV1 is Initializable {
-    mapping(address => uint256) public state;
+contract StringOracle is Initializable {
+    mapping(address => string) public state;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -16,7 +16,7 @@ contract OracleV1 is Initializable {
     }
 
     function updateState(
-        uint256 value
+        string memory value
     ) public virtual {
         state[msg.sender] = value;
     }
