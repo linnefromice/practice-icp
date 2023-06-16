@@ -5,5 +5,10 @@ dfx stop && dfx start --clean --background && dfx canister create --all && dfx b
 # confirmation
 dfx deploy
 
-cd tests && yarn test
+dfx canister call counter_motoko label '()'
+dfx canister call counter_rust label '()'
+dfx canister call counter_motoko get '()'
+dfx canister call counter_rust get '()'
+
+cd tests && yarn test --test-timeout=20000
 ```

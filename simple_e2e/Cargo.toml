@@ -1,4 +1,5 @@
 [workspace]
 members = [
     "src/hello_rust",
+    "src/counter_rust",
 ]
