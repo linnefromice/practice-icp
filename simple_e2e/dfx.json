@@ -2,22 +2,24 @@
   "version": 1,
   "canisters": {
     "hello_motoko": {
-      "type": "motoko",
-      "main": "src/hello_motoko/main.mo"
+      "type": "custom",
+      "candid": "artifacts/hello_motoko.did",
+      "wasm": "artifacts/hello_motoko.wasm"
     },
     "hello_rust": {
-      "type": "rust",
-      "package": "hello_rust",
-      "candid": "src/hello_rust/hello_rust.did"
+      "type": "custom",
+      "candid": "artifacts/hello_rust.did",
+      "wasm": "artifacts/hello_rust.wasm"
     },
     "counter_motoko": {
-      "type": "motoko",
-      "main": "src/counter_motoko/main.mo"
+      "type": "custom",
+      "candid": "artifacts/counter_motoko.did",
+      "wasm": "artifacts/counter_motoko.wasm"
     },
     "counter_rust": {
-      "type": "rust",
-      "package": "counter_rust",
-      "candid": "src/counter_rust/counter_rust.did"
+      "type": "custom",
+      "candid": "artifacts/counter_rust.did",
+      "wasm": "artifacts/counter_rust.wasm"
     }
   },
   "defaults": {

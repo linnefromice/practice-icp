@@ -1,6 +1,9 @@
 # simple_e2e
 
 ```bash
+./scripts/build.sh
+dfx generate
+
 dfx stop && dfx start --clean --background && dfx canister create --all && dfx build && dfx canister install --all
 # confirmation
 dfx deploy
