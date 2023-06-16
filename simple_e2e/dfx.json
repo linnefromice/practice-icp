@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "canisters": {
+    "hello_motoko": {
+      "type": "motoko",
+      "main": "src/hello_motoko/main.mo"
+    },
+    "hello_rust": {
+      "type": "rust",
+      "package": "hello_rust",
+      "candid": "src/hello_rust/hello_rust.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
