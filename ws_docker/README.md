@@ -10,5 +10,9 @@ docker run -it --rm dfx_pj_container
 # check
 dfx stop && dfx start --clean --background && dfx canister create --all && dfx build && dfx canister install --all
 
-npm run test -- --test-timeout=20000
+npm run test -- --test-timeout=30000
 ```
+
+## Supplements
+
+- ./project from ../simple_e2e folder

@@ -6,6 +6,8 @@ import { idlFactory as idlFactoryMotoko } from "../../src/declarations/hello_mot
 import { idlFactory as idlFactoryRust } from "../../src/declarations/hello_rust/hello_rust.did.js";
 import { idlFactory as idlFactoryCounterMotoko } from "../../src/declarations/counter_motoko/counter_motoko.did.js";
 import { idlFactory as idlFactoryCounterRust } from "../../src/declarations/counter_rust/counter_rust.did.js";
+import { idlFactory as idlFactoryHttpOutcallErc20 } from "../../src/declarations/http_outcall_erc20/http_outcall_erc20.did.js";
+import { idlFactory as idlFactoryHttpOutcallPool } from "../../src/declarations/http_outcall_pool/http_outcall_pool.did.js";
 
 const createActor = async (canisterId, options, idlFactory) => {
     const agent = new HttpAgent({ ...options.agentOptions });
@@ -25,11 +27,15 @@ const createActorHelloMotoko = async (canisterId, options) => createActor(canist
 const createActorHelloRust = async (canisterId, options) => createActor(canisterId, options, idlFactoryRust);
 const createActorCounterMotoko = async (canisterId, options) => createActor(canisterId, options, idlFactoryCounterMotoko);
 const createActorCounterRust = async (canisterId, options) => createActor(canisterId, options, idlFactoryCounterRust);
+const createActorHttpOutcallErc20 = async (canisterId, options) => createActor(canisterId, options, idlFactoryHttpOutcallErc20);
+const createActorHttpOutcallPool = async (canisterId, options) => createActor(canisterId, options, idlFactoryHttpOutcallPool);
 
 const helloMotokoCanister = canisterIds.hello_motoko.local;
 const helloRustCanister = canisterIds.hello_rust.local;
 const counterMotokoCanister = canisterIds.counter_motoko.local;
 const counterRustCanister = canisterIds.counter_rust.local;
+const httpOutcallErc20Canister = canisterIds.http_outcall_erc20.local;
+const httpOutcallPoolCanister = canisterIds.http_outcall_pool.local;
 
 const commonAgentOption = {
     host: URL,
@@ -52,10 +58,20 @@ const counterRust = await createActorCounterRust(
     counterRustCanister,
     { agentOptions: commonAgentOption }
 );
+const httpOutcallErc20 = await createActorHttpOutcallErc20(
+    httpOutcallErc20Canister,
+    { agentOptions: commonAgentOption }
+);
+const httpOutcallPool = await createActorHttpOutcallPool(
+    httpOutcallPoolCanister,
+    { agentOptions: commonAgentOption }
+);
 
 module.exports = {
     helloMotoko,
     helloRust,
     counterMotoko,
     counterRust,
+    httpOutcallErc20,
+    httpOutcallPool
 }

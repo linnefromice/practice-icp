@@ -42,15 +42,18 @@ RUN sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 
 # Setup dfx (global)
 RUN apt-get update
-# RUN apt-get install -y expect
+
 ## for creating a wallet canister
 ###　Without this, the following error occurs
 ### /root/.cache/dfinity/versions/0.14.1/canister_sandbox: error while loading shared libraries: libunwind.so.8: cannot open shared object file: No such file or directory
 RUN apt-get install -y libunwind8
 
+RUN dfx identity new operator --storage-mode plaintext
+## if no use --storage-mode plaintext
+# RUN apt-get install -y expect
 # COPY script_dfx_new.exp /root/script_dfx_new.exp
 # RUN chmod 755 /root/script_dfx_new.exp
 # RUN /root/script_dfx_new.exp
-RUN dfx identity new operator --storage-mode plaintext
+
 
 RUN dfx identity use operator
