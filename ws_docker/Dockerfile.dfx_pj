@@ -1,0 +1,9 @@
+FROM --platform=linux/amd64 dfx_base_container:latest
+
+# for dependencies
+RUN apt-get install libunwind8
+
+COPY ./project /project
+WORKDIR /project
+RUN dfx generate
+RUN npm i
