@@ -1,0 +1,7 @@
+service : {
+  get: () -> (nat) query;
+  inc: () -> ();
+  name: () -> (text) query;
+  reset: () -> ();
+  set: (nat) -> ();
+}

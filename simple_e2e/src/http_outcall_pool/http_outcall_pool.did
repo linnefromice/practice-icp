@@ -1,0 +1,14 @@
+type HttpHeader = record { value : text; name : text };
+type HttpResponse = record {
+  status : nat;
+  body : vec nat8;
+  headers : vec HttpHeader;
+};
+type TransformArgs = record { context : vec nat8; response : HttpResponse };
+service : {
+  fee : () -> (nat32);
+  slot0 : () -> (text, int32, nat16);
+  token0 : () -> (text);
+  token1 : () -> (text);
+  transform : (TransformArgs) -> (HttpResponse) query;
+}

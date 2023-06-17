@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "canisters": {
+    "hello_motoko": {
+      "type": "custom",
+      "candid": "artifacts/hello_motoko.did",
+      "wasm": "artifacts/hello_motoko.wasm"
+    },
+    "hello_rust": {
+      "type": "custom",
+      "candid": "artifacts/hello_rust.did",
+      "wasm": "artifacts/hello_rust.wasm"
+    },
+    "counter_motoko": {
+      "type": "custom",
+      "candid": "artifacts/counter_motoko.did",
+      "wasm": "artifacts/counter_motoko.wasm"
+    },
+    "counter_rust": {
+      "type": "custom",
+      "candid": "artifacts/counter_rust.did",
+      "wasm": "artifacts/counter_rust.wasm"
+    },
+    "http_outcall_erc20": {
+      "type": "custom",
+      "candid": "artifacts/http_outcall_erc20.did",
+      "wasm": "artifacts/http_outcall_erc20.wasm"
+    },
+    "http_outcall_pool": {
+      "type": "custom",
+      "candid": "artifacts/http_outcall_pool.did",
+      "wasm": "artifacts/http_outcall_pool.wasm"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}

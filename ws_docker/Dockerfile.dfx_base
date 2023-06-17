@@ -1,0 +1,59 @@
+FROM --platform=linux/amd64 ubuntu:22.04
+
+ENV TZ=Asia/Tokyo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ENV NVM_DIR=/root/.nvm
+ENV NVM_VERSION=v0.39.1
+ENV NODE_VERSION=18.1.0
+
+ENV RUSTUP_HOME=/opt/rustup
+ENV CARGO_HOME=/opt/cargo
+ENV RUST_VERSION=1.62.0
+
+ENV DFX_VERSION=0.14.1
+
+# Install a basic environment needed for our build tools
+RUN apt -yq update && \
+    apt -yqq install --no-install-recommends curl ca-certificates \
+        build-essential pkg-config libssl-dev llvm-dev liblmdb-dev clang cmake rsync
+
+# Install Node.js using nvm
+ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin:${PATH}"
+RUN curl --fail -sSf https://raw.githubusercontent.com/creationix/nvm/${NVM_VERSION}/install.sh | bash
+RUN . "${NVM_DIR}/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "${NVM_DIR}/nvm.sh" && nvm use v${NODE_VERSION}
+RUN . "${NVM_DIR}/nvm.sh" && nvm alias default v${NODE_VERSION}
+
+# Install Rust and Cargo
+ENV PATH=/opt/cargo/bin:${PATH}
+# RUN curl --fail https://sh.rustup.rs -sSf \
+#         | sh -s -- -y --default-toolchain ${RUST_VERSION}-x86_64-unknown-linux-gnu --no-modify-path && \
+#     rustup default ${RUST_VERSION}-x86_64-unknown-linux-gnu && \
+#     rustup target add wasm32-unknown-unknown &&\
+#     cargo install ic-wasm
+RUN curl --fail https://sh.rustup.rs -sSf \
+        | sh -s -- -y --default-toolchain ${RUST_VERSION}-x86_64-unknown-linux-gnu --no-modify-path
+RUN rustup default ${RUST_VERSION}-x86_64-unknown-linux-gnu
+RUN rustup target add wasm32-unknown-unknown
+
+# Install dfx
+RUN sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
+
+# Setup dfx (global)
+RUN apt-get update
+
+## for creating a wallet canister
+###　Without this, the following error occurs
+### /root/.cache/dfinity/versions/0.14.1/canister_sandbox: error while loading shared libraries: libunwind.so.8: cannot open shared object file: No such file or directory
+RUN apt-get install -y libunwind8
+
+RUN dfx identity new operator --storage-mode plaintext
+## if no use --storage-mode plaintext
+# RUN apt-get install -y expect
+# COPY script_dfx_new.exp /root/script_dfx_new.exp
+# RUN chmod 755 /root/script_dfx_new.exp
+# RUN /root/script_dfx_new.exp
+
+
+RUN dfx identity use operator

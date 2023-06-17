@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "src/hello_rust",
+    "src/counter_rust",
+    "src/http_outcall_erc20",
+    "src/http_outcall_pool"
+]

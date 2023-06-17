@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "canisters": {
+    "hello_motoko": {
+      "type": "motoko",
+      "main": "src/hello_motoko/main.mo"
+    },
+    "hello_rust": {
+      "type": "rust",
+      "package": "hello_rust",
+      "candid": "src/hello_rust/hello_rust.did"
+    },
+    "counter_motoko": {
+      "type": "motoko",
+      "main": "src/counter_motoko/main.mo"
+    },
+    "counter_rust": {
+      "type": "rust",
+      "package": "counter_rust",
+      "candid": "src/counter_rust/counter_rust.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
