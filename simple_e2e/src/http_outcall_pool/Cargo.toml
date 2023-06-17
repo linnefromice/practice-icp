@@ -1,0 +1,19 @@
+[package]
+name = "http_outcall_pool"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+candid = "0.8.4"
+ic-cdk = "0.8.1"
+ic-cdk-macros = "0.6.10"
+
+ic-web3-rs = "0.1.1"
+ic-solidity-bindgen = "0.1.5"
+chainsight-cdk-macros = { git = "ssh://github-megared/horizonx-tech/chainsight-sdk.git", rev = "17e65f7759c4fa8a6c3f397ef5ef7a454d276cea" }
+hex = "0.4.3"

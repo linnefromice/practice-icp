@@ -20,6 +20,16 @@
       "type": "custom",
       "candid": "artifacts/counter_rust.did",
       "wasm": "artifacts/counter_rust.wasm"
+    },
+    "http_outcall_erc20": {
+      "type": "custom",
+      "candid": "artifacts/http_outcall_erc20.did",
+      "wasm": "artifacts/http_outcall_erc20.wasm"
+    },
+    "http_outcall_pool": {
+      "type": "custom",
+      "candid": "artifacts/http_outcall_pool.did",
+      "wasm": "artifacts/http_outcall_pool.wasm"
     }
   },
   "defaults": {
