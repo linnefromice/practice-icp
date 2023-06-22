@@ -1,0 +1,133 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x24a59C01F13C173488046E4efe53915fe15D928F",
+    "txHash": "0x0626003b55d475460d9c6e2e20839dff51ed2c85e88d11e8b3816aa9c843ff8d"
+  },
+  "proxies": [
+    {
+      "address": "0x1B3C219eB4eeCFEDF369151678a2082b6cD3EE05",
+      "txHash": "0xd181e060f4dc1c9e5244994f15e26ca7bded277a1cfa40c66f3ac550ac04cd93",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xbBBc20dFDe34D4B4AC147A073B7e2f29f2Fd6b53",
+      "txHash": "0x0184bbf33064e5fb67694099028358f43780e87c302dab40972d75284e6736b1",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "5e67a2c233822b9bbd0e930d5bc82667879f5f6d0738074c997f8e477573456f": {
+      "address": "0x2b26d3a003a65Cd7cEb958cda68262Ba1D631C18",
+      "txHash": "0x2055e8c8fa62810bce2a7ea401f54fe8246a67f0f78b1873817fa098cf38059b",
+      "layout": {
+        "solcVersion": "0.8.18",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "state",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "contract": "StringOracle",
+            "src": "contracts/StringOracle.sol:7"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "9f9c7021a95107991df2d6522beb06ef0d53672757c7080f9c125c5225cbea4e": {
+      "address": "0x0539a0EF8e5E60891fFf0958A059E049e43020d9",
+      "txHash": "0x53f4d4fa96679fb577eebf660225a57e50da9bddf298ce94702ff8e69d8e4d01",
+      "layout": {
+        "solcVersion": "0.8.18",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "state",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "Uint256Oracle",
+            "src": "contracts/Uint256Oracle.sol:7"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}
