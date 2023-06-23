@@ -39,7 +39,7 @@
     js-sha256 "^0.9.0"
     randombytes "^2.1.0"
 
-"@dfinity/principal@^0.15.3":
+"@dfinity/principal@^0.15.3", "@dfinity/principal@^0.15.7":
   version "0.15.7"
   resolved "https://registry.yarnpkg.com/@dfinity/principal/-/principal-0.15.7.tgz#311cf1072d6fd64b9b91476dda4d3ef5ddfcefea"
   integrity sha512-6/AkYzpGEH6Jw/0+B/EeeQn+5u2GDDvRLt1kQPhIG4txQYFnOy04H3VvyrymmfAj6/CXUgrOrux6OxgYSLYVJg==
