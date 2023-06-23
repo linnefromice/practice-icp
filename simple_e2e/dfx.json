@@ -4,32 +4,68 @@
     "hello_motoko": {
       "type": "custom",
       "candid": "artifacts/hello_motoko.did",
-      "wasm": "artifacts/hello_motoko.wasm"
+      "wasm": "artifacts/hello_motoko.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
     },
     "hello_rust": {
       "type": "custom",
       "candid": "artifacts/hello_rust.did",
-      "wasm": "artifacts/hello_rust.wasm"
+      "wasm": "artifacts/hello_rust.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
     },
     "counter_motoko": {
       "type": "custom",
       "candid": "artifacts/counter_motoko.did",
-      "wasm": "artifacts/counter_motoko.wasm"
+      "wasm": "artifacts/counter_motoko.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
     },
     "counter_rust": {
       "type": "custom",
       "candid": "artifacts/counter_rust.did",
-      "wasm": "artifacts/counter_rust.wasm"
+      "wasm": "artifacts/counter_rust.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
     },
     "http_outcall_erc20": {
       "type": "custom",
       "candid": "artifacts/http_outcall_erc20.did",
-      "wasm": "artifacts/http_outcall_erc20.wasm"
+      "wasm": "artifacts/http_outcall_erc20.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
     },
     "http_outcall_pool": {
       "type": "custom",
       "candid": "artifacts/http_outcall_pool.did",
-      "wasm": "artifacts/http_outcall_pool.wasm"
+      "wasm": "artifacts/http_outcall_pool.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
     }
   },
   "defaults": {
