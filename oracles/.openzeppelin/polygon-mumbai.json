@@ -14,6 +14,16 @@
       "address": "0xbBBc20dFDe34D4B4AC147A073B7e2f29f2Fd6b53",
       "txHash": "0x0184bbf33064e5fb67694099028358f43780e87c302dab40972d75284e6736b1",
       "kind": "transparent"
+    },
+    {
+      "address": "0x9F1A8d885dDecD12eBb5B0680EfCde3346Df94ab",
+      "txHash": "0x1dfd1a534b6f72e4d2a3412d30447b970cd550b65256d22b362ef94b0eb6e3e9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3e504c7c5bf7b26A45AacCF32900D800C3c5E6b7",
+      "txHash": "0x9942da179d90ee868e274b3e2df30f740f9a00c6a8766e22647cd698248e049a",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -121,6 +131,118 @@
           "t_uint256": {
             "label": "uint256",
             "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "586fce3d7f9b8c3f870210e4d9ee787af95e6963455fe44b72d6440335729224": {
+      "address": "0x7eCBe4fE2Ea7631b948F95b76eCDaA70CF9782F4",
+      "txHash": "0x7a33d127eff3d042d60a50bc85b2640aea5b89408275e9c4b572d16d55856397",
+      "layout": {
+        "solcVersion": "0.8.18",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "state",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_uint128)",
+            "contract": "Uint128Oracle",
+            "src": "contracts/Uint128Oracle.sol:7"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint128)": {
+            "label": "mapping(address => uint128)",
+            "numberOfBytes": "32"
+          },
+          "t_uint128": {
+            "label": "uint128",
+            "numberOfBytes": "16"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "0a692e9c777c5ed4b06555576cfebf6474443723c5e4bc68bc1bdab58bfaf948": {
+      "address": "0x69a37Ba9b2DFbEA4bF658949c966f4EE324469d3",
+      "txHash": "0x099b87902d860b3b2871a9f1de4ead41b9c6fd5d62b53be2acd8aae6f7b914ea",
+      "layout": {
+        "solcVersion": "0.8.18",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "state",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_address,t_uint64)",
+            "contract": "Uint64Oracle",
+            "src": "contracts/Uint64Oracle.sol:7"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint64)": {
+            "label": "mapping(address => uint64)",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
           },
           "t_uint8": {
             "label": "uint8",
