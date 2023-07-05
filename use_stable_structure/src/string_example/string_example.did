@@ -1,0 +1,8 @@
+type Result = variant { Ok; Err : text };
+service : {
+  get_cell : () -> (text) query;
+  get_vec : (nat64) -> (opt text) query;
+  greet : (text) -> (text) query;
+  insert_to_vec : (text) -> (Result);
+  set_cell : (text) -> (Result);
+}

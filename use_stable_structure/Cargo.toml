@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "src/basic_example",
+    "src/string_example"
 ]
 
 [workspace.dependencies]

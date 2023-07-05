@@ -10,7 +10,8 @@ use ic_stable_structures::{
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
-    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> = RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
+    static MEMORY_MANAGER: RefCell<MemoryManager<DefaultMemoryImpl>> =
+        RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
 
     static MAP: RefCell<StableBTreeMap<u128, u128, Memory>> = RefCell::new(
         StableBTreeMap::init(

@@ -1704,6 +1704,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "string_example"
+version = "0.1.0"
+dependencies = [
+ "candid",
+ "chainsight-cdk",
+ "chainsight-cdk-macros",
+ "ic-cdk 0.7.4",
+ "ic-cdk-timers",
+ "ic-solidity-bindgen",
+ "ic-stable-structures",
+ "ic-web3-rs",
+]
+
+[[package]]
 name = "strsim"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

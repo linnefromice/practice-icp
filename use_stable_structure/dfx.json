@@ -5,6 +5,11 @@
       "type": "rust",
       "package": "basic_example",
       "candid": "src/basic_example/basic_example.did"
+    },
+    "string_example": {
+      "type": "rust",
+      "package": "string_example",
+      "candid": "src/string_example/string_example.did"
     }
   },
   "defaults": {
