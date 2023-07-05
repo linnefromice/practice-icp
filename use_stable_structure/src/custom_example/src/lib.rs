@@ -8,16 +8,18 @@ use ic_stable_structures::{
 };
 use ic_stable_structures::{StableCell, StableVec};
 
-#[derive(Clone, Default, candid::CandidType, candid::Deserialize)]
-pub struct SnapshotTuple(
-    pub String,
-    pub i32,
-    // pub u16,
-    // pub u16,
-    // pub u16,
-    // pub u16,
-    pub bool,
+type CustomType = (
+    String,
+    i32,
+    // u16,
+    // u16,
+    // u16,
+    // u16,
+    bool,
 );
+
+#[derive(Clone, Default, candid::CandidType, candid::Deserialize)]
+pub struct SnapshotTuple(CustomType);
 impl Storable for SnapshotTuple {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
         Cow::Owned(Encode!(self).unwrap())
@@ -34,15 +36,7 @@ impl BoundedStorable for SnapshotTuple {
 
 #[derive(Clone, Default, candid::CandidType, candid::Deserialize)]
 pub struct SnapshotStruct {
-    pub value: (
-        String,
-        i32,
-        // u16,
-        // u16,
-        // u16,
-        // u16,
-        bool,
-    ),
+    pub value: CustomType,
     pub timestamp: u64,
 }
 impl Storable for SnapshotStruct {
