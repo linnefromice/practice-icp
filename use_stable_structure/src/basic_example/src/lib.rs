@@ -1,11 +1,11 @@
 use std::cell::RefCell;
 
 use chainsight_cdk_macros::did_export;
-use ic_stable_structures::{StableBTreeMap, StableVec};
 use ic_stable_structures::{
     memory_manager::{MemoryId, MemoryManager, VirtualMemory},
     DefaultMemoryImpl,
 };
+use ic_stable_structures::{StableBTreeMap, StableVec};
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
@@ -47,7 +47,7 @@ fn set_map(key: u128, value: u128) {
 #[ic_cdk::query]
 #[candid::candid_method(query)]
 fn get_vec(idx: u64) -> Option<u128> {
-    VEC.with(|vec| vec.borrow().get(idx as u64))
+    VEC.with(|vec| vec.borrow().get(idx))
 }
 
 #[ic_cdk::update]

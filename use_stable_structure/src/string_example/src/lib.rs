@@ -1,9 +1,10 @@
 use std::cell::RefCell;
 
 use chainsight_cdk_macros::did_export;
-use ic_stable_structures::memory_manager::{MemoryManager, VirtualMemory, MemoryId};
-use ic_stable_structures::{DefaultMemoryImpl, Storable, StableCell, StableVec, BoundedStorable};
+use ic_stable_structures::memory_manager::{MemoryId, MemoryManager, VirtualMemory};
+use ic_stable_structures::{BoundedStorable, DefaultMemoryImpl, StableCell, StableVec, Storable};
 
+#[derive(Default)]
 struct StringWrapper(String);
 impl Storable for StringWrapper {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
@@ -18,25 +19,20 @@ impl BoundedStorable for StringWrapper {
     const MAX_SIZE: u32 = 100;
     const IS_FIXED_SIZE: bool = false;
 }
-impl Default for StringWrapper {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
 
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
     static MEMORY_MANAGER: RefCell<MemoryManager<ic_stable_structures::DefaultMemoryImpl>>  =
         RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
-    
+
     static CELL: RefCell<StableCell<StringWrapper, Memory>> = RefCell::new(
         StableCell::init(
             MEMORY_MANAGER.with(|mm| mm.borrow().get(MemoryId::new(0))),
             StringWrapper::default()
         ).unwrap()
     );
-    
+
     static VEC: RefCell<StableVec<StringWrapper,Memory>> = RefCell::new(
         StableVec::init(
             MEMORY_MANAGER.with(|mm| mm.borrow().get(MemoryId::new(1)))
@@ -60,15 +56,13 @@ fn get_cell() -> String {
 #[candid::candid_method(update)]
 fn set_cell(value: String) -> Result<(), String> {
     let res = CELL.with(|cell| cell.borrow_mut().set(StringWrapper(value)));
-    res
-        .map(|_| ())
-        .map_err(|e| format!("{:?}", e))
+    res.map(|_| ()).map_err(|e| format!("{:?}", e))
 }
 
 #[ic_cdk::query]
 #[candid::candid_method(query)]
 fn get_vec(idx: u64) -> Option<String> {
-    VEC.with(|vec| vec.borrow().get(idx as u64).map(|s| s.0.clone()))
+    VEC.with(|vec| vec.borrow().get(idx).map(|s| s.0))
 }
 
 #[ic_cdk::update]
