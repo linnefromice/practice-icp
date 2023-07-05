@@ -1,8 +1,11 @@
-use std::{cell::RefCell, borrow::Cow};
+use std::{borrow::Cow, cell::RefCell};
 
 use candid::{Decode, Encode};
 use chainsight_cdk_macros::did_export;
-use ic_stable_structures::{memory_manager::{VirtualMemory, MemoryManager, MemoryId}, DefaultMemoryImpl, Storable, BoundedStorable};
+use ic_stable_structures::{
+    memory_manager::{MemoryId, MemoryManager, VirtualMemory},
+    BoundedStorable, DefaultMemoryImpl, Storable,
+};
 use ic_stable_structures::{StableCell, StableVec};
 
 #[derive(Clone, Default, candid::CandidType, candid::Deserialize)]
@@ -13,7 +16,7 @@ pub struct SnapshotTuple(
     // pub u16,
     // pub u16,
     // pub u16,
-    pub bool
+    pub bool,
 );
 impl Storable for SnapshotTuple {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
@@ -38,7 +41,7 @@ pub struct SnapshotStruct {
         // u16,
         // u16,
         // u16,
-        bool
+        bool,
     ),
     pub timestamp: u64,
 }
@@ -56,13 +59,12 @@ impl BoundedStorable for SnapshotStruct {
     const IS_FIXED_SIZE: bool = false;
 }
 
-
 type Memory = VirtualMemory<DefaultMemoryImpl>;
 
 thread_local! {
     static MEMORY_MANAGER: RefCell<ic_stable_structures::memory_manager::MemoryManager<ic_stable_structures::DefaultMemoryImpl>>   =
         RefCell::new(MemoryManager::init(DefaultMemoryImpl::default()));
-    
+
     static TUPLE_CELL: RefCell<StableCell<SnapshotTuple, Memory>> = RefCell::new(
         StableCell::init(
             MEMORY_MANAGER.with(|mm| mm.borrow().get(MemoryId::new(0))),
@@ -106,9 +108,7 @@ fn get_tuple_cell() -> SnapshotTuple {
 #[candid::candid_method(update)]
 fn set_tuple_cell(val: SnapshotTuple) -> Result<(), String> {
     let res = TUPLE_CELL.with(|cell| cell.borrow_mut().set(val));
-    res
-        .map(|_| ())
-        .map_err(|e| format!("{:?}", e))
+    res.map(|_| ()).map_err(|e| format!("{:?}", e))
 }
 
 #[ic_cdk::query]
@@ -121,9 +121,7 @@ fn get_tuple_vec(idx: u64) -> Option<SnapshotTuple> {
 #[candid::candid_method(update)]
 fn insert_to_tuple_vec(val: SnapshotTuple) -> Result<(), String> {
     let res = TUPLE_VEC.with(|vec| vec.borrow_mut().push(&val));
-    res
-        .map(|_| ())
-        .map_err(|e| format!("{:?}", e))
+    res.map(|_| ()).map_err(|e| format!("{:?}", e))
 }
 
 #[ic_cdk::query]
@@ -136,9 +134,7 @@ fn get_struct_cell() -> SnapshotStruct {
 #[candid::candid_method(update)]
 fn set_struct_cell(val: SnapshotStruct) -> Result<(), String> {
     let res = STRUCT_CELL.with(|cell| cell.borrow_mut().set(val));
-    res
-        .map(|_| ())
-        .map_err(|e| format!("{:?}", e))
+    res.map(|_| ()).map_err(|e| format!("{:?}", e))
 }
 
 #[ic_cdk::query]
@@ -151,9 +147,7 @@ fn get_struct_vec(idx: u64) -> Option<SnapshotStruct> {
 #[candid::candid_method(update)]
 fn insert_to_struct_vec(val: SnapshotStruct) -> Result<(), String> {
     let res = STRUCT_VEC.with(|vec| vec.borrow_mut().push(&val));
-    res
-        .map(|_| ())
-        .map_err(|e| format!("{:?}", e))
+    res.map(|_| ()).map_err(|e| format!("{:?}", e))
 }
 
 did_export!("custom_example");
