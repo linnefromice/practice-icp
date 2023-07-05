@@ -2,7 +2,8 @@
 members = [
     "src/basic_example",
     "src/string_example",
-    "src/custom_example"
+    "src/custom_example",
+    "src/measurement"
 ]
 
 [workspace.dependencies]

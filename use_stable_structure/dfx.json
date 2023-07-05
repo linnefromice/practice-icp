@@ -15,6 +15,11 @@
       "type": "rust",
       "package": "custom_example",
       "candid": "src/custom_example/custom_example.did"
+    },
+    "measurement": {
+      "type": "rust",
+      "package": "measurement",
+      "candid": "src/measurement/measurement.did"
     }
   },
   "defaults": {

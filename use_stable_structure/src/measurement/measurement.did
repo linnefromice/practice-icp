@@ -1,0 +1,20 @@
+type Result = variant { Ok : nat64; Err : record { text; nat64 } };
+type SnapshotStruct = record {
+  value : record { text; int32; bool };
+  timestamp : nat64;
+};
+service : {
+  get_state_cell : () -> (text, nat64) query;
+  get_state_vec : (nat64) -> (opt text, nat64) query;
+  get_struct_cell : () -> (SnapshotStruct, nat64) query;
+  get_struct_vec : (nat64) -> (opt SnapshotStruct, nat64) query;
+  get_tuple_cell : () -> (record { text; int32; bool }, nat64) query;
+  get_tuple_vec : (nat64) -> (opt record { text; int32; bool }, nat64) query;
+  greet : (text) -> (text) query;
+  insert_to_state_vec : (text) -> (nat64);
+  insert_to_struct_vec : (SnapshotStruct) -> (Result);
+  insert_to_tuple_vec : (record { text; int32; bool }) -> (Result);
+  set_state_cell : (text) -> (nat64);
+  set_struct_cell : (SnapshotStruct) -> (Result);
+  set_tuple_cell : (record { text; int32; bool }) -> (Result);
+}
