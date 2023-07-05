@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "canisters": {
+    "basic_example": {
+      "type": "rust",
+      "package": "basic_example",
+      "candid": "src/basic_example/basic_example.did"
+    },
+    "string_example": {
+      "type": "rust",
+      "package": "string_example",
+      "candid": "src/string_example/string_example.did"
+    },
+    "custom_example": {
+      "type": "rust",
+      "package": "custom_example",
+      "candid": "src/custom_example/custom_example.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}

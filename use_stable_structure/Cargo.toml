@@ -1,0 +1,18 @@
+[workspace]
+members = [
+    "src/basic_example",
+    "src/string_example",
+    "src/custom_example"
+]
+
+[workspace.dependencies]
+candid = "0.8"
+ic-cdk = "0.7"
+ic-cdk-timers = "0.1" # Feel free to remove this dependency if you don't need timers
+ic-stable-structures = "0.5.5"
+serde = "1.0.166"
+
+ic-web3-rs = { version = "0.1.1" }
+ic-solidity-bindgen = { version = "0.1.5" }
+chainsight-cdk-macros = { git = "https://github.com/horizonx-tech/chainsight-sdk.git", rev = "d23809e77bbbf3293a1101e026728e4e35971ab7" }
+chainsight-cdk = { git = "https://github.com/horizonx-tech/chainsight-sdk.git", rev = "d23809e77bbbf3293a1101e026728e4e35971ab7" }

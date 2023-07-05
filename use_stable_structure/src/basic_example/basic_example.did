@@ -1,0 +1,8 @@
+type Result = variant { Ok; Err : text };
+service : {
+  get_map : (nat) -> (opt nat) query;
+  get_vec : (nat64) -> (opt nat) query;
+  greet : (text) -> (text) query;
+  insert_to_vec : (nat) -> (Result);
+  set_map : (nat, nat) -> ();
+}
