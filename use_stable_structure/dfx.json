@@ -10,6 +10,11 @@
       "type": "rust",
       "package": "string_example",
       "candid": "src/string_example/string_example.did"
+    },
+    "custom_example": {
+      "type": "rust",
+      "package": "custom_example",
+      "candid": "src/custom_example/custom_example.did"
     }
   },
   "defaults": {
