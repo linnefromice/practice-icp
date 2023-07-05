@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "src/use_stable_structure_backend",
+]

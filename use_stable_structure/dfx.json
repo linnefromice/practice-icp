@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "canisters": {
+    "use_stable_structure_backend": {
+      "type": "rust",
+      "package": "use_stable_structure_backend",
+      "candid": "src/use_stable_structure_backend/use_stable_structure_backend.did"
+    },
+    "use_stable_structure_frontend": {
+      "type": "assets",
+      "source": [
+        "src/use_stable_structure_frontend/assets"
+      ],
+      "dependencies": [
+        "use_stable_structure_backend"
+      ]
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
