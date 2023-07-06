@@ -3,6 +3,10 @@ service : {
   add_vec_val : (record { text; int32; bool }) -> (Result, nat64);
   get_last_vec_val : () -> (opt record { text; int32; bool }, nat64) query;
   get_top_vec_vals : (nat64) -> (vec record { text; int32; bool }, nat64) query;
+  get_top_vec_vals_v2 : (nat64) -> (
+      vec record { text; int32; bool },
+      nat64,
+    ) query;
   get_vec : () -> (vec record { text; int32; bool }, nat64) query;
   get_vec_val : (nat64) -> (opt record { text; int32; bool }, nat64) query;
   get_vec_vals_len : () -> (nat64, nat64) query;

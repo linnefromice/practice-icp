@@ -84,6 +84,19 @@ fn get_top_vec_vals(n: u64) -> Vec<u128> {
 }
 #[ic_cdk::query]
 #[candid::candid_method(query)]
+fn get_top_vec_vals_v2(n: u64) -> Vec<u128> {
+    VEC.with(|mem| {
+        let borrowed_mem = mem.borrow();
+        let len = borrowed_mem.len();
+        let mut res = Vec::new();
+        for i in 0..n {
+            res.push(borrowed_mem.get(len - i - 1).unwrap());
+        }
+        res
+    })
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
 fn get_vec() -> Vec<u128> {
     VEC.with(|mem| mem.borrow().iter().collect())
 }

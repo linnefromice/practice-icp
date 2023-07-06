@@ -22,11 +22,11 @@ type CustomType = (
 pub struct SnapshotTuple(CustomType);
 impl Storable for SnapshotTuple {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+        Cow::Owned(candid::Encode!(self).unwrap())
     }
 
     fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
+        candid::Decode!(bytes.as_ref(), Self).unwrap()
     }
 }
 impl BoundedStorable for SnapshotTuple {
@@ -41,11 +41,11 @@ pub struct SnapshotStruct {
 }
 impl Storable for SnapshotStruct {
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+        Cow::Owned(candid::Encode!(self).unwrap())
     }
 
     fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
-        Decode!(bytes.as_ref(), Self).unwrap()
+        candid::Decode!(bytes.as_ref(), Self).unwrap()
     }
 }
 impl BoundedStorable for SnapshotStruct {
