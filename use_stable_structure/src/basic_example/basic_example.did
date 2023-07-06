@@ -1,9 +1,14 @@
 type Result = variant { Ok; Err : text };
 service : {
   add_vec_val : (nat) -> (Result);
+  get_cell : () -> (nat) query;
   get_last_vec_val : () -> (opt nat) query;
+  get_map : (nat) -> (opt nat) query;
   get_top_vec_vals : (nat64) -> (vec nat) query;
   get_vec : () -> (vec nat) query;
   get_vec_val : (nat64) -> (opt nat) query;
   get_vec_vals_len : () -> (nat64) query;
+  greet : (text) -> (text) query;
+  set_cell : (nat) -> (Result);
+  set_map : (nat, nat) -> ();
 }
