@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "src/basic_example",
+    "src/basic_example_measurement",
     "src/string_example",
     "src/custom_example",
     "src/measurement"
