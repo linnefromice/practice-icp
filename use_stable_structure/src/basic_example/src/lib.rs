@@ -60,6 +60,11 @@ fn get_vec_val(idx: u64) -> Option<u128> {
 }
 #[ic_cdk::query]
 #[candid::candid_method(query)]
+fn get_vec_val_unwrap(idx: u64) -> u128 {
+    VEC.with(|mem| mem.borrow().get(idx)).unwrap()
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
 fn get_vec_vals_len() -> u64 {
     VEC.with(|mem| mem.borrow().len())
 }
@@ -71,6 +76,15 @@ fn get_last_vec_val() -> Option<u128> {
         let len = borrowed_mem.len();
         borrowed_mem.get(len - 1)
     })
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn get_last_vec_val_unwrap() -> u128 {
+    VEC.with(|mem| {
+        let borrowed_mem = mem.borrow();
+        let len = borrowed_mem.len();
+        borrowed_mem.get(len - 1)
+    }).unwrap()
 }
 #[ic_cdk::query]
 #[candid::candid_method(query)]
