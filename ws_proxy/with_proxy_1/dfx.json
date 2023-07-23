@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "canisters": {
+    "with_proxy_1_backend": {
+      "type": "rust",
+      "package": "with_proxy_1_backend",
+      "candid": "src/with_proxy_1_backend/with_proxy_1_backend.did"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}

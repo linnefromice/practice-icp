@@ -1,0 +1,18 @@
+[workspace]
+members = [
+    "src/with_proxy_1_backend",
+]
+
+[workspace.dependencies]
+candid = "0.8"
+ic-cdk = "0.8"
+ic-cdk-macros = "0.6.10"
+ic-cdk-timers = "0.1"
+ic-stable-structures = "0.5.5"
+serde = "1.0.163"
+hex = "0.4.3"
+
+ic-web3-rs = { version = "0.1.1" }
+ic-solidity-bindgen = { version = "0.1.5" }
+chainsight-cdk-macros = { git = "https://github.com/horizonx-tech/chainsight-sdk.git", rev = "d50310c3de9b7d5af7e8b4b5f81a8b1b98a287a2" }
+chainsight-cdk = { git = "https://github.com/horizonx-tech/chainsight-sdk.git", rev = "d50310c3de9b7d5af7e8b4b5f81a8b1b98a287a2" }
