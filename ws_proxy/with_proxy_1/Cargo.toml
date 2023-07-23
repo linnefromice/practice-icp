@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "src/with_proxy_1_backend",
+    "src/caller_impl",
+    "src/callee_impl",
 ]
 
 [workspace.dependencies]

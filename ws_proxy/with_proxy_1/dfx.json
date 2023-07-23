@@ -1,10 +1,15 @@
 {
   "version": 1,
   "canisters": {
-    "with_proxy_1_backend": {
+    "caller_impl": {
       "type": "rust",
-      "package": "with_proxy_1_backend",
-      "candid": "src/with_proxy_1_backend/with_proxy_1_backend.did"
+      "package": "caller_impl",
+      "candid": "src/caller_impl/interface.did"
+    },
+    "callee_impl": {
+      "type": "rust",
+      "package": "callee_impl",
+      "candid": "src/callee_impl/interface.did"
     }
   },
   "defaults": {
