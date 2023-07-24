@@ -4,12 +4,12 @@
     "caller_impl": {
       "type": "rust",
       "package": "caller_impl",
-      "candid": "src/caller_impl/interface.did"
+      "candid": "src/caller_impl/caller_impl.did"
     },
     "callee_impl": {
       "type": "rust",
       "package": "callee_impl",
-      "candid": "src/callee_impl/interface.did"
+      "candid": "src/callee_impl/callee_impl.did"
     }
   },
   "defaults": {

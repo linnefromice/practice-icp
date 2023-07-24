@@ -1,0 +1,5 @@
+type Result = variant { Ok : text; Err : text };
+service : {
+  call_to_impl : (principal) -> (Result);
+  call_to_impl_last : (principal, nat64) -> (Result);
+}
