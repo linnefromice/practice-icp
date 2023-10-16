@@ -2,5 +2,4 @@ type Result = variant { Ok : text; Err : text };
 service : {
   call_to_impl : (principal, nat64) -> (Result);
   call_to_impl_last : (principal) -> (Result);
-  call_to_proxy_last : (principal, principal) -> (Result);
 }
