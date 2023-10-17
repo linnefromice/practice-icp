@@ -12,7 +12,11 @@
     "posttest": "npm run lint"
   },
   "dependencies": {
+    "@dfinity/agent": "^0.19.3",
+    "@dfinity/candid": "^0.19.3",
+    "@dfinity/principal": "^0.19.3",
     "@types/node": "^20.8.6",
+    "ethers": "^6.8.0",
     "gts": "^5.2.0",
     "typescript": "~5.2.0",
     "vitest": "^0.34.6"
