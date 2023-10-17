@@ -1,7 +1,9 @@
-import {describe, test, expect} from '@jest/globals';
+import {describe, test, expect} from 'vitest';
+
+test('setup test tool', () => {
+  expect('ping').toBe('ping');
+});
 
 describe('ping', () => {
-  test('should return pong', () => {
-    expect('pong').toBe('pong');
-  });
+  // do something
 });
