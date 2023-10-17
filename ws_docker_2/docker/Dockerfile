@@ -11,7 +11,8 @@ ENV DFX_VERSION=0.14.3
 RUN apt -yq update && \
     apt -yqq install --no-install-recommends curl ca-certificates \
         build-essential pkg-config libssl-dev llvm-dev liblmdb-dev clang cmake rsync \
-        wget
+        wget \
+        libunwind8
 
 # Install Rust and Cargo
 ENV PATH=/opt/cargo/bin:${PATH}

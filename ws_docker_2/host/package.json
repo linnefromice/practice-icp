@@ -5,7 +5,8 @@
   "license": "Apache-2.0",
   "keywords": [],
   "scripts": {
-    "test": "vitest",
+    "test:pre-check": "vitest test/pre-check",
+    "test:check": "vitest test/check",
     "lint": "gts lint",
     "clean": "gts clean",
     "fix": "gts fix",
