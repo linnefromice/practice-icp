@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "canisters": {
+    "counter": {
+      "type": "custom",
+      "candid": "./counter_rust.did",
+      "wasm": "./counter_rust.wasm",
+      "metadata": [
+        {
+          "name": "candid:service",
+          "visibility": "public"
+        }
+      ]
+    }
+  },
+  "networks": {
+    "local": {
+      "bind": "0.0.0.0:14943",
+      "type": "ephemeral"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "",
+      "args": ""
+    }
+  },
+  "output_env_file": ".env"
+}
