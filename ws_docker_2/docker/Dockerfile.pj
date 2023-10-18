@@ -1,7 +1,8 @@
-FROM --platform=linux/amd64 ubuntu:22.04
 FROM --platform=linux/amd64 dfx_hardhat_node_base:latest
 
-COPY ./artifacts /workspace/artifacts
+# NOTE: to add at build time
+COPY ./artifacts_sample /workspace/artifacts
+# COPY ./artifacts_csx /workspace/artifacts
 COPY ./workspace_pj/* /workspace/
 
 EXPOSE 8545
