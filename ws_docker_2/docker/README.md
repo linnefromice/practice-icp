@@ -6,12 +6,12 @@ docker build -f Dockerfile.base -t dfx_hardhat_node_base . --progress=plain && d
 docker run -it --name dfx_hardhat_node -p 18545:18545 -p 14943:14943 --rm dfx_hardhat_node /bin/bash
 
 ## With mount
-# rm -rf ./.artifacts && cp -rp ./artifacts_sample ./.artifacts
-# docker run -t \
-#   --name dfx_hardhat_node \
-#   -p 18545:18545 -p 14943:14943 \
-#   -v $PWD/.artifacts:/workspace/artifacts \
-#   --rm dfx_hardhat_node
+rm -rf ./.artifacts && cp -rp ./artifacts_sample ./.artifacts
+docker run -t \
+  --name dfx_hardhat_node \
+  -p 18545:18545 -p 14943:14943 \
+  -v $PWD/.artifacts:/workspace/artifacts \
+  --rm dfx_hardhat_node
 ### docker run -it --name dfx_hardhat_node -p 18545:18545 -p 14943:14943 -v $PWD/.artifacts:/workspace/artifacts --rm dfx_hardhat_node /bin/bash
 
 # Confirm

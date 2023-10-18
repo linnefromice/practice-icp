@@ -3,8 +3,10 @@ echo "> ls -l"
 ls -l
 echo "> ls -l artifacts"
 ls -l artifacts
-echo "> cd artifacts"
-cd artifacts
+echo "> cp -rp artifacts ws_dfx"
+cp -rp artifacts ws_dfx
+echo "> cd ws_dfx"
+cd ws_dfx
 echo "> pwd"
 pwd
 echo "> dfx start --background --clean"
