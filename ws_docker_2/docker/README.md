@@ -6,13 +6,15 @@ docker build -f Dockerfile.base -t dfx_hardhat_node_base . --progress=plain && d
 docker run -it --name dfx_hardhat_node -p 18545:18545 -p 14943:14943 --rm dfx_hardhat_node /bin/bash
 
 ## With mount
-rm -rf ./.artifacts && cp -rp ./artifacts_sample ./.artifacts
+rm -rf ./.artifacts ./.outputs && cp -rp ./artifacts_csx ./.artifacts && mkdir ./.outputs
 docker run -t \
   --name dfx_hardhat_node \
   -p 18545:18545 -p 14943:14943 \
   -v $PWD/.artifacts:/workspace/artifacts \
+  -v $PWD/.outputs:/workspace/outputs \
   --rm dfx_hardhat_node
-### docker run -it --name dfx_hardhat_node -p 18545:18545 -p 14943:14943 -v $PWD/.artifacts:/workspace/artifacts --rm dfx_hardhat_node /bin/bash
+
+### docker run -it --name dfx_hardhat_node -p 18545:18545 -p 14943:14943 -v $PWD/.artifacts:/workspace/artifacts -v $PWD/.outputs:/workspace/outputs --rm dfx_hardhat_node /bin/bash
 
 # Confirm
 curl -X POST http://localhost:18545 --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":31337}'
