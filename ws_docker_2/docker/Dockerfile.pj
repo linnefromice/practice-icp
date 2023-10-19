@@ -1,0 +1,12 @@
+FROM --platform=linux/amd64 dfx_hardhat_node_base:latest
+
+# NOTE: to add at build time
+# COPY ./artifacts_sample /workspace/artifacts
+# COPY ./artifacts_csx /workspace/artifacts
+COPY ./workspace_pj/* /workspace/
+
+EXPOSE 8545
+EXPOSE 4943
+
+RUN chmod 744 ./bootstrap.sh
+CMD ["./bootstrap.sh"]

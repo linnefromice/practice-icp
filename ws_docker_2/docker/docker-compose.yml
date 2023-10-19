@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  node:
+    image: dfx_hardhat_node_base:latest
+    platform: linux/x86_64
+    command: tail -f /dev/null
+    volumes:
+      - type: bind
+        source: "./workspace_pj/bootstrap.sh"
+        target: "/workspace/bootstrap.sh"
+      - type: bind
+        source: "./workspace_pj/hardhat.config.js"
+        target: "/workspace/hardhat.config.js"
+      - type: bind
+        source: "./artifacts_sample"
+        target: "/workspace/artifacts"
