@@ -1,8 +1,8 @@
 {
   "canisters": {
-    "ws_shell_1_backend": {
-      "candid": "src/ws_shell_1_backend/interface.did",
-      "package": "ws_shell_1_backend",
+    "backend": {
+      "candid": "src/backend/interface.did",
+      "package": "backend",
       "type": "rust"
     }
   },
