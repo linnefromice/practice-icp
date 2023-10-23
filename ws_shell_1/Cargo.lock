@@ -428,6 +428,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "ic-cdk"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1faa7b42964694fb38d7f62172e0d8261381e39ce85b4d6b519929f7cad9b4fb"
+dependencies = [
+ "candid",
+ "ic-cdk-macros",
+ "ic0",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
 name = "ic-cdk-macros"
 version = "0.6.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -448,7 +461,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c739e7c592cb66df4f15c6b6c4859b1195782f63923e2fb1b29553d9c0819bd4"
 dependencies = [
  "futures",
- "ic-cdk",
+ "ic-cdk 0.7.4",
  "ic0",
  "serde",
  "serde_bytes",
@@ -1183,6 +1196,7 @@ name = "ws_shell_1_backend"
 version = "0.1.0"
 dependencies = [
  "candid",
- "ic-cdk",
+ "ic-cdk 0.8.1",
+ "ic-cdk-macros",
  "ic-cdk-timers",
 ]
