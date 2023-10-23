@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "ws_shell_1_backend": {
+      "candid": "src/ws_shell_1_backend/ws_shell_1_backend.did",
+      "package": "ws_shell_1_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

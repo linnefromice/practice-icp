@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "src/ws_shell_1_backend",
+]
