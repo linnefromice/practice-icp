@@ -1,0 +1,170 @@
+---
+source: src/main.rs
+expression: result
+---
+// This is an experimental feature to generate Rust binding from Candid.
+// You may want to manually adjust some of the types.
+#![allow(dead_code, unused_imports)]
+use candid::{self, CandidType, Deserialize, Principal, Encode, Decode};
+use ic_cdk::api::call::CallResult as Result;
+
+#[derive(CandidType, Deserialize)]
+pub struct QuoteData { pub volume_24h: f64, pub price: f64 }
+
+#[derive(CandidType, Deserialize)]
+pub struct Quote { pub usd: QuoteData }
+
+#[derive(CandidType, Deserialize)]
+pub struct CurrencyData { pub quote: Quote }
+
+#[derive(CandidType, Deserialize)]
+pub struct BodyData { pub data: CurrencyData }
+
+#[derive(CandidType, Deserialize)]
+pub struct Body { pub data: BodyData }
+
+#[derive(CandidType, Deserialize)]
+pub struct Data { pub body: Body }
+
+#[derive(CandidType, Deserialize)]
+pub struct SnapshotValue { pub data: Data }
+
+#[derive(CandidType, Deserialize)]
+pub struct Snapshot { pub value: SnapshotValue, pub timestamp: u64 }
+
+#[derive(CandidType, Deserialize)]
+pub enum Env { Production, Test, LocalDevelopment }
+
+#[derive(CandidType, Deserialize)]
+pub enum InitError {
+  InvalidDestination(String),
+  InvalidPrincipal(Principal),
+  InvalidContent(String),
+  InvalidRequest(String),
+}
+
+#[derive(CandidType, Deserialize)]
+pub enum Result_ { Ok, Err(InitError) }
+
+#[derive(CandidType, Deserialize)]
+pub struct CanisterMetricsSnapshot {
+  pub cycles: candid::Nat,
+  pub timestamp: u64,
+}
+
+pub struct Service(pub Principal);
+impl Service {
+  pub async fn get_last_snapshot(&self) -> Result<(Snapshot,)> {
+    ic_cdk::call(self.0, "get_last_snapshot", ()).await
+  }
+  pub async fn get_last_snapshot_value(&self) -> Result<(SnapshotValue,)> {
+    ic_cdk::call(self.0, "get_last_snapshot_value", ()).await
+  }
+  pub async fn get_snapshot(&self, arg0: u64) -> Result<(Snapshot,)> {
+    ic_cdk::call(self.0, "get_snapshot", (arg0,)).await
+  }
+  pub async fn get_snapshot_value(&self, arg0: u64) -> Result<
+    (SnapshotValue,)
+  > { ic_cdk::call(self.0, "get_snapshot_value", (arg0,)).await }
+  pub async fn get_snapshots(&self) -> Result<(Vec<Snapshot>,)> {
+    ic_cdk::call(self.0, "get_snapshots", ()).await
+  }
+  pub async fn get_top_snapshot_values(&self, arg0: u64) -> Result<
+    (Vec<SnapshotValue>,)
+  > { ic_cdk::call(self.0, "get_top_snapshot_values", (arg0,)).await }
+  pub async fn get_top_snapshots(&self, arg0: u64) -> Result<(Vec<Snapshot>,)> {
+    ic_cdk::call(self.0, "get_top_snapshots", (arg0,)).await
+  }
+  pub async fn init_in(&self, arg0: Env) -> Result<(Result_,)> {
+    ic_cdk::call(self.0, "init_in", (arg0,)).await
+  }
+  pub async fn last_executed(&self) -> Result<(u64,)> {
+    ic_cdk::call(self.0, "last_executed", ()).await
+  }
+  pub async fn metric(&self) -> Result<(CanisterMetricsSnapshot,)> {
+    ic_cdk::call(self.0, "metric", ()).await
+  }
+  pub async fn metrics(&self, arg0: u64) -> Result<
+    (Vec<CanisterMetricsSnapshot>,)
+  > { ic_cdk::call(self.0, "metrics", (arg0,)).await }
+  pub async fn proxy_canister_metrics_snapshots_len(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_canister_metrics_snapshots_len", (arg0,)).await
+  }
+  pub async fn proxy_get_canister_metrics_snapshot(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_canister_metrics_snapshot", (arg0,)).await
+  }
+  pub async fn proxy_get_canister_metrics_snapshots(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_canister_metrics_snapshots", (arg0,)).await
+  }
+  pub async fn proxy_get_last_canister_metrics_snapshot(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_last_canister_metrics_snapshot", (
+      arg0,
+    )).await
+  }
+  pub async fn proxy_get_last_snapshot(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_last_snapshot", (arg0,)).await
+  }
+  pub async fn proxy_get_last_snapshot_value(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_last_snapshot_value", (arg0,)).await
+  }
+  pub async fn proxy_get_snapshot(&self, arg0: serde_bytes::ByteBuf) -> Result<
+    (serde_bytes::ByteBuf,)
+  > { ic_cdk::call(self.0, "proxy_get_snapshot", (arg0,)).await }
+  pub async fn proxy_get_snapshot_value(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_snapshot_value", (arg0,)).await
+  }
+  pub async fn proxy_get_snapshots(&self, arg0: serde_bytes::ByteBuf) -> Result<
+    (serde_bytes::ByteBuf,)
+  > { ic_cdk::call(self.0, "proxy_get_snapshots", (arg0,)).await }
+  pub async fn proxy_get_top_canister_metrics_snapshots(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_top_canister_metrics_snapshots", (
+      arg0,
+    )).await
+  }
+  pub async fn proxy_get_top_snapshot_values(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_top_snapshot_values", (arg0,)).await
+  }
+  pub async fn proxy_get_top_snapshots(
+    &self,
+    arg0: serde_bytes::ByteBuf,
+  ) -> Result<(serde_bytes::ByteBuf,)> {
+    ic_cdk::call(self.0, "proxy_get_top_snapshots", (arg0,)).await
+  }
+  pub async fn proxy_snapshots_len(&self, arg0: serde_bytes::ByteBuf) -> Result<
+    (serde_bytes::ByteBuf,)
+  > { ic_cdk::call(self.0, "proxy_snapshots_len", (arg0,)).await }
+  pub async fn set_task(&self, arg0: u32, arg1: u32) -> Result<()> {
+    ic_cdk::call(self.0, "set_task", (arg0,arg1,)).await
+  }
+  pub async fn snapshots_len(&self) -> Result<(u64,)> {
+    ic_cdk::call(self.0, "snapshots_len", ()).await
+  }
+}
+
