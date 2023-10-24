@@ -8,6 +8,4 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.75"
 candid = { version = "0.9.11", features = ["parser"] }
-ic-cdk = "0.11.3"
 insta = "1.34.0"
-serde = "1.0.189"
