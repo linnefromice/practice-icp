@@ -1,18 +1,9 @@
 {
   "canisters": {
-    "timer_backend": {
-      "candid": "src/timer_backend/timer_backend.did",
-      "package": "timer_backend",
+    "backend": {
+      "candid": "src/backend/interface.did",
+      "package": "backend",
       "type": "rust"
-    },
-    "timer_frontend": {
-      "dependencies": [
-        "timer_backend"
-      ],
-      "source": [
-        "src/timer_frontend/assets"
-      ],
-      "type": "assets"
     }
   },
   "defaults": {
