@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "timer_backend": {
+      "candid": "src/timer_backend/timer_backend.did",
+      "package": "timer_backend",
+      "type": "rust"
+    },
+    "timer_frontend": {
+      "dependencies": [
+        "timer_backend"
+      ],
+      "source": [
+        "src/timer_frontend/assets"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
