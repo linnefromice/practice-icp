@@ -6,22 +6,25 @@ thread_local! {
     static TIMER_ID: RefCell<Option<TimerId>> = RefCell::default();
 }
 
-pub fn timer_id() -> Option<TimerId> {
+fn timer_id() -> Option<TimerId> {
     TIMER_ID.with(|state| *state.borrow())
 }
-pub fn set_timer_id(value: Option<TimerId>) {
+fn set_timer_id(value: Option<TimerId>) {
     TIMER_ID.with(|state| *state.borrow_mut() = value);
 }
-
+fn now() -> u64 {
+    ic_cdk::api::time() / (1000 * 1000000)
+}
 
 #[ic_cdk::update]
 #[candid::candid_method(update)]
 pub fn start(interval_secs: u64) {
     let interval = std::time::Duration::from_secs(interval_secs as u64);
     let timer_id = ic_cdk_timers::set_timer_interval(interval, || {
-        ic_cdk::println!("run task = {}", (ic_cdk::api::time() / (1000 * 1000000)));
+        ic_cdk::println!("run task = {}", now());
     });
     set_timer_id(Some(timer_id));
+    ic_cdk::println!("Started...: {}", now())
 }
 
 #[ic_cdk::query]
@@ -36,7 +39,8 @@ fn stop() {
     let timer_id = timer_id();
     if let Some(timer_id) = timer_id {
         ic_cdk_timers::clear_timer(timer_id);
-        set_timer_id(None)            
+        set_timer_id(None);
+        ic_cdk::println!("Stopped...: {}", now())
     }
 }
 

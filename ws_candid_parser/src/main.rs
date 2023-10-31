@@ -44,4 +44,18 @@ mod tests {
         let result = candid::bindings::rust::compile(&config, &te, &None);
         assert_snapshot!(result);
     }
+
+    #[test]
+    fn test_prog_from_text() {
+        let did: &str = r#"
+        type RequestArgsType = nat64;
+        type ResponseType = record { value : text; timestamp : nat64 };
+        type FunctionType = func (RequestArgsType) -> (ResponseType) query;
+    "#;
+        let ast: IDLProg = did.to_string().parse().unwrap();
+        let mut te = TypeEnv::new();
+        let _ = check_prog(&mut te, &ast);
+        println!("{:?}", ast);
+        println!("{:?}", te.find_type("RequestArgsType").unwrap().to_string());
+    }
 }
