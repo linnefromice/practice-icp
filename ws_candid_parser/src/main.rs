@@ -21,6 +21,16 @@ mod tests {
     }
 
     #[test]
+    fn test_compile_from_file_2() {
+        let candid_path = "assets/app.did";
+        let (env, _) = pretty_check_file(Path::new(candid_path)).unwrap();
+        let config = candid::bindings::rust::Config::new();
+        let result = candid::bindings::rust::compile(&config, &env, &None);
+        assert_snapshot!(result);
+    }
+
+
+    #[test]
     fn test_compile_with_actor_from_file() {
         let candid_path = "assets/sample.did";
         let (env, actor) = pretty_check_file(Path::new(candid_path)).unwrap();

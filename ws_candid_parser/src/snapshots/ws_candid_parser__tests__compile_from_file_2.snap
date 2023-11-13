@@ -1,0 +1,55 @@
+---
+source: src/main.rs
+expression: result
+---
+// This is an experimental feature to generate Rust binding from Candid.
+// You may want to manually adjust some of the types.
+#![allow(dead_code, unused_imports)]
+use candid::{self, CandidType, Deserialize, Principal, Encode, Decode};
+use ic_cdk::api::call::CallResult as Result;
+
+#[derive(CandidType, Deserialize)]
+pub struct CalculateArgs { pub target: String, pub index: u64 }
+
+#[derive(CandidType, Deserialize)]
+pub struct CanisterMetricsSnapshot {
+  pub cycles: candid::Nat,
+  pub timestamp: u64,
+}
+
+#[derive(CandidType, Deserialize)]
+pub enum Env { Production, Test, LocalDevelopment }
+
+#[derive(CandidType, Deserialize)]
+pub enum InitError {
+  InvalidDestination(String),
+  InvalidPrincipal(Principal),
+  InvalidContent(String),
+  InvalidRequest(String),
+}
+
+#[derive(CandidType, Deserialize)]
+pub struct LensValue { pub dummy: u64 }
+
+#[derive(CandidType, Deserialize)]
+pub enum Result_ { Ok, Err(InitError) }
+
+#[derive(CandidType, Deserialize)]
+pub enum SourceType {
+  #[serde(rename="evm")]
+  Evm,
+  #[serde(rename="https")]
+  Https,
+  #[serde(rename="chainsight")]
+  Chainsight,
+}
+
+#[derive(CandidType, Deserialize)]
+pub struct Sources {
+  pub source: String,
+  pub interval_sec: Option<u32>,
+  pub attributes: Vec<(String,String,)>,
+  pub source_type: SourceType,
+}
+
+
