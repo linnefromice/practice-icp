@@ -1,0 +1,8 @@
+service : {
+  get : () -> (nat) query;
+  greet : (text) -> (text) query;
+  inc : () -> ();
+  panic : (text) -> () query;
+  reset : () -> ();
+  set : (int64) -> ();
+}
