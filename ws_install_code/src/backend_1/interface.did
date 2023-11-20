@@ -1,0 +1,6 @@
+service : () -> {
+  get_player : () -> (text, nat32) query;
+  greet : (text) -> (text) query;
+  greet_with_msg : (text, text) -> (text) query;
+  set_player : (text, nat32) -> ();
+}
