@@ -6,6 +6,8 @@ build:
 	dfx build --all
 	cp .dfx/local/canisters/backend_1/backend_1.wasm artifacts/Backend1.wasm
 	cp .dfx/local/canisters/backend_2/backend_2.wasm artifacts/Backend2.wasm
+	cp .dfx/local/canisters/backend_1_gzip/backend_1_gzip.wasm.gz artifacts/Backend1_gzip.wasm.gz
+	cp .dfx/local/canisters/backend_2_gzip/backend_2_gzip.wasm.gz artifacts/Backend2_gzip.wasm.gz
 	dfx stop
 
 build_by_manual:

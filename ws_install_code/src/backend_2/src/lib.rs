@@ -10,7 +10,7 @@ thread_local! {
 #[ic_cdk::query]
 #[candid::candid_method(query)]
 fn greet(name: String) -> String {
-    format!("Hello, {}!", name)
+    format!("Hello, {}! I'm upgraded!", name)
 }
 #[ic_cdk::query]
 #[candid::candid_method(query)]

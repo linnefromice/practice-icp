@@ -1,18 +1,11 @@
 use candid::{Principal, CandidType, Deserialize};
-use ic_cdk::{
-    api::{
-        management_canister::{
-            main::{
-                install_code,
-                CanisterInstallMode, InstallCodeArgument,
-            },
-        }, call::CallResult,
-    },
-};
+use ic_cdk::api::{management_canister::main::{install_code, CanisterInstallMode, InstallCodeArgument}, call::CallResult};
 use ic_cdk_macros::{init, pre_upgrade, post_upgrade};
 
-const BACKEND1_WASM: &[u8] = include_bytes!("../../../artifacts/Backend1.wasm");
-const BACKEND2_WASM: &[u8] = include_bytes!("../../../artifacts/Backend2.wasm");
+// const BACKEND1_WASM: &[u8] = include_bytes!("../../../artifacts/Backend1.wasm");
+const BACKEND1_WASM: &[u8] = include_bytes!("../../../artifacts/Backend1_gzip.wasm.gz"); // use gzip
+// const BACKEND2_WASM: &[u8] = include_bytes!("../../../artifacts/Backend2.wasm");
+const BACKEND2_WASM: &[u8] = include_bytes!("../../../artifacts/Backend2_gzip.wasm.gz"); // use gzip
 
 thread_local! {
     static BACKEND1_ADDRESS: std::cell::RefCell<String> = std::cell::RefCell::new("".to_string());
