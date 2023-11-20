@@ -1,3 +1,5 @@
+use candid::Principal;
+use ic_cdk::api::{call::CallResult, management_canister::{main::{UpdateSettingsArgument, update_settings}, provisional::CanisterSettings}};
 use ic_cdk_macros::init;
 
 thread_local! {
@@ -8,7 +10,7 @@ thread_local! {
 #[ic_cdk::query]
 #[candid::candid_method(query)]
 fn greet(name: String) -> String {
-    format!("Hello, {}!", name)
+    format!("Hello, {}! I'm Upgraded!", name)
 }
 #[ic_cdk::query]
 #[candid::candid_method(query)]
@@ -31,14 +33,31 @@ fn set_player(name: String, age: u32) {
     AGE.with(|a| *a.borrow_mut() = age);
 }
 
+#[ic_cdk::update]
+#[candid::candid_method]
+async fn add_controller(controller: Principal) -> CallResult<()> {
+    let this_canister = ic_cdk::api::id();
+    update_settings(UpdateSettingsArgument {
+        canister_id: this_canister.clone(),
+        settings: CanisterSettings {
+            controllers: Some(vec![this_canister, controller]), // NOTE: overwrite only
+            compute_allocation: None,
+            freezing_threshold: None,
+            memory_allocation: None,
+        },
+    })
+    .await
+}
+
 #[init]
-fn init() {
+async fn init() {
     NAME.with(|n| *n.borrow_mut() = "Anonymous".to_string());
     AGE.with(|a| *a.borrow_mut() = 99);
 }
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     candid::export_service!();
 
     #[test]

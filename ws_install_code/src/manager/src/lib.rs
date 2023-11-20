@@ -1,5 +1,18 @@
 use candid::{Principal, CandidType, Deserialize};
+use ic_cdk::{
+    api::{
+        management_canister::{
+            main::{
+                install_code,
+                CanisterInstallMode, InstallCodeArgument,
+            },
+        }, call::CallResult,
+    },
+};
 use ic_cdk_macros::{init, pre_upgrade, post_upgrade};
+
+const BACKEND1_WASM: &[u8] = include_bytes!("../../../artifacts/Backend1.wasm");
+const BACKEND2_WASM: &[u8] = include_bytes!("../../../artifacts/Backend2.wasm");
 
 thread_local! {
     static BACKEND1_ADDRESS: std::cell::RefCell<String> = std::cell::RefCell::new("".to_string());
@@ -29,6 +42,40 @@ fn get_principals() -> (Principal, Principal) {
 fn set_principal_texts(addr1: String, addr2: String) {
     BACKEND1_ADDRESS.with(|n| *n.borrow_mut() = addr1);
     BACKEND2_ADDRESS.with(|a| *a.borrow_mut() = addr2);
+}
+
+#[derive(CandidType, Deserialize)]
+struct _UpgradeResponse {
+    principal: String,
+    before_module_hash: String,
+    after_module_hash: String
+}
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+async fn upgrade_backends() {
+    let principal = Principal::from_text(BACKEND1_ADDRESS.with(|n| n.borrow().clone())).unwrap();
+    install(
+        principal,
+        BACKEND1_WASM.to_vec(),
+        Vec::new()
+    ).await.unwrap();
+
+    let principal = Principal::from_text(BACKEND2_ADDRESS.with(|n| n.borrow().clone())).unwrap();
+    install(
+        principal,
+        BACKEND2_WASM.to_vec(),
+        Vec::new()
+    ).await.unwrap();
+}
+
+async fn install(canister_id: Principal, wasm_module: Vec<u8>, arg: Vec<u8>) -> CallResult<()> {
+    install_code(InstallCodeArgument {
+        mode: CanisterInstallMode::Upgrade,
+        canister_id,
+        wasm_module,
+        arg,
+    })
+    .await
 }
 
 #[derive(CandidType, Deserialize)]

@@ -7,4 +7,7 @@ dfx canister call backend_2 get_player
 dfx canister call backend_2 greet '("backend_2")'
 dfx canister call manager get_principal_texts
 dfx canister call manager get_principals
+
+dfx canister install manager --argument "(record { backend_1 = \"$(dfx canister id backend_1)\"; backend_2 = \"$(dfx canister id backend_2)\" })" --mode upgrade
+dfx canister call manager upgrade_backends
 ```

@@ -19,3 +19,10 @@ launch:
 	dfx deploy backend_1
 	dfx deploy backend_2
 	dfx deploy manager --argument "(record { backend_1 = \"$(dfx canister id backend_1)\"; backend_2 = \"$(dfx canister id backend_2)\" })"
+
+setup:
+	dfx canister call manager set_principal_texts "(\"$(dfx canister id backend_1)\", \"$(dfx canister id backend_2)\")"
+	dfx canister update-settings backend_1 --add-controller $(dfx canister id manager)
+	dfx canister update-settings backend_2 --add-controller $(dfx canister id manager)
+	# dfx canister call backend_1 add_controller "(principal \"$(dfx canister id manager)\")"
+	# dfx canister call backend_2 add_controller "(principal \"$(dfx canister id manager)\")"
