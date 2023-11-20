@@ -32,3 +32,5 @@ Cargo.lock
 *.pdb
 
 .dfx
+artifacts/*
+!artifacts/.gitkeep
