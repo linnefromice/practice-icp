@@ -9,6 +9,23 @@
       "candid": "src/backend_2/interface.did",
       "package": "backend_2",
       "type": "rust"
+    },
+    "backend_1_gzip": {
+      "gzip": true,
+      "candid": "src/backend_1/interface.did",
+      "package": "backend_1",
+      "type": "rust"
+    },
+    "backend_2_gzip": {
+      "gzip": true,
+      "candid": "src/backend_2/interface.did",
+      "package": "backend_2",
+      "type": "rust"
+    },
+    "manager": {
+      "candid": "src/manager/interface.did",
+      "package": "manager",
+      "type": "rust"
     }
   },
   "defaults": {
