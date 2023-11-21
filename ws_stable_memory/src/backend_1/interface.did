@@ -2,9 +2,9 @@ type Player = record { age : nat32; name : text; index : nat32 };
 service : () -> {
   add_default_player : () -> (Player);
   add_player : (text, nat32) -> (Player);
-  get_latest_player_from_heap : () -> (Player) query;
-  get_latest_player_from_stable : () -> (Player) query;
-  get_player : (nat64) -> (Player) query;
+  get_latest_player_from_heap : () -> (opt Player) query;
+  get_latest_player_from_stable : () -> (opt Player) query;
+  get_player : (nat64) -> (opt Player) query;
   get_players_len_from_heap : () -> (nat64) query;
   get_players_len_from_stable : () -> (nat64) query;
 }
