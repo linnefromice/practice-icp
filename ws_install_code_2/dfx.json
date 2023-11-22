@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "backend_by_canister": {
+      "candid": "src/backend_1/interface.did",
+      "package": "backend_1",
+      "type": "rust"
+    },
+    "backend_by_cli": {
+      "candid": "src/backend_1/interface.did",
+      "package": "backend_1",
+      "type": "rust"
+    },
+    "manager": {
+      "candid": "src/manager/interface.did",
+      "package": "manager",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

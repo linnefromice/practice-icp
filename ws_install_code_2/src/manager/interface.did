@@ -1,0 +1,11 @@
+type RejectionCode = variant {
+  NoError;
+  CanisterError;
+  SysTransient;
+  DestinationInvalid;
+  Unknown;
+  SysFatal;
+  CanisterReject;
+};
+type Result = variant { Ok; Err : record { RejectionCode; text } };
+service : { upgrade_backend : (principal) -> (Result) }
