@@ -8,7 +8,7 @@ type RejectionCode = variant {
   CanisterReject;
 };
 type Result = variant { Ok; Err : record { RejectionCode; text } };
-service : () -> {
+service : (principal, principal, principal) -> {
   add_controller : (principal) -> (Result);
   get_player : () -> (text, nat32) query;
   greet : (text) -> (text) query;

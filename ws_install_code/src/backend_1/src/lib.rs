@@ -50,7 +50,7 @@ async fn add_controller(controller: Principal) -> CallResult<()> {
 }
 
 #[init]
-async fn init() {
+async fn init(_registry: Principal, _target: Principal, _db: Principal) {
     NAME.with(|n| *n.borrow_mut() = "Anonymous".to_string());
     AGE.with(|a| *a.borrow_mut() = 99);
 }

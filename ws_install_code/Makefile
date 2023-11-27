@@ -18,8 +18,9 @@ build_by_manual:
 
 launch:
 	dfx stop && dfx start --background --clean
-	dfx deploy backend_1
 	dfx deploy backend_2
+	dfx deploy backend_1
+	# dfx deploy backend_1 --argument "(principal \"$(dfx canister id backend_2)\", principal \"$(dfx canister id backend_2)\", principal \"$(dfx canister id backend_2)\")"
 	dfx deploy manager --argument "(record { backend_1 = \"$(dfx canister id backend_1)\"; backend_2 = \"$(dfx canister id backend_2)\" })"
 
 setup:
