@@ -20,12 +20,31 @@ fn transform(response: TransformArgs) -> HttpResponse {
 
 #[ic_cdk::update]
 #[candid::candid_method(update)]
-async fn call() -> String {
+async fn call_spx() -> String {
+    call_internal("https://query2.finance.yahoo.com/v8/finance/chart/%5ESPX".to_string()).await
+}
+
+#[allow(non_snake_case)]
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+async fn call_SPX240315C04500000() -> String {
+    call_internal("https://query2.finance.yahoo.com/v8/finance/chart/SPX240315C04500000".to_string()).await
+}
+
+#[allow(non_snake_case)]
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+async fn call_SPX240315P04500000() -> String {
+    call_internal("https://query2.finance.yahoo.com/v8/finance/chart/SPX240315P04500000".to_string()).await
+}
+
+
+async fn call_internal(url: String) -> String {
     let headers: Vec<HttpHeader> = vec![
         HttpHeader { name :"Content-Type".to_string(),value:"application/json".to_string() },
     ];
     let args = CanisterHttpRequestArgument {
-        url: "https://query2.finance.yahoo.com/v8/finance/chart/%5ESPX".to_string(),
+        url,
         method: HttpMethod::GET,
         headers,
         max_response_bytes: None,

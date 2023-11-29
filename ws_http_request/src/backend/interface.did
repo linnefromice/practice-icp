@@ -6,7 +6,9 @@ type HttpResponse = record {
 };
 type TransformArgs = record { context : vec nat8; response : HttpResponse };
 service : {
-  call : () -> (text);
+  call_SPX240315C04500000 : () -> (text);
+  call_SPX240315P04500000 : () -> (text);
+  call_spx : () -> (text);
   greet : (text) -> (text) query;
   transform : (TransformArgs) -> (HttpResponse) query;
 }
