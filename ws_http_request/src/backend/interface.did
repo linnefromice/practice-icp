@@ -1,14 +1,19 @@
+type Chart = record { result : vec Result };
 type HttpHeader = record { value : text; name : text };
 type HttpResponse = record {
   status : nat;
   body : vec nat8;
   headers : vec HttpHeader;
 };
+type Meta = record { regularMarketPrice : float64; symbol : text };
+type Result = record { meta : Meta };
+type Result_1 = variant { Ok : SnapshotValue; Err : text };
+type SnapshotValue = record { chart : Chart };
 type TransformArgs = record { context : vec nat8; response : HttpResponse };
 service : {
-  call_SPX240315C04500000 : () -> (text);
-  call_SPX240315P04500000 : () -> (text);
-  call_spx : () -> (text);
+  call_SPX240315C04500000 : () -> (Result_1);
+  call_SPX240315P04500000 : () -> (Result_1);
+  call_spx : () -> (Result_1);
   greet : (text) -> (text) query;
   transform : (TransformArgs) -> (HttpResponse) query;
 }
