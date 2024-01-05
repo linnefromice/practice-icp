@@ -1,1 +1,22 @@
-service : { greet : (text) -> (text) query }
+type CanisterStatusResponse = record {
+  status : CanisterStatusType;
+  memory_size : nat;
+  cycles : nat;
+  settings : DefiniteCanisterSettings;
+  idle_cycles_burned_per_day : nat;
+  module_hash : opt vec nat8;
+};
+type CanisterStatusType = variant { stopped; stopping; running };
+type DefiniteCanisterSettings = record {
+  freezing_threshold : nat;
+  controllers : vec principal;
+  memory_allocation : nat;
+  compute_allocation : nat;
+};
+service : {
+  call_status : (text) -> (CanisterStatusResponse);
+  call_status_self : () -> (CanisterStatusResponse);
+  greet : (text) -> (text) query;
+  query_status : (text) -> (CanisterStatusResponse) query;
+  query_status_self : () -> (CanisterStatusResponse) query;
+}
