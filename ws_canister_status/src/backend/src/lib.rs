@@ -8,28 +8,28 @@ fn greet(name: String) -> String {
 
 #[ic_cdk::query]
 #[candid::candid_method(query)]
-async fn query_status_self() -> CanisterStatusResponse {
-    call_canister_status(CanisterIdRecord { canister_id: ic_cdk::api::id() }).await.unwrap().0
+async fn query_status_self() -> CallResult<(CanisterStatusResponse,)> {
+    call_canister_status(CanisterIdRecord { canister_id: ic_cdk::api::id() }).await
 }
 
 #[ic_cdk::query]
 #[candid::candid_method(query)]
-async fn query_status(id: String) -> CanisterStatusResponse {
+async fn query_status(id: String) -> CallResult<(CanisterStatusResponse,)> {
     let id = Principal::from_text(id).unwrap();
-    call_canister_status(CanisterIdRecord { canister_id: id }).await.unwrap().0
+    call_canister_status(CanisterIdRecord { canister_id: id }).await
 }
 
 #[ic_cdk::update]
 #[candid::candid_method(update)]
-async fn call_status_self() -> CanisterStatusResponse {
-    call_canister_status(CanisterIdRecord { canister_id: ic_cdk::api::id() }).await.unwrap().0
+async fn call_status_self() -> CallResult<(CanisterStatusResponse,)> {
+    call_canister_status(CanisterIdRecord { canister_id: ic_cdk::api::id() }).await
 }
 
 #[ic_cdk::update]
 #[candid::candid_method(update)]
-async fn call_status(id: String) -> CanisterStatusResponse {
+async fn call_status(id: String) -> CallResult<(CanisterStatusResponse,)> {
     let id = Principal::from_text(id).unwrap();
-    call_canister_status(CanisterIdRecord { canister_id: id }).await.unwrap().0
+    call_canister_status(CanisterIdRecord { canister_id: id }).await
 }
 
 async fn call_canister_status(id_record: CanisterIdRecord) -> CallResult<(CanisterStatusResponse,)> {

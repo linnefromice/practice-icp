@@ -13,10 +13,23 @@ type DefiniteCanisterSettings = record {
   memory_allocation : nat;
   compute_allocation : nat;
 };
+type RejectionCode = variant {
+  NoError;
+  CanisterError;
+  SysTransient;
+  DestinationInvalid;
+  Unknown;
+  SysFatal;
+  CanisterReject;
+};
+type Result = variant {
+  Ok : record { CanisterStatusResponse };
+  Err : record { RejectionCode; text };
+};
 service : {
-  call_status : (text) -> (CanisterStatusResponse);
-  call_status_self : () -> (CanisterStatusResponse);
+  call_status : (text) -> (Result);
+  call_status_self : () -> (Result);
   greet : (text) -> (text) query;
-  query_status : (text) -> (CanisterStatusResponse) query;
-  query_status_self : () -> (CanisterStatusResponse) query;
+  query_status : (text) -> (Result) query;
+  query_status_self : () -> (Result) query;
 }
