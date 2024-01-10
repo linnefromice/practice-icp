@@ -1,4 +1,11 @@
+use std::cell::RefCell;
+
 mod types;
+
+thread_local! {
+    static HEAP_DATUM: RefCell<Option<types::Snapshot>> = RefCell::new(None);
+    static HEAP_DATA: RefCell<Vec<types::Snapshot>> = RefCell::new(Vec::new());
+}
 
 #[ic_cdk::query]
 #[candid::candid_method(query)]
@@ -12,7 +19,15 @@ fn get_data_by_json() -> types::SnapshotValue {
     let raw = get_raw_data_by_json();
     serde_json::from_str(&raw).unwrap()
 }
-
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn get_snapshot_by_json() -> types::Snapshot {
+    let value = get_data_by_json();
+    types::Snapshot {
+        value,
+        timestamp: 0,
+    }
+}
 #[ic_cdk::query]
 #[candid::candid_method(query)]
 fn get_raw_data_by_json() -> String {

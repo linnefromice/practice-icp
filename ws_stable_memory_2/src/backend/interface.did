@@ -7,6 +7,7 @@ type ResultV3Pool = record {
   sqrt_ratio_x96 : text;
   tick_spacing : int32;
 };
+type Snapshot = record { value : SnapshotValue; timestamp : nat64 };
 type SnapshotValue = record {
   id : text;
   result : ResultV3Pool;
@@ -22,5 +23,6 @@ type Tick = record {
 service : {
   get_data_by_json : () -> (SnapshotValue) query;
   get_raw_data_by_json : () -> (text) query;
+  get_snapshot_by_json : () -> (Snapshot) query;
   greet : (text) -> (text) query;
 }

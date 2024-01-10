@@ -1,6 +1,12 @@
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone, candid::CandidType, candid::Deserialize, serde::Serialize)]
+pub struct Snapshot {
+    pub value: SnapshotValue,
+    pub timestamp: u64,
+}
+
+#[derive(Debug, Clone, candid::CandidType, candid::Deserialize, serde::Serialize)]
 pub struct SnapshotValue {
     pub jsonrpc: String,
     pub id: String,

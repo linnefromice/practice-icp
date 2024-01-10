@@ -15,5 +15,9 @@ ic-cdk-macros.workspace = true
 ic-cdk-timers.workspace = true
 ic-stable-structures.workspace = true
 
-serde = "1.0.192"
+serde = "1.0.163"
 serde_json = "1.0.108"
+
+# Latest
+# serde = "1.0.192"
+# serde_json = "1.0.108"
