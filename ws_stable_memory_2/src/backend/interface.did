@@ -1,3 +1,18 @@
+type ResultV3Pool = record { ticks : vec record { text; Tick } };
+type SnapshotValue = record {
+  id : text;
+  result : ResultV3Pool;
+  jsonrpc : text;
+};
+type Tick = record {
+  fee_growth_outside_0x128 : text;
+  liquidity_gross : text;
+  initialized : bool;
+  liquidity_net : text;
+  fee_growth_outside_1x128 : text;
+};
 service : {
-    "greet": (text) -> (text) query;
+  get_data_by_json : () -> (SnapshotValue) query;
+  get_raw_data_by_json : () -> (text) query;
+  greet : (text) -> (text) query;
 }
