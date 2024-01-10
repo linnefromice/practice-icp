@@ -21,13 +21,17 @@ type Tick = record {
   fee_growth_outside_1x128 : text;
 };
 service : {
-  add_data : () -> ();
   add_datum : () -> ();
-  get_data_by_json : () -> (SnapshotValue) query;
-  get_datum : () -> (opt Snapshot) query;
-  get_last_data : () -> (Snapshot) query;
-  get_raw_data_by_json : () -> (text) query;
-  get_seleted_data : (nat64) -> (Snapshot) query;
   get_snapshot_by_json : () -> (Snapshot) query;
   greet : (text) -> (text) query;
+  heap_add_data : () -> ();
+  heap_get_datum : () -> (opt Snapshot) query;
+  heap_get_last_data : () -> (Snapshot) query;
+  heap_get_selected_data : (nat64) -> (Snapshot) query;
+  raw_data_by_json : () -> (text) query;
+  raw_get_data : () -> (SnapshotValue) query;
+  stable_add_data : (bool) -> ();
+  stable_add_datum : () -> ();
+  stable_get_datum : () -> (Snapshot) query;
+  stable_get_last_data : () -> (Snapshot) query;
 }
