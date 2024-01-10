@@ -1,17 +1,23 @@
 use std::collections::BTreeMap;
 
-#[derive(Debug, Clone, candid::CandidType, candid::Deserialize)]
+#[derive(Debug, Clone, candid::CandidType, candid::Deserialize, serde::Serialize)]
 pub struct SnapshotValue {
     pub jsonrpc: String,
     pub id: String,
     pub result: ResultV3Pool,
 }
-#[derive(Debug, Clone, candid::CandidType, candid::Deserialize)]
+#[derive(Debug, Clone, candid::CandidType, candid::Deserialize, serde::Serialize)]
 pub struct ResultV3Pool {
+    pub address: String,
+    pub token0: String,
+    pub sqrt_ratio_x96: String,
+    pub liquidity: String,
+    pub tick_current: i32,
+    pub tick_spacing: i32,
     #[serde(deserialize_with = "from_ticks")]
     pub ticks: BTreeMap<String, Tick>
 }
-#[derive(Debug, Clone, candid::CandidType, candid::Deserialize)]
+#[derive(Debug, Clone, candid::CandidType, candid::Deserialize, serde::Serialize)]
 pub struct Tick {
     pub liquidity_gross: String,
     pub liquidity_net: String,
@@ -41,8 +47,8 @@ impl<'de> serde::de::Visitor<'de> for CustomVisitor {
     {
         let mut result = BTreeMap::new();
         while let Some((k, v)) = map.next_entry::<i64, Tick>()? {
-            ic_cdk::println!("key={}", &k);
-            ic_cdk::println!("value={:?}", &v);
+            // ic_cdk::println!("key={}", &k);
+            // ic_cdk::println!("value={:?}", &v);
             result.insert(
                 k.to_string(),
                 v

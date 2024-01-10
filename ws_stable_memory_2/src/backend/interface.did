@@ -1,4 +1,12 @@
-type ResultV3Pool = record { ticks : vec record { text; Tick } };
+type ResultV3Pool = record {
+  ticks : vec record { text; Tick };
+  tick_current : int32;
+  liquidity : text;
+  token0 : text;
+  address : text;
+  sqrt_ratio_x96 : text;
+  tick_spacing : int32;
+};
 type SnapshotValue = record {
   id : text;
   result : ResultV3Pool;
