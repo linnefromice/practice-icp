@@ -30,4 +30,11 @@ service : {
   stable_add_datum_from_default : () -> ();
   stable_add_datum_from_dummy : () -> ();
   stable_get_datum : () -> (Snapshot) query;
+  stable_vec_add_bytes_from_default : () -> ();
+  stable_vec_add_bytes_from_dummy : () -> ();
+  stable_vec_add_datum_from_default : () -> ();
+  stable_vec_add_datum_from_dummy : () -> ();
+  stable_vec_get_data : (nat64) -> (Snapshot) query;
+  stable_vec_get_last_bytes : () -> (vec nat8) query;
+  stable_vec_get_last_data : () -> (Snapshot) query;
 }

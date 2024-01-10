@@ -23,16 +23,42 @@ pub fn dummy() -> Snapshot {
 }
 
 #[derive(Debug, Clone, Default, candid::CandidType, candid::Deserialize, serde::Serialize)]
+pub struct SnapshotBytes(pub Vec<u8>);
+impl Storable for SnapshotBytes {
+    fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        ic_cdk::println!("from_bytes");
+        ic_cdk::println!("{:x?}", bytes);
+        Decode!(bytes.as_ref(), Self).unwrap()
+    }
+    fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
+        let res = Encode!(self).unwrap();
+        ic_cdk::println!("to_bytes");
+        ic_cdk::println!("{:x?}", res);
+        Cow::Owned(res)
+    }
+}
+impl BoundedStorable for SnapshotBytes {
+    const MAX_SIZE: u32 = 100;
+    const IS_FIXED_SIZE: bool = false;
+}
+
+
+#[derive(Debug, Clone, Default, candid::CandidType, candid::Deserialize, serde::Serialize)]
 pub struct Snapshot {
     pub value: SnapshotValue,
     pub timestamp: u64,
 }
 impl Storable for Snapshot {
     fn from_bytes(bytes: std::borrow::Cow<[u8]>) -> Self {
+        ic_cdk::println!("from_bytes");
+        ic_cdk::println!("{:x?}", bytes);
         Decode!(bytes.as_ref(), Self).unwrap()
     }
     fn to_bytes(&self) -> std::borrow::Cow<[u8]> {
-        Cow::Owned(Encode!(self).unwrap())
+        let res = Encode!(self).unwrap();
+        ic_cdk::println!("to_bytes");
+        ic_cdk::println!("{:x?}", res);
+        Cow::Owned(res)
     }
 }
 impl BoundedStorable for Snapshot {
