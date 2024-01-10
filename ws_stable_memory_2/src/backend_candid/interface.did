@@ -1,0 +1,30 @@
+type ResultV3Pool = record {
+  ticks : vec record { text; Tick };
+  tick_current : int32;
+  liquidity : text;
+  token0 : text;
+  address : text;
+  sqrt_ratio_x96 : text;
+  tick_spacing : int32;
+};
+type Snapshot = record { value : SnapshotValue; timestamp : nat64 };
+type SnapshotValue = record {
+  id : text;
+  result : ResultV3Pool;
+  jsonrpc : text;
+};
+type Tick = record {
+  fee_growth_outside_0x128 : text;
+  liquidity_gross : text;
+  initialized : bool;
+  liquidity_net : text;
+  fee_growth_outside_1x128 : text;
+};
+service : {
+  all_default : () -> (Snapshot) query;
+  all_default_bytes : () -> (text, vec nat8) query;
+  all_default_re_bytes : () -> (bool, text, text) query;
+  all_dummy : () -> (Snapshot) query;
+  all_dummy_bytes : () -> (text, vec nat8) query;
+  all_dummy_re_bytes : () -> (bool, text, text) query;
+}

@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "src/backend",
+    "src/backend_candid",
 ]
 
 [workspace.dependencies]
