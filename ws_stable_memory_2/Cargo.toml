@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "src/ws_stable_memory_2_backend",
+]
