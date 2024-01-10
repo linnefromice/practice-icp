@@ -27,4 +27,7 @@ service : {
   all_dummy : () -> (Snapshot) query;
   all_dummy_bytes : () -> (text, vec nat8) query;
   all_dummy_re_bytes : () -> (bool, text, text) query;
+  stable_add_datum_from_default : () -> ();
+  stable_add_datum_from_dummy : () -> ();
+  stable_get_datum : () -> (Snapshot) query;
 }
