@@ -36,7 +36,7 @@ fn get_snapshot_by_json() -> types::Snapshot {
     let value = raw_get_data();
     types::Snapshot {
         value,
-        timestamp: 0,
+        timestamp: ic_cdk::api::time() / (1000 * 1000000),
     }
 }
 #[ic_cdk::query]
@@ -77,7 +77,7 @@ fn heap_get_selected_data(n: u64) -> types::Snapshot {
 }
 #[ic_cdk::update]
 #[candid::candid_method(update)]
-fn add_datum() {
+fn heap_add_datum() {
     let datum = get_snapshot_by_json();
     HEAP_DATUM.with(|mem| {
         *mem.borrow_mut() = Some(datum.clone());
