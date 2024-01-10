@@ -34,6 +34,56 @@ fn get_raw_data_by_json() -> String {
     include_str!("../../v3pool.json").to_string()
 }
 
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn get_datum() -> Option<types::Snapshot> {
+    let datum = HEAP_DATUM.with(|mem| {
+        mem.borrow().clone()
+    });
+    datum
+}
+
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn get_last_data() -> types::Snapshot {
+    let datum = HEAP_DATA.with(|mem| {
+        let borrowed_mem = mem.borrow();
+        let len = borrowed_mem.len();
+        let res = borrowed_mem.get(len - 1);
+        res.unwrap().clone()
+    });
+    datum
+}
+
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn get_selected_data(n: u64) -> types::Snapshot {
+    let datum = HEAP_DATA.with(|mem| {
+        let borrowed_mem = mem.borrow();
+        let res = borrowed_mem.get(n as usize);
+        res.unwrap().clone()
+    });
+    datum
+}
+
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+fn add_datum() {
+    let datum = get_snapshot_by_json();
+    HEAP_DATUM.with(|mem| {
+        *mem.borrow_mut() = Some(datum.clone());
+    });
+}
+
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+fn add_data() {
+    let datum = get_snapshot_by_json();
+    HEAP_DATA.with(|mem| {
+        mem.borrow_mut().push(datum);
+    });
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
