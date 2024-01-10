@@ -176,6 +176,36 @@ fn stable_vec_add_bytes(datum: types_all::SnapshotBytes) {
     });
 }
 
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn check_bytes_from_dummy() -> (bool, Vec<u8>, Vec<u8>)  {
+    let (_, base_bytes) = all_dummy_bytes();
+    let data = types_all::SnapshotBytes(base_bytes);
+    let bytes = Encode!(&data).unwrap();
+    let decoded = Decode!(bytes.as_ref(), types_all::SnapshotBytes).unwrap();
+    let re_bytes = Encode!(&decoded).unwrap();
+    (
+        bytes == re_bytes,
+        bytes,
+        re_bytes
+    )
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn check_bytes_from_default() -> (bool, Vec<u8>, Vec<u8>) {
+    let (_, base_bytes) = all_default_bytes();
+    let data = types_all::SnapshotBytes(base_bytes);
+    let bytes = Encode!(&data).unwrap();
+    let decoded = Decode!(bytes.as_ref(), types_all::SnapshotBytes).unwrap();
+    let re_bytes = Encode!(&decoded).unwrap();
+    (
+        bytes == re_bytes,
+        bytes,
+        re_bytes
+    )
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
