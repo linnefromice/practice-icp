@@ -1,0 +1,42 @@
+type ResultV3Pool = record {
+  ticks : vec record { text; Tick };
+  tick_current : int32;
+  liquidity : text;
+  token0 : text;
+  address : text;
+  sqrt_ratio_x96 : text;
+  tick_spacing : int32;
+};
+type Snapshot = record { value : SnapshotValue; timestamp : nat64 };
+type SnapshotValue = record {
+  id : text;
+  result : ResultV3Pool;
+  jsonrpc : text;
+};
+type Tick = record {
+  fee_growth_outside_0x128 : text;
+  liquidity_gross : text;
+  initialized : bool;
+  liquidity_net : text;
+  fee_growth_outside_1x128 : text;
+};
+service : {
+  all_default : () -> (Snapshot) query;
+  all_default_bytes : () -> (text, vec nat8) query;
+  all_default_re_bytes : () -> (bool, text, text) query;
+  all_dummy : () -> (Snapshot) query;
+  all_dummy_bytes : () -> (text, vec nat8) query;
+  all_dummy_re_bytes : () -> (bool, text, text) query;
+  check_bytes_from_default : () -> (bool, vec nat8, vec nat8) query;
+  check_bytes_from_dummy : () -> (bool, vec nat8, vec nat8) query;
+  stable_add_datum_from_default : () -> ();
+  stable_add_datum_from_dummy : () -> ();
+  stable_get_datum : () -> (Snapshot) query;
+  stable_vec_add_bytes_from_default : () -> ();
+  stable_vec_add_bytes_from_dummy : () -> ();
+  stable_vec_add_datum_from_default : () -> ();
+  stable_vec_add_datum_from_dummy : () -> ();
+  stable_vec_get_data : (nat64) -> (Snapshot) query;
+  stable_vec_get_last_bytes : () -> (vec nat8) query;
+  stable_vec_get_last_data : () -> (Snapshot) query;
+}

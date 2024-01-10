@@ -1,0 +1,43 @@
+type ResultV3Pool = record {
+  ticks : vec record { text; Tick };
+  tick_current : int32;
+  liquidity : text;
+  token0 : text;
+  address : text;
+  sqrt_ratio_x96 : text;
+  tick_spacing : int32;
+};
+type Snapshot = record { value : SnapshotValue; timestamp : nat64 };
+type SnapshotValue = record {
+  id : text;
+  result : ResultV3Pool;
+  jsonrpc : text;
+};
+type Tick = record {
+  fee_growth_outside_0x128 : text;
+  liquidity_gross : text;
+  initialized : bool;
+  liquidity_net : text;
+  fee_growth_outside_1x128 : text;
+};
+service : {
+  dummy_snapshot : () -> (Snapshot) query;
+  get_snapshot_by_json : () -> (Snapshot) query;
+  get_tick_filtered_snapshot_by_json : (nat64) -> (Snapshot) query;
+  get_ticks_size_by_json : () -> (nat64) query;
+  greet : (text) -> (text) query;
+  heap_add_data : () -> ();
+  heap_add_datum : () -> ();
+  heap_get_datum : () -> (opt Snapshot) query;
+  heap_get_last_data : () -> (Snapshot) query;
+  heap_get_selected_data : (nat64) -> (Snapshot) query;
+  raw_data_by_json : () -> (text) query;
+  raw_get_data : () -> (SnapshotValue) query;
+  stable_add_data : (bool) -> ();
+  stable_add_data_dummy : () -> ();
+  stable_add_data_with_ticks_count : (nat64) -> ();
+  stable_add_datum : () -> ();
+  stable_get_datum : () -> (Snapshot) query;
+  stable_get_last_data : () -> (Snapshot) query;
+  stable_get_selected_data : (nat64) -> (Snapshot) query;
+}
