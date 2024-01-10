@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, collections::BTreeMap};
 
 use ic_stable_structures::{memory_manager::{MemoryManager, VirtualMemory, MemoryId}, DefaultMemoryImpl};
 
@@ -32,8 +32,29 @@ fn raw_get_data() -> types::SnapshotValue {
 }
 #[ic_cdk::query]
 #[candid::candid_method(query)]
+fn get_ticks_size_by_json() -> usize {
+    let datum = get_snapshot_by_json();
+    datum.value.result.ticks.len()
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
 fn get_snapshot_by_json() -> types::Snapshot {
     let value = raw_get_data();
+    types::Snapshot {
+        value,
+        timestamp: ic_cdk::api::time() / (1000 * 1000000),
+    }
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn get_tick_filtered_snapshot_by_json(count: u64) -> types::Snapshot {
+    let mut value = raw_get_data();
+    let ticks_size = value.result.ticks.len();
+    value.result.ticks = value.result.ticks.into_iter().skip(ticks_size - count as usize).collect();
+    // temp
+    value.result.liquidity = Default::default();
+    value.result.tick_current = Default::default();
+    value.jsonrpc = Default::default();
     types::Snapshot {
         value,
         timestamp: ic_cdk::api::time() / (1000 * 1000000),
@@ -137,6 +158,40 @@ fn stable_add_data(is_default: bool) {
     STABLE_DATA.with(|mem| {
         mem.borrow_mut().push(&datum).unwrap();
     });
+}
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+fn stable_add_data_dummy() {
+    let datum = dummy_snapshot();
+    STABLE_DATA.with(|mem| {
+        mem.borrow_mut().push(&datum).unwrap();
+    });
+}
+#[ic_cdk::update]
+#[candid::candid_method(update)]
+fn stable_add_data_with_ticks_count(count: u64) {
+    let datum = get_tick_filtered_snapshot_by_json(count);
+    STABLE_DATA.with(|mem| {
+        mem.borrow_mut().push(&datum).unwrap();
+    });
+}
+#[ic_cdk::query]
+#[candid::candid_method(query)]
+fn dummy_snapshot() -> types::Snapshot {
+    let mut datum = types::Snapshot::default();
+    datum.timestamp = ic_cdk::api::time() / (1000 * 1000000);
+    datum.value.id = "1".to_string();
+    // datum.value.jsonrpc = "2.0".to_string(); // <- Causes of fail?
+    datum.value.result = types::ResultV3Pool {
+        ticks: BTreeMap::new(),
+        tick_current: 0, // -77_456
+        liquidity: "".to_string(), // "0x1d2f091ff09fb67174738".to_string(),
+        token0: "0x6b175474e89094c44da98b954eedeac495271d0f".to_string(),
+        address: "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8".to_string(),
+        sqrt_ratio_x96: "0x55376cd2ad05b815780ecfb".to_string(),
+        tick_spacing: 60
+    };
+    datum
 }
 
 #[cfg(test)]

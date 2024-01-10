@@ -21,7 +21,10 @@ type Tick = record {
   fee_growth_outside_1x128 : text;
 };
 service : {
+  dummy_snapshot : () -> (Snapshot) query;
   get_snapshot_by_json : () -> (Snapshot) query;
+  get_tick_filtered_snapshot_by_json : (nat64) -> (Snapshot) query;
+  get_ticks_size_by_json : () -> (nat64) query;
   greet : (text) -> (text) query;
   heap_add_data : () -> ();
   heap_add_datum : () -> ();
@@ -31,6 +34,8 @@ service : {
   raw_data_by_json : () -> (text) query;
   raw_get_data : () -> (SnapshotValue) query;
   stable_add_data : (bool) -> ();
+  stable_add_data_dummy : () -> ();
+  stable_add_data_with_ticks_count : (nat64) -> ();
   stable_add_datum : () -> ();
   stable_get_datum : () -> (Snapshot) query;
   stable_get_last_data : () -> (Snapshot) query;
