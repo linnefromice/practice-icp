@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "incrementer_backend": {
+      "candid": "src/incrementer_backend/incrementer_backend.did",
+      "package": "incrementer_backend",
+      "type": "rust"
+    },
+    "incrementer_frontend": {
+      "dependencies": [
+        "incrementer_backend"
+      ],
+      "source": [
+        "src/incrementer_frontend/assets"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
