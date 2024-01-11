@@ -1,18 +1,9 @@
 {
   "canisters": {
-    "incrementer_backend": {
-      "candid": "src/incrementer_backend/incrementer_backend.did",
-      "package": "incrementer_backend",
+    "backend_candid": {
+      "candid": "src/backend/interface.did",
+      "package": "backend",
       "type": "rust"
-    },
-    "incrementer_frontend": {
-      "dependencies": [
-        "incrementer_backend"
-      ],
-      "source": [
-        "src/incrementer_frontend/assets"
-      ],
-      "type": "assets"
     }
   },
   "defaults": {

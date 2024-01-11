@@ -1,0 +1,6 @@
+service : {
+  get : () -> (nat64) query;
+  greet : (text) -> (text) query;
+  hello : () -> (text) query;
+  increment : () -> ();
+}
