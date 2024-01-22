@@ -1,10 +1,16 @@
-use std::{collections::BTreeMap, fs::File, path::Path, process::{Command, Output}};
+use std::{collections::BTreeMap, fs::File, io::Write, path::Path, process::{Command, Output}};
 
 use candid::{Encode, Decode};
 use ic_agent::{export::Principal, Agent};
+use serde::{Deserialize, Serialize};
 
 const IC_URL: &str = "https://ic0.app";
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct Summary {
+    pub info: CanisterInfo,
+    pub metadata: Metadata,
+}
 #[tokio::main]
 async fn main() {
     // Get canister ids from canister_ids.json
@@ -17,7 +23,25 @@ async fn main() {
         let canister_id = &canister_info.id.replace("\"", "");
         // let canister_id = "q6yxa-fiaaa-aaaag-qc5sq-cai";
         println!("canister_id: {}", canister_id);
-        check_data(canister_id, &agent).await;
+        let (metadata, snapshot) = check_data(canister_id, &canister_info.name, &agent).await;
+
+        // write data
+        let summary = Summary {
+            info: canister_info.clone(),
+            metadata
+        };
+        let path = format!("output/{}.json", &canister_info.name);
+        let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
+        let serialized: String = serde_json::to_string(&summary).unwrap();
+        f.write_all(serialized.as_bytes()).unwrap();
+        f.flush().unwrap();
+        if let Some(snapshot) = snapshot {
+            let path = format!("output/{}_snapshot.json", &canister_info.name);
+            let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
+            let serialized: String = serde_json::to_string(&snapshot).unwrap();
+            f.write_all(serialized.as_bytes()).unwrap();
+            f.flush().unwrap();
+        }
     }
 }
 
@@ -29,7 +53,7 @@ fn agent(url: &str) -> Agent {
         .unwrap()
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct CanisterInfo {
     pub name: String,
     pub id: String
@@ -44,22 +68,32 @@ fn get_canister_infos(file: File) -> Vec<CanisterInfo> {
     }).collect()
 }
 
-async fn check_data(canister_id: &str, agent: &Agent) {
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct SnapshotInfo {
+    pub last_snapshot: String,
+    pub snapshots_len: u64
+}
+async fn check_data(canister_id: &str, canister_name: &str, agent: &Agent) -> (Metadata, Option<SnapshotInfo>) {
     let metadata = get_metadata(canister_id);
-    println!("{:?}", metadata);
     let principal = Principal::from_text(canister_id).unwrap();
-    if metadata.type_.starts_with("snapshot_indexer_") {
-        println!("{} is snapshot_indexer", canister_id);
+    let snapshot_info = if metadata.type_.starts_with("snapshot_indexer_") {
         let snapshots_len = call_snapshots_len(&agent, &principal).await.unwrap();
-        println!("snapshots_len: {}", snapshots_len);
-        let last_snapshot = call_last_snapshot(canister_id, Path::new(".")).unwrap();
-        println!("last_snapshot: {:?}", std::str::from_utf8(&last_snapshot.stdout).unwrap().to_string());
+        let last_snapshot = call_last_snapshot(
+            canister_id,
+            Path::new("."),
+            format!("resources/{}.did", canister_name)
+        ).unwrap();
+        Some(SnapshotInfo {
+            last_snapshot: std::str::from_utf8(&last_snapshot.stdout).unwrap().to_string(),
+            snapshots_len
+        })
     } else {
-        println!("{} is not snapshot_indexer", canister_id);
-    }
+        None
+    };
+    (metadata, snapshot_info)
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 struct Metadata {
     pub id: String,
     pub label: String,
@@ -122,8 +156,9 @@ fn output_by_exec_cmd(
 fn call_last_snapshot(
     canister_id: &str,
     execution_dir: &Path,
+    did_path: String,
 ) -> std::io::Result<Output> {
-    let args = vec!["canister", "--ic", "call", canister_id, "get_last_snapshot_value"];
+    let args = vec!["canister", "--ic", "call", canister_id, "get_last_snapshot_value", "--candid", &did_path];
     output_by_exec_cmd("dfx", execution_dir, args)
 }
 

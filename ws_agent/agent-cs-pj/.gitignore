@@ -16,3 +16,5 @@ Cargo.lock
 *.pdb
 
 /resources/*.did
+/output/*
+!/output/.gitkeep
