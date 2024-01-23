@@ -23,7 +23,7 @@ async fn main() {
         let canister_id = &canister_info.id.replace("\"", "");
         // let canister_id = "q6yxa-fiaaa-aaaag-qc5sq-cai";
         println!("canister_id: {}", canister_id);
-        let (metadata, snapshot) = check_data(canister_id, &canister_info.name, &agent).await;
+        let (metadata, settings, snapshot) = check_data(canister_id, &canister_info.name, &agent).await;
 
         // write data
         let summary = Summary {
@@ -35,6 +35,13 @@ async fn main() {
         let serialized: String = serde_json::to_string(&summary).unwrap();
         f.write_all(serialized.as_bytes()).unwrap();
         f.flush().unwrap();
+
+        let path = format!("output/{}_settings.json", &canister_info.name);
+        let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
+        let serialized: String = serde_json::to_string(&settings).unwrap();
+        f.write_all(serialized.as_bytes()).unwrap();
+        f.flush().unwrap();
+
         if let Some(snapshot) = snapshot {
             let path = format!("output/{}_snapshot.json", &canister_info.name);
             let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
@@ -73,8 +80,9 @@ struct SnapshotInfo {
     pub last_snapshot: String,
     pub snapshots_len: u64
 }
-async fn check_data(canister_id: &str, canister_name: &str, agent: &Agent) -> (Metadata, Option<SnapshotInfo>) {
+async fn check_data(canister_id: &str, canister_name: &str, agent: &Agent) -> (Metadata, Settings, Option<SnapshotInfo>) {
     let metadata = get_metadata(canister_id);
+    let settings = get_settings(canister_id, &agent, metadata.type_.clone()).await;
     let principal = Principal::from_text(canister_id).unwrap();
     let snapshot_info = if metadata.type_.starts_with("snapshot_indexer_") {
         let snapshots_len = call_snapshots_len(&agent, &principal).await.unwrap();
@@ -90,7 +98,7 @@ async fn check_data(canister_id: &str, canister_name: &str, agent: &Agent) -> (M
     } else {
         None
     };
-    (metadata, snapshot_info)
+    (metadata, settings, snapshot_info)
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -142,6 +150,50 @@ fn get_metadata(canister_id: &str) -> Metadata {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+struct Settings {
+    pub sources: String,
+    pub indexing_config: Option<String>,
+    pub next_schedule: Option<String>,
+}
+async fn get_settings(
+    canister_id: &str,
+    agent: &Agent,
+    component_type: String,
+) -> Settings {
+    let current_dir = Path::new(".");
+    let principal = Principal::from_text(canister_id).unwrap();
+    let proxy = get_proxy_from_component(&agent, &principal).await;
+
+    let sources = output_by_exec_cmd(
+        "dfx",
+        current_dir,
+        vec!["canister", "--ic", "call", canister_id, "get_sources"]
+    ).unwrap();
+
+    let (indexing_config, next_schedule) = if component_type != "algorithm_lens" {
+        let indexing_config = output_by_exec_cmd(
+            "dfx",
+            current_dir,
+            vec!["canister", "--ic", "call", proxy.to_text().as_str(), "get_indexing_config"]
+        ).unwrap();
+        let next_schedule = output_by_exec_cmd(
+            "dfx",
+            current_dir,
+            vec!["canister", "--ic", "call", proxy.to_text().as_str(), "next_schedule"]
+        ).unwrap();
+        (Some(std::str::from_utf8(&indexing_config.stdout).unwrap().to_string()), Some(std::str::from_utf8(&next_schedule.stdout).unwrap().to_string()))
+    } else {
+        (None, None)
+    };
+
+    Settings {
+        sources: std::str::from_utf8(&sources.stdout).unwrap().to_string(),
+        indexing_config: indexing_config,
+        next_schedule: next_schedule
+    }
+}
+
 fn output_by_exec_cmd(
     cmd: &str,
     execution_dir: &Path,
@@ -172,4 +224,16 @@ async fn call_snapshots_len(
         .call()
         .await?;
     Ok(Decode!(res.as_slice(), u64).unwrap())
+}
+
+async fn get_proxy_from_component(agent: &Agent, principal: &Principal) -> Principal {
+    let res = agent.update(
+        &principal,
+        "get_proxy",
+    )
+    .with_arg(Encode!().unwrap())
+    .call_and_wait()
+    .await
+    .unwrap();
+    Decode!(res.as_slice(), Principal).unwrap()
 }
