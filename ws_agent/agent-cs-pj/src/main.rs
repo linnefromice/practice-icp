@@ -30,24 +30,11 @@ async fn main() {
             info: canister_info.clone(),
             metadata
         };
-        let path = format!("output/{}.json", &canister_info.name);
-        let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
-        let serialized: String = serde_json::to_string(&summary).unwrap();
-        f.write_all(serialized.as_bytes()).unwrap();
-        f.flush().unwrap();
-
-        let path = format!("output/{}_settings.json", &canister_info.name);
-        let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
-        let serialized: String = serde_json::to_string(&settings).unwrap();
-        f.write_all(serialized.as_bytes()).unwrap();
-        f.flush().unwrap();
+        out_json_record(&format!("{}.json", &canister_info.name), &summary);
+        out_json_record(&format!("{}_settings.json", &canister_info.name), &settings);
 
         if let Some(snapshot) = snapshot {
-            let path = format!("output/{}_snapshot.json", &canister_info.name);
-            let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
-            let serialized: String = serde_json::to_string(&snapshot).unwrap();
-            f.write_all(serialized.as_bytes()).unwrap();
-            f.flush().unwrap();
+            out_json_record(&format!("{}_snapshot.json", &canister_info.name), &snapshot);
         }
     }
 }
@@ -194,17 +181,6 @@ async fn get_settings(
     }
 }
 
-fn output_by_exec_cmd(
-    cmd: &str,
-    execution_dir: &Path,
-    args: Vec<&str>,
-) -> std::io::Result<Output> {
-    Command::new(cmd)
-        .current_dir(execution_dir)
-        .args(args)
-        .output()
-}
-
 fn call_last_snapshot(
     canister_id: &str,
     execution_dir: &Path,
@@ -236,4 +212,25 @@ async fn get_proxy_from_component(agent: &Agent, principal: &Principal) -> Princ
     .await
     .unwrap();
     Decode!(res.as_slice(), Principal).unwrap()
+}
+
+fn output_by_exec_cmd(
+    cmd: &str,
+    execution_dir: &Path,
+    args: Vec<&str>,
+) -> std::io::Result<Output> {
+    Command::new(cmd)
+        .current_dir(execution_dir)
+        .args(args)
+        .output()
+}
+
+fn out_json_record<T>(file_name: &str, data: T)
+    where T: Serialize
+{
+    let path = format!("output/{}", &file_name);
+    let mut f = std::fs::OpenOptions::new().create_new(true).write(true).open(&path).unwrap();
+    let serialized: String = serde_json::to_string(&data).unwrap();
+    f.write_all(serialized.as_bytes()).unwrap();
+    f.flush().unwrap();
 }
