@@ -142,6 +142,7 @@ struct Settings {
     pub sources: String,
     pub indexing_config: Option<String>,
     pub next_schedule: Option<String>,
+    pub ethereum_address: Option<String>,
 }
 async fn get_settings(
     canister_id: &str,
@@ -174,10 +175,17 @@ async fn get_settings(
         (None, None)
     };
 
+    let ethereum_address = if component_type == "relayer" {
+        Some(call_get_ethereum_address(agent, &principal).await.unwrap())
+    } else {
+        None
+    };
+
     Settings {
         sources: std::str::from_utf8(&sources.stdout).unwrap().to_string(),
         indexing_config: indexing_config,
-        next_schedule: next_schedule
+        next_schedule: next_schedule,
+        ethereum_address,
     }
 }
 
@@ -200,6 +208,18 @@ async fn call_snapshots_len(
         .call()
         .await?;
     Ok(Decode!(res.as_slice(), u64).unwrap())
+}
+
+async fn call_get_ethereum_address(
+    agent: &ic_agent::Agent,
+    principal: &Principal,
+) -> anyhow::Result<String> {
+    let res = agent
+        .query(principal, "get_ethereum_address")
+        .with_arg(Encode!().unwrap())
+        .call()
+        .await?;
+    Ok(Decode!(res.as_slice(), String).unwrap())
 }
 
 async fn get_proxy_from_component(agent: &Agent, principal: &Principal) -> Principal {
