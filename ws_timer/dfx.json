@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "ws_timer_backend": {
+      "candid": "src/ws_timer_backend/ws_timer_backend.did",
+      "package": "ws_timer_backend",
+      "type": "rust"
+    },
+    "ws_timer_frontend": {
+      "dependencies": [
+        "ws_timer_backend"
+      ],
+      "source": [
+        "src/ws_timer_frontend/assets"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
