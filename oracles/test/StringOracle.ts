@@ -29,4 +29,9 @@ describe("StringOracle", () => {
     expect(await oracle.state(deployer.address)).eq("Abc321");
     expect(await oracle.state(user.address)).eq("xyZ123");
   });
+
+  it(".hello", async () => {
+    const { oracle } = await setup();
+    expect(await oracle.hello("World!")).eq("Hello, World!");
+  });
 });

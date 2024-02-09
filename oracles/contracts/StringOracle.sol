@@ -20,4 +20,9 @@ contract StringOracle is Initializable {
     ) public virtual {
         state[msg.sender] = value;
     }
+
+    function hello(string memory value) public pure virtual returns (string memory) {
+        bytes memory concatenatedBytes = abi.encodePacked("Hello, ", value);
+        return string(concatenatedBytes);
+    }
 }
