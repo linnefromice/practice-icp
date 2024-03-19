@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "ws_candid_func_backend": {
+      "candid": "src/ws_candid_func_backend/ws_candid_func_backend.did",
+      "package": "ws_candid_func_backend",
+      "type": "rust"
+    },
+    "ws_candid_func_frontend": {
+      "dependencies": [
+        "ws_candid_func_backend"
+      ],
+      "source": [
+        "src/ws_candid_func_frontend/assets"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

@@ -1,0 +1,4 @@
+[workspace]
+members = [
+    "src/ws_candid_func_backend",
+]
