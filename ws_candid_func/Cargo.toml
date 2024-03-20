@@ -1,4 +1,11 @@
 [workspace]
 members = [
-    "src/ws_candid_func_backend",
+    "src/backend"
 ]
+
+[workspace.dependencies]
+candid = "0.9.6"
+ic-cdk = "0.11.3"
+ic-cdk-macros = "0.8.1"
+ic-cdk-timers = "0.5.0"
+ic-stable-structures = "0.5.5"
