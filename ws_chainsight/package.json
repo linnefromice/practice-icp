@@ -15,7 +15,7 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "start": "ts-node src/index.ts",
+    "exec:list_components": "ts-node src/bin/list_components.ts",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run lint",

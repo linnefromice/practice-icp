@@ -150,3 +150,5 @@ dist
 # Customize
 .env
 src/aws-exports.ts
+outputs/*.json
+outputs/*.csv
