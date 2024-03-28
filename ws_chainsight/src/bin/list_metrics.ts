@@ -1,5 +1,6 @@
 import { Principal } from '@dfinity/principal';
 import {
+  Metric,
   PATH_COMPONENTS,
   PATH_METRIC,
   bootstrap,
@@ -37,10 +38,10 @@ const execute = async () => {
     const metric = await actor.metric().catch(() => {
       return null;
     });
-    const data = {
+    const data: Metric = {
       id: c.id,
       label: c.label,
-      metric,
+      metric: metric ?? null,
     };
     result.push(data);
   }

@@ -17,6 +17,7 @@
     "fix": "gts fix",
     "exec:list_components": "ts-node src/bin/list_components.ts",
     "exec:list_metrics": "ts-node src/bin/list_metrics.ts",
+    "exec:to_csv": "ts-node src/bin/output_summary_to_csv.ts",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run lint",
