@@ -148,4 +148,5 @@ dist
 *.vsix
 
 # Customize
+.env
 src/aws-exports.ts

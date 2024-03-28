@@ -1,0 +1,45 @@
+query GetComponent($id: ID!) {
+  component(id: $id) {
+    componentType
+    controllers
+    description
+    id
+    intervalSec
+    label
+    proxy
+    relayerMetadata {
+      chainId
+      destination
+      oracleType
+      signer
+    }
+    sources {
+      attributes {
+        chainId
+        contractType
+        eventName
+        functionName
+        queries {
+          key
+          value
+        }
+        sources {
+          id
+          componentType
+        }
+      }
+      source {
+        ... on StringSource {
+          value
+        }
+        ... on Component {
+          id
+          componentType
+        }
+      }
+      sourceType
+    }
+    tags
+    vault
+  }
+}
