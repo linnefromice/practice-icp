@@ -16,6 +16,7 @@
     "compile": "tsc",
     "fix": "gts fix",
     "exec:list_components": "ts-node src/bin/list_components.ts",
+    "exec:list_metrics": "ts-node src/bin/list_metrics.ts",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run lint",
@@ -38,5 +39,8 @@
     "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0"
+  },
+  "engines": {
+    "node": ">=10.6.0"
   }
 }

@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const principal_1 = require("@dfinity/principal");
-const common_1 = require("./common");
+const common_1 = require("../common");
 (0, common_1.bootstrap)();
 const execute = async () => {
-    console.log('Hello World');
     const endpoint = process.env.GRAPHQL_ENDPOINT;
     const apiKey = process.env.AMPLIFY_API_KEY;
     if (!endpoint || !apiKey) {
@@ -12,14 +10,7 @@ const execute = async () => {
     }
     const sdk = (0, common_1.gqlSdk)(endpoint, apiKey);
     const { components } = await sdk.ListComponents();
-    console.log(components.items.length);
-    const agent = (0, common_1.getAgent)();
-    const res = await agent.status();
-    console.log(res.ic_api_version, res.replica_health_status);
-    const vaultPrincipal = principal_1.Principal.fromText('3emnb-tiaaa-aaaal-qdrfq-cai');
-    const vault = (0, common_1.vaultActor)(vaultPrincipal, agent);
-    const metric = await vault.metric();
-    console.log(metric);
+    (0, common_1.writeJson)(common_1.PATH_COMPONENTS, components.items);
 };
 execute()
     .then(() => {
@@ -28,4 +19,4 @@ execute()
     .catch((error) => {
     console.error(error);
 });
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=list_components.js.map
