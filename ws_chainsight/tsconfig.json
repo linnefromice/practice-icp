@@ -4,10 +4,12 @@
     "rootDir": ".",
     "outDir": "build",
     "allowJs": true,
-    "skipLibCheck": true,
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
+  ],
+  "exclude": [
+    "src/did/**/*/ts"
   ]
 }
