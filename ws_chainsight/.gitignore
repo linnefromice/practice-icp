@@ -152,3 +152,4 @@ dist
 src/aws-exports.ts
 outputs/*.json
 outputs/*.csv
+/build

@@ -1,1 +1,0 @@
-{"version":3,"file":"aws-exports.js","sourceRoot":"","sources":["../../src/aws-exports.ts"],"names":[],"mappings":";AAAA,qGAAqG;;AAErG,MAAM,MAAM,GAAwB;IAClC,GAAG,EAAE;QACH,OAAO,EAAE;YACP,QAAQ,EACN,gFAAgF;YAClF,MAAM,EAAE,WAAW;YACnB,eAAe,EAAE,QAAQ;YACzB,MAAM,EAAE,gCAAgC;SACzC;KACF;CACF,CAAC;AAEF,kBAAe,MAAM,CAAC"}
