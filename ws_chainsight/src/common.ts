@@ -1,15 +1,15 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {GraphQLClient} from 'graphql-request';
-import {Amplify} from 'aws-amplify';
+import { GraphQLClient } from 'graphql-request';
+import { Amplify } from 'aws-amplify';
 import * as dotenv from 'dotenv';
 
 import AwsExports from './aws-exports';
-import {getSdk} from './gql/graphql';
+import { getSdk } from './gql/graphql';
 import * as Vault from './did/_management_canister_vault';
-import {Principal} from '@dfinity/principal';
-import {HttpAgent} from '@dfinity/agent';
+import { Principal } from '@dfinity/principal';
+import { HttpAgent } from '@dfinity/agent';
 
 const DFINITY_ENDPOINT = 'https://ic0.app/';
 
@@ -30,13 +30,13 @@ export const gqlSdk = (endpoint: string, apiKey: string) => {
 
 // IC
 export const getAgent = () => {
-  const agent = new HttpAgent({host: DFINITY_ENDPOINT});
+  const agent = new HttpAgent({ host: DFINITY_ENDPOINT });
   // await agent.fetchRootKey(); // for local
   return agent;
 };
 
 export const vaultActor = (canister: Principal, agent: HttpAgent) => {
-  return Vault.createActor(canister, {agent});
+  return Vault.createActor(canister, { agent });
 };
 
 // File Operation
@@ -53,6 +53,6 @@ export const writeJson = async <T>(path: string, data: T) => {
 };
 
 export const loadJson = async <T>(path: string): Promise<T> => {
-  const text = fs.readFileSync(path, {encoding: 'utf8'});
+  const text = fs.readFileSync(path, { encoding: 'utf8' });
   return JSON.parse(text) as T;
 };

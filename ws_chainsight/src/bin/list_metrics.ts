@@ -1,4 +1,4 @@
-import {Principal} from '@dfinity/principal';
+import { Principal } from '@dfinity/principal';
 import {
   PATH_COMPONENTS,
   PATH_METRIC,
@@ -8,7 +8,7 @@ import {
   vaultActor,
   writeJson,
 } from '../common';
-import type {ListComponentsQuery} from '../gql/graphql';
+import type { ListComponentsQuery } from '../gql/graphql';
 
 // NOTE: TypeError: Do not know how to serialize a BigInt
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

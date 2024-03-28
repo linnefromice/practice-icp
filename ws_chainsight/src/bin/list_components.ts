@@ -1,4 +1,4 @@
-import {PATH_COMPONENTS, bootstrap, gqlSdk, writeJson} from '../common';
+import { PATH_COMPONENTS, bootstrap, gqlSdk, writeJson } from '../common';
 
 bootstrap();
 
@@ -9,7 +9,7 @@ const execute = async () => {
     throw new Error('Missing environment variables');
   }
   const sdk = gqlSdk(endpoint, apiKey);
-  const {components} = await sdk.ListComponents();
+  const { components } = await sdk.ListComponents();
 
   writeJson(PATH_COMPONENTS, components.items);
 };

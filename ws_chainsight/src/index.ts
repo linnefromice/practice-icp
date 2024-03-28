@@ -1,5 +1,5 @@
-import {Principal} from '@dfinity/principal';
-import {bootstrap, getAgent, gqlSdk, vaultActor} from './common';
+import { Principal } from '@dfinity/principal';
+import { bootstrap, getAgent, gqlSdk, vaultActor } from './common';
 
 bootstrap();
 
@@ -13,7 +13,7 @@ const execute = async () => {
   }
 
   const sdk = gqlSdk(endpoint, apiKey);
-  const {components} = await sdk.ListComponents();
+  const { components } = await sdk.ListComponents();
   console.log(components.items.length);
 
   const agent = getAgent();
