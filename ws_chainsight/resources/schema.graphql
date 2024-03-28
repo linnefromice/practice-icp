@@ -1,0 +1,245 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+union SourceLike = Component | StringSource
+
+type AcceptDeploymentReceipt {
+  accepted: Boolean!
+  causedBy: String
+  chainId: Int
+  id: ID
+  rpcfUrl: String!
+}
+
+type AssetDataStore @aws_api_key @aws_cognito_user_pools {
+  component: Component!
+  description: String
+  feeds: AssetFeeds!
+  id: String!
+  symbol: String!
+}
+
+type AssetFeed @aws_api_key @aws_cognito_user_pools {
+  # plugins: [AssetFeederPlugin!]!
+  dataStore: AssetDataStore!
+  feeder: AssetFeeder!
+  id: String!
+}
+
+type AssetFeeder @aws_api_key @aws_cognito_user_pools {
+  chainId: Int!
+  component: Component!
+  description: String
+  duration: Int!
+  id: String!
+}
+
+type AssetFeeds {
+  feeds: [AssetFeed!]!
+}
+
+type Component @aws_api_key @aws_cognito_user_pools {
+  componentType: ComponentType!
+  controllers: [String!]!
+  description: String!
+  id: ID!
+  intervalSec: Int
+  label: String!
+  proxy: String!
+  relayerMetadata: RelayerMetadata
+  sources: [ComponentSource!]!
+  tags: [String!]!
+  vault: String!
+}
+
+type ComponentResponse @aws_api_key @aws_cognito_user_pools {
+  items: [Component!]!
+  nextToken: String
+}
+
+type ComponentSource @aws_api_key @aws_cognito_user_pools {
+  attributes: ComponentSourceAttribute!
+  source: SourceLike!
+  sourceType: ComponentSourceType!
+}
+
+type ComponentSourceAttribute @aws_api_key @aws_cognito_user_pools {
+  chainId: Int
+  contractType: String
+  eventName: String
+  functionName: String
+  queries: [KeyValue]
+  sources: [Component]
+}
+
+type DeployRelayerOutput {
+  accepted: Boolean!
+  causedBy: String
+  id: ID!
+}
+
+type KeyValue @aws_api_key @aws_cognito_user_pools {
+  key: String!
+  value: String!
+}
+
+type Layout @aws_cognito_user_pools {
+  data: String!
+}
+
+type ListAssetFeedersResponse {
+  items: [AssetFeeder!]!
+  nextToken: String
+}
+
+type ListAssetStoresResponse {
+  items: [AssetDataStore!]!
+  nextToken: String
+}
+
+type Mutation {
+  addToMyComponents(input: AddToMyComponentsInput!): ID! @aws_cognito_user_pools
+  createFeed(input: RegisterFeedInput!): AssetFeed! @aws_cognito_user_pools
+  createMyComponents(label: String!): ID! @aws_cognito_user_pools
+  deleteFeed(input: DeleteFeedInput!): String! @aws_cognito_user_pools
+  deleteMyComponents(id: ID!): ID! @aws_cognito_user_pools
+  deployRelayer(input: DeployRelayerInput!): AcceptDeploymentReceipt! @aws_api_key
+  removeFromMyComponents(input: RemoveFromMyComponentsInput!): ID! @aws_cognito_user_pools
+  updateLayout(data: String!): String @aws_cognito_user_pools
+  updateMyComponents(input: UpdateMyComponentsInput!): ID! @aws_cognito_user_pools
+  updateRelayer(input: UpdateRelayerInput!): Relayer! @aws_iam
+}
+
+type MyComponent @aws_cognito_user_pools {
+  component: Component!
+}
+
+type MyComponents @aws_cognito_user_pools {
+  components: [MyComponent!]!
+  id: ID!
+  label: String!
+}
+
+type Query {
+  assetDataStore(id: String!): AssetDataStore
+  assetDataStores(input: ListAssetDataStoresInput): ListAssetStoresResponse!
+  assetFeeder(id: String!): AssetFeeder
+  assetFeeders(input: ListAssetFeedersInput): ListAssetFeedersResponse!
+  component(id: ID!): Component
+  components(nextToken: String): ComponentResponse!
+  componentsByIds(ids: [ID!]!): [Component!]!
+  layout: Layout @aws_cognito_user_pools
+  myComponents: [MyComponents!]! @aws_cognito_user_pools
+  myComponentsById(id: ID!): MyComponents @aws_cognito_user_pools
+  myFeeds: [AssetFeed!]! @aws_cognito_user_pools
+  relayer(id: ID!): Relayer!
+  relayers(nextToken: String): RelayersResponse!
+  searchComponents(query: String): [Component!]!
+}
+
+type Relayer {
+  asset: String!
+  chainId: Int!
+  component: Component!
+  ethereumAddress: String!
+  id: ID!
+  rpcUrl: String!
+}
+
+type RelayerMetadata @aws_api_key @aws_cognito_user_pools {
+  chainId: Int!
+  destination: String!
+  oracleType: String!
+  signer: String!
+}
+
+type RelayersResponse {
+  items: [Relayer!]!
+  nextToken: String
+}
+
+type StringSource @aws_api_key @aws_cognito_user_pools {
+  value: String!
+}
+
+type Subscription {
+  onRelayerDeployed(id: ID!): Relayer @aws_subscribe(mutations : ["updateRelayer"])
+}
+
+enum ComponentSourceType @aws_api_key @aws_cognito_user_pools {
+  Chainsight
+  Evm
+  Https
+  Icp
+}
+
+enum ComponentType @aws_api_key @aws_cognito_user_pools {
+  AlgorithmIndexer
+  AlgorithmLens
+  EventIndexer
+  Relayer
+  SnapshotIndexerEvm
+  SnapshotIndexerHttps
+  SnapshotIndexerIcp
+}
+
+input AddToMyComponentsInput {
+  canisterId: ID!
+  id: ID!
+}
+
+input DeleteFeedInput @aws_cognito_user_pools {
+  id: String!
+}
+
+input DeployRelayerInput {
+  rpcUrl: String!
+  symbol: String!
+}
+
+input ListAssetDataStoresInput {
+  limit: Int
+  nextToken: String
+  symbol: String
+}
+
+# type AssetFeederPlugin @aws_api_key @aws_cognito_user_pools { //TODO: need this?
+#  id: String!
+#  component: Component!
+#}
+input ListAssetFeedersInput {
+  chainId: Int
+  limit: Int
+  nextToken: String
+}
+
+input RegisterFeedInput @aws_cognito_user_pools {
+  dataStore: String!
+  #  TODO: should be interval and chainId?
+  feeder: String!
+}
+
+input RemoveFromMyComponentsInput {
+  canisterId: ID!
+  id: ID!
+}
+
+input SearchComponentsInput {
+  from: Int
+  query: String
+  size: Int
+}
+
+input UpdateMyComponentsInput {
+  id: ID!
+  label: String!
+}
+
+input UpdateRelayerInput {
+  ethereumAddress: String!
+  id: ID!
+  principal: String!
+}

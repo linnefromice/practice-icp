@@ -1,0 +1,16 @@
+query ListComponents($nextToken: String) {
+  components(nextToken: $nextToken) {
+    nextToken
+    items {
+      componentType
+      controllers
+      description
+      id
+      intervalSec
+      label
+      proxy
+      tags
+      vault
+    }
+  }
+}
