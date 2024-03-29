@@ -1,9 +1,13 @@
 import { Principal } from '@dfinity/principal';
 import {
   Metric,
-  PATH_COMPONENTS,
-  PATH_METRIC,
+  PATH_COMPONENTS_JSON,
+  PATH_METRIC_CSV,
+  PATH_METRIC_ERR_CSV,
+  PATH_METRIC_ERR_JSON,
+  PATH_METRIC_JSON,
   bootstrap,
+  flattenObject,
   getAgent,
   loadJson,
   vaultActor,
@@ -19,9 +23,11 @@ import type { ListComponentsQuery } from '../gql/graphql';
 
 bootstrap();
 
-const execute = async () => {
+export const execute = async () => {
   const components =
-    await loadJson<ListComponentsQuery['components']['items']>(PATH_COMPONENTS);
+    await loadJson<ListComponentsQuery['components']['items']>(
+      PATH_COMPONENTS_JSON
+    );
 
   // for: Debug
   // const sliced = components.slice(
@@ -31,11 +37,13 @@ const execute = async () => {
 
   const agent = getAgent();
   const result = [];
+  const errs: { id: string; error: string }[] = [];
   for (const c of components) {
     const principal = Principal.fromText(c.vault);
     const actor = vaultActor(principal, agent);
 
-    const metric = await actor.metric().catch(() => {
+    const metric = await actor.metric().catch((e: any) => {
+      errs.push({ id: c.id, error: e.totring() });
       return null;
     });
     const data: Metric = {
@@ -45,7 +53,11 @@ const execute = async () => {
     };
     result.push(data);
   }
-  writeJson(PATH_METRIC, result);
+  writeJson(PATH_METRIC_ERR_JSON, errs);
+  writeJson(PATH_METRIC_ERR_CSV, errs.map(flattenObject));
+
+  // writeJson(PATH_METRIC_JSON, result);
+  // writeJson(PATH_METRIC_CSV, result.map(flattenObject));
 };
 
 execute()

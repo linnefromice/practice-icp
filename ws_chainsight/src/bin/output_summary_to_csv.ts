@@ -1,7 +1,7 @@
 import {
   Metric,
-  PATH_COMPONENTS,
-  PATH_METRIC,
+  PATH_COMPONENTS_JSON,
+  PATH_METRIC_JSON,
   PATH_SUMMURY_CSV,
   bootstrap,
   extendedMetric,
@@ -13,10 +13,14 @@ import { ListComponentsQuery } from '../gql/graphql';
 
 bootstrap();
 
-const execute = async () => {
+export const execute = async () => {
   const components =
-    await loadJson<ListComponentsQuery['components']['items']>(PATH_COMPONENTS);
-  const metrics = await loadJson<Metric[]>(PATH_METRIC);
+    await loadJson<ListComponentsQuery['components']['items']>(
+      PATH_COMPONENTS_JSON
+    );
+  const metrics = await loadJson<Metric[]>(PATH_METRIC_JSON);
+  console.log(`components: ${components.length}`);
+  console.log(`metrics: ${metrics.length}`);
 
   const merged = components.map(c => {
     const metric = metrics.find(m => m.id === c.id);

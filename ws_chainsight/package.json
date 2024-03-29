@@ -15,8 +15,10 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
+    "exec:all": "ts-node src/bin/all.ts",
     "exec:list_components": "ts-node src/bin/list_components.ts",
     "exec:list_metrics": "ts-node src/bin/list_metrics.ts",
+    "exec:list_snapshots": "ts-node src/bin/list_snapshots.ts",
     "exec:to_csv": "ts-node src/bin/output_summary_to_csv.ts",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
@@ -34,6 +36,7 @@
   },
   "dependencies": {
     "@dfinity/agent": "^1.2.0",
+    "@dfinity/candid": "^1.2.0",
     "@dfinity/principal": "^1.2.0",
     "@graphql-codegen/typescript-graphql-request": "^6.2.0",
     "aws-amplify": "^6.0.23",

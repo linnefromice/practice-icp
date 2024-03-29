@@ -74,8 +74,22 @@ export const extendedMetric = (metric: Metric) => {
 
 // File Operation
 const OUTPUTS_PATH = path.join(process.cwd(), 'outputs');
-export const PATH_COMPONENTS = path.join(OUTPUTS_PATH, 'components.json');
-export const PATH_METRIC = path.join(OUTPUTS_PATH, 'metric.json');
+export const PATH_COMPONENTS_JSON = path.join(OUTPUTS_PATH, 'components.json');
+export const PATH_COMPONENTS_CSV = path.join(OUTPUTS_PATH, 'components.csv');
+export const PATH_METRIC_JSON = path.join(OUTPUTS_PATH, 'metric.json');
+export const PATH_METRIC_CSV = path.join(OUTPUTS_PATH, 'metric.csv');
+export const PATH_METRIC_ERR_JSON = path.join(OUTPUTS_PATH, 'metric.err.json');
+export const PATH_METRIC_ERR_CSV = path.join(OUTPUTS_PATH, 'metric.err.csv');
+export const PATH_SNAPSHOTS_JSON = path.join(OUTPUTS_PATH, 'snapshots.json');
+export const PATH_SNAPSHOTS_CSV = path.join(OUTPUTS_PATH, 'snapshots.csv');
+export const PATH_SNAPSHOTS_ERR_JSON = path.join(
+  OUTPUTS_PATH,
+  'snapshots.err.json'
+);
+export const PATH_SNAPSHOTS_ERR_CSV = path.join(
+  OUTPUTS_PATH,
+  'snapshots.err.csv'
+);
 export const PATH_SUMMURY_CSV = path.join(OUTPUTS_PATH, 'summury.csv');
 
 export const writeJson = async <T>(path: string, data: T) => {
