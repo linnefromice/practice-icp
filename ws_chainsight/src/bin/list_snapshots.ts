@@ -9,6 +9,7 @@ import {
   flattenObject,
   getAgent,
   loadJson,
+  writeCsv,
   writeJson,
 } from '../common';
 import { ListComponentsQuery } from '../gql/graphql';
@@ -75,9 +76,9 @@ export const execute = async () => {
   console.log(`result: ${result.length}`);
   console.log(`errors: ${errs.length}`);
   writeJson(PATH_SNAPSHOTS_JSON, result);
-  writeJson(PATH_SNAPSHOTS_CSV, result.map(flattenObject));
+  writeCsv(PATH_SNAPSHOTS_CSV, result.map(flattenObject));
   writeJson(PATH_SNAPSHOTS_JSON, errs);
-  writeJson(PATH_SNAPSHOTS_CSV, errs.map(flattenObject));
+  writeCsv(PATH_SNAPSHOTS_CSV, errs.map(flattenObject));
   console.log(JSON.stringify(errs, null, 2));
 };
 

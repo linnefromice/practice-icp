@@ -11,6 +11,7 @@ import {
   getAgent,
   loadJson,
   vaultActor,
+  writeCsv,
   writeJson,
 } from '../common';
 import type { ListComponentsQuery } from '../gql/graphql';
@@ -53,11 +54,11 @@ export const execute = async () => {
     };
     result.push(data);
   }
+  writeJson(PATH_METRIC_JSON, result);
+  writeCsv(PATH_METRIC_CSV, result.map(flattenObject));
   writeJson(PATH_METRIC_ERR_JSON, errs);
-  writeJson(PATH_METRIC_ERR_CSV, errs.map(flattenObject));
-
-  // writeJson(PATH_METRIC_JSON, result);
-  // writeJson(PATH_METRIC_CSV, result.map(flattenObject));
+  writeCsv(PATH_METRIC_ERR_CSV, errs.map(flattenObject));
+  console.log(JSON.stringify(errs, null, 2));
 };
 
 execute()

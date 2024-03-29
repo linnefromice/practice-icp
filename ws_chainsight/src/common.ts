@@ -72,6 +72,39 @@ export const extendedMetric = (metric: Metric) => {
   };
 };
 
+export type Snapshot = {
+  id: string;
+  intervalSec: number;
+  snapshots: Array<{
+    value: any; // temp
+    timestamp: bigint;
+  }>;
+};
+// todo: use length of snapshots
+const extendSnapshot = (snapshot: Snapshot['snapshots'][0]) => {
+  const timestampStr = new Date(
+    Number(BigInt(snapshot.timestamp))
+  ).toISOString();
+
+  return {
+    value: JSON.stringify(snapshot.value).replace(/,/g, '_'),
+    timestamp: snapshot.timestamp,
+    timestamp_str: timestampStr,
+  };
+};
+export const extendedSnapshot = (snapshots: Snapshot['snapshots']) => {
+  const nullVal = {
+    value: '',
+    timestamp: BigInt(0),
+    timestamp_str: '',
+  };
+
+  return {
+    snapshot_1: snapshots[0] ? extendSnapshot(snapshots[0]) : nullVal,
+    snapshot2: snapshots[1] ? extendSnapshot(snapshots[1]) : nullVal,
+  };
+};
+
 // File Operation
 const OUTPUTS_PATH = path.join(process.cwd(), 'outputs');
 export const PATH_COMPONENTS_JSON = path.join(OUTPUTS_PATH, 'components.json');
