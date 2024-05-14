@@ -1,5 +1,12 @@
 [workspace]
 members = [
-    "src/ws_stable_memory_3_backend"
+    "src/backend_1"
 ]
 resolver = "2"
+
+[workspace.dependencies]
+candid = "^0.9.6"
+ic-cdk = "^0.11"
+ic-cdk-macros = "^0.8"
+ic-cdk-timers = "0.5.0"
+ic-stable-structures = "0.5.5"
