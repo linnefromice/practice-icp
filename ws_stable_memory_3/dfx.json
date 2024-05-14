@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "ws_stable_memory_3_backend": {
+      "candid": "src/ws_stable_memory_3_backend/ws_stable_memory_3_backend.did",
+      "package": "ws_stable_memory_3_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/ws_stable_memory_3_backend"
+]
+resolver = "2"
