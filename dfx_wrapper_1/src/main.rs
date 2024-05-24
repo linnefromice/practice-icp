@@ -1,46 +1,52 @@
 use std::env;
 
-use ic_agent::export::Principal;
 use tokio::runtime::Runtime;
 
 #[derive(Debug)]
-enum NetworkEnv {
+enum Network {
     LOCAL,
     IC,
 }
-impl From<String> for NetworkEnv {
+impl From<String> for Network {
     fn from(env: String) -> Self {
         match env.as_str() {
-            "local" => NetworkEnv::LOCAL,
-            "ic" => NetworkEnv::IC,
+            "local" => Network::LOCAL,
+            "ic" => Network::IC,
             _ => panic!("Invalid network environment"),
         }
     }
 }
-impl NetworkEnv {
+impl Network {
     fn url(&self) -> &str {
         match self {
-            NetworkEnv::LOCAL => "http://localhost:4943",
-            NetworkEnv::IC => "https://ic0.app",
+            Network::LOCAL => "http://localhost:4943",
+            Network::IC => "https://ic0.app",
         }
     }
 }
 
 #[derive(Debug)]
 struct Args {
-    env: NetworkEnv,
     command: String,
+    network: Network,
 }
 
 fn main() {
     let env_args: Vec<String> = env::args().collect();
-    if env_args.len() != 3 {
-        println!("Usage: ic-cli <env> <command>");
+    let env_args_lens = env_args.len();
+    if env_args_lens <= 1 || 3 < env_args_lens {
+        println!("Usage: cargo run <command> <env>");
         return;
     }
+
+    let network = if let Some(network_str) = env_args.get(2) {
+        Network::from(network_str.clone())
+    } else {
+        Network::LOCAL
+    };
     let args = Args {
-        env: NetworkEnv::from(env_args[1].clone()),
-        command: env_args[2].clone(),
+        command: env_args[1].clone(),
+        network,
     };
 
     let runtime = Runtime::new().expect("Unable to create a runtime");
@@ -48,16 +54,21 @@ fn main() {
 }
 
 async fn execute(args: Args) {
-    let agent = generate_agent(args.env.url());
-    if let NetworkEnv::LOCAL = args.env {
+    let agent = generate_agent(args.network.url());
+    if let Network::LOCAL = args.network {
         agent.fetch_root_key().await.unwrap();
     }
 
-    let subnet_id =
-        Principal::from_text("2fq7c-slacv-26cgz-vzbx2-2jrcs-5edph-i5s2j-tck77-c3rlz-iobzx-mqe")
-            .unwrap();
-    let metrics = agent.read_state_subnet_metrics(subnet_id).await.unwrap();
-    println!("{:?}", metrics);
+    println!("Your Command is `{}`", args.command);
+    match args.command.as_str() {
+        "canister_create" => {}
+        "build" => {}
+        "canister_install" => {}
+        "canister_call" => {}
+        _ => {
+            panic!("Invalid command");
+        }
+    }
 }
 
 pub fn generate_agent(url: &str) -> ic_agent::Agent {
