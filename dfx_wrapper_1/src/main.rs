@@ -67,7 +67,10 @@ async fn execute(args: Args) {
             let res = commands::ping(&agent).await;
             println!("{:?}", res);
         }
-        "canister_create" => {}
+        "canister_create" => {
+            let res = commands::canister_create(&agent).await;
+            println!("{:?}", res);
+        }
         "build" => {}
         "canister_install" => {}
         "canister_call" => {}
