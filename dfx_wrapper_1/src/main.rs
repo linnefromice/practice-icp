@@ -2,6 +2,8 @@ use std::env;
 
 use tokio::runtime::Runtime;
 
+mod commands;
+
 #[derive(Debug)]
 enum Network {
     LOCAL,
@@ -61,6 +63,10 @@ async fn execute(args: Args) {
 
     println!("Your Command is `{}`", args.command);
     match args.command.as_str() {
+        "ping" => {
+            let res = commands::ping(&agent).await;
+            println!("{:?}", res);
+        }
         "canister_create" => {}
         "build" => {}
         "canister_install" => {}
