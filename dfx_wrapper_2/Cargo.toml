@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 dfx-core = { git = "https://github.com/dfinity/sdk", package = "dfx-core" }
-ic-agent = "0.35.0"
-ic-utils = "0.35.0"
+ic-agent = { git = "https://github.com/dfinity/agent-rs.git", rev = "8273d321e9a09fd8373bd4e38b0676ec6ad9c260" }
+ic-utils =  { git = "https://github.com/dfinity/agent-rs.git", rev = "8273d321e9a09fd8373bd4e38b0676ec6ad9c260" }
+# ic-agent = "0.35.0"
+# ic-utils = "0.35.0"
 tokio = { version = "1.37.0", features = ["full"] }
