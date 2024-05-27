@@ -1,5 +1,11 @@
 use std::env;
 
+use dfx_core::identity::{
+    // keyring_mock::{keyring_available, KEYRING_IDENTITY_PREFIX, KEYRING_SERVICE_NAME},
+    IdentityManager,
+};
+use ic_agent::Identity;
+use slog::{Discard, Logger};
 use tokio::runtime::Runtime;
 
 mod commands;
@@ -56,7 +62,18 @@ fn main() {
 }
 
 async fn execute(args: Args) {
-    let agent = generate_agent(args.network.url());
+    println!("CARGO_PKG_VERSION is {:?}", env!("CARGO_PKG_VERSION"));
+
+    let logger = Logger::root(Discard, slog::o!());
+    let mut identity_mgr = IdentityManager::new(&logger, &None).unwrap();
+    // let identity_config =
+    //     identity_mgr.get_identity_config_or_default(identity_mgr.get_selected_identity_name());
+    // note: if error in keychain, set "Allow all applications" to internet_computer_identities / internet_computer_identity_(name) in Keychain access.
+    let identity: Box<dyn Identity + Send + Sync> =
+        identity_mgr.instantiate_selected_identity(&logger).unwrap();
+
+    let agent = generate_agent(args.network.url(), identity);
+    // let agent = generate_agent(args.network.url(), _identity);
     if let Network::LOCAL = args.network {
         agent.fetch_root_key().await.unwrap();
     }
@@ -68,7 +85,8 @@ async fn execute(args: Args) {
             println!("{:?}", res);
         }
         "canister_create" => {
-            let res = commands::canister_create(&agent).await;
+            // let res = commands::canister_create(logger, &agent).await;
+            let res = commands::canister_create(logger).await;
             println!("{:?}", res);
         }
         "build" => {}
@@ -80,9 +98,10 @@ async fn execute(args: Args) {
     }
 }
 
-pub fn generate_agent(url: &str) -> ic_agent::Agent {
+pub fn generate_agent(url: &str, identity: Box<dyn Identity + Send + Sync>) -> ic_agent::Agent {
     ic_agent::Agent::builder()
         .with_url(url)
+        .with_boxed_identity(identity)
         .with_verify_query_signatures(false)
         .build()
         .unwrap()
