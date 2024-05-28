@@ -3,7 +3,7 @@ use std::path::Path;
 use crate::config::Network;
 
 #[derive(Debug, serde::Deserialize)]
-struct ResponseTypePing {
+pub struct ResponseTypePing {
     pub ic_api_version: String,
     pub replica_health_status: String,
     pub root_key: Vec<u8>,
@@ -27,10 +27,7 @@ pub fn exec_cmd_none_output(
     execution_dir: &Path,
     args: Vec<&str>,
 ) -> Result<(), String> {
-    match exec_cmd_output(cmd, execution_dir, args) {
-        Ok(_stdout) => Ok(()),
-        Err(stderr) => Err(std::str::from_utf8(&stderr).unwrap().to_string()),
-    }
+    exec_cmd_generic_output(cmd, execution_dir, args, |_stdout| Ok(()))
 }
 
 pub fn exec_cmd_string_output(
@@ -38,10 +35,9 @@ pub fn exec_cmd_string_output(
     execution_dir: &Path,
     args: Vec<&str>,
 ) -> Result<String, String> {
-    match exec_cmd_output(cmd, execution_dir, args) {
-        Ok(stdout) => Ok(std::str::from_utf8(&stdout).unwrap().to_string()),
-        Err(stderr) => Err(std::str::from_utf8(&stderr).unwrap().to_string()),
-    }
+    exec_cmd_generic_output(cmd, execution_dir, args, |stdout| {
+        Ok(std::str::from_utf8(&stdout).unwrap().to_string())
+    })
 }
 
 pub fn exec_cmd_json_output<T>(
@@ -52,23 +48,26 @@ pub fn exec_cmd_json_output<T>(
 where
     T: serde::de::DeserializeOwned,
 {
-    match exec_cmd_output(cmd, execution_dir, args) {
-        Ok(stdout) => Ok(serde_json::from_slice(&stdout).unwrap()),
-        Err(stderr) => Err(std::str::from_utf8(&stderr).unwrap().to_string()),
-    }
+    exec_cmd_generic_output(cmd, execution_dir, args, |stdout| {
+        Ok(serde_json::from_slice(&stdout).unwrap())
+    })
 }
 
-pub fn exec_cmd_output(
+pub fn exec_cmd_generic_output<T, F>(
     cmd: &str,
     execution_dir: &Path,
     args: Vec<&str>,
-) -> Result<Vec<u8>, Vec<u8>> {
+    process_output: F,
+) -> Result<T, String>
+where
+    F: FnOnce(Vec<u8>) -> Result<T, String>,
+{
     let output = exec_cmd(cmd, execution_dir, args)
         .unwrap_or_else(|_| panic!("failed to execute process: {}", cmd));
     if output.status.success() {
-        Ok(output.stdout.clone())
+        process_output(output.stdout)
     } else {
-        Err(output.stderr.clone())
+        Err(std::str::from_utf8(&output.stderr).unwrap().to_string())
     }
 }
 

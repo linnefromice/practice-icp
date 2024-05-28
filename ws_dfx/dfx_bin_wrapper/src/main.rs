@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, fmt::Debug};
 
 use config::Network;
 use tokio::runtime::Runtime;
@@ -39,9 +39,10 @@ async fn execute(args: Args) {
     println!("Network: {:?}", args.network);
     println!("Command: {:?}", args.command);
 
-    match args.command.as_str() {
-        "ping" => ping(args.network),
-        "canister_create" => canister_create(args.network),
-        _ => println!("Invalid command"),
-    }
+    let res: Box<dyn Debug> = match args.command.as_str() {
+        "ping" => Box::new(ping(args.network)),
+        "canister_create" => Box::new(canister_create(args.network)),
+        _ => Box::new("Invalid command"),
+    };
+    println!("{:?}", res)
 }
