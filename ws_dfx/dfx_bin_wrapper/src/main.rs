@@ -1,33 +1,12 @@
 use std::env;
 
+use config::Network;
 use tokio::runtime::Runtime;
 
 use crate::dfx_wrapper::{canister_create, ping};
 
+mod config;
 mod dfx_wrapper;
-
-#[derive(Debug)]
-enum Network {
-    LOCAL,
-    IC,
-}
-impl From<String> for Network {
-    fn from(env: String) -> Self {
-        match env.as_str() {
-            "local" => Network::LOCAL,
-            "ic" => Network::IC,
-            _ => panic!("Invalid network environment"),
-        }
-    }
-}
-impl Network {
-    fn url(&self) -> &str {
-        match self {
-            Network::LOCAL => "http://localhost:4943",
-            Network::IC => "https://ic0.app",
-        }
-    }
-}
 
 #[derive(Debug)]
 struct Args {
@@ -61,8 +40,8 @@ async fn execute(args: Args) {
     println!("Command: {:?}", args.command);
 
     match args.command.as_str() {
-        "ping" => ping(),
-        "canister_create" => canister_create(),
+        "ping" => ping(args.network),
+        "canister_create" => canister_create(args.network),
         _ => println!("Invalid command"),
     }
 }

@@ -1,14 +1,27 @@
 use std::path::Path;
 
-pub fn ping() {
-    let res = exec_cmd_string_output("dfx", &Path::new("."), vec!["ping"]);
-    println!("{:?}", res);
+use crate::config::Network;
+
+#[derive(Debug, serde::Deserialize)]
+struct ResponseTypePing {
+    pub ic_api_version: String,
+    pub replica_health_status: String,
+    pub root_key: Vec<u8>,
+    // for local
+    pub certified_height: Option<u64>,
+    pub impl_version: Option<String>,
+    pub impl_hash: Option<String>,
+}
+pub fn ping(network: Network) {
+    let args = vec!["ping", network.url()];
+    let res = exec_cmd_json_output::<ResponseTypePing>("dfx", &Path::new("."), args);
+    println!("{:?}", res.unwrap());
 }
 
-pub fn canister_create() {
-    // note: fail because no response ("")
-    let _ = exec_cmd_string_output("dfx", &Path::new("."), vec!["canister", "create", "--all"]);
-    // println!("{:?}", res);
+pub fn canister_create(network: Network) {
+    let args = vec![vec!["canister", "create", "--all"], network.args()].concat();
+    let res = exec_cmd_output("dfx", &Path::new("."), args);
+    println!("{:?}", res);
 }
 
 pub fn exec_cmd_string_output(
