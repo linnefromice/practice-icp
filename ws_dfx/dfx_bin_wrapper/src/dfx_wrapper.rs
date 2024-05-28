@@ -22,15 +22,28 @@ pub fn canister_create(network: Network) -> Result<(), String> {
     exec_cmd_none_output("dfx", &Path::new("."), args)
 }
 
-pub fn exec_cmd_none_output(
-    cmd: &str,
-    execution_dir: &Path,
-    args: Vec<&str>,
-) -> Result<(), String> {
+pub fn build(network: Network) -> Result<(), String> {
+    let args = vec![vec!["build"], network.args()].concat();
+    exec_cmd_none_output("dfx", &Path::new("."), args)
+}
+
+pub fn canister_install(network: Network) -> Result<String, String> {
+    let args = vec![vec!["canister", "install", "--all"], network.args()].concat();
+    exec_cmd_string_output("dfx", &Path::new("."), args)
+}
+
+pub fn canister_call(network: Network) -> Result<String, String> {
+    let canister_args = vec!["backend_candid", "hello"]; // temp
+
+    let args = vec![vec!["canister", "call"], canister_args, network.args()].concat();
+    exec_cmd_string_output("dfx", &Path::new("."), args)
+}
+
+fn exec_cmd_none_output(cmd: &str, execution_dir: &Path, args: Vec<&str>) -> Result<(), String> {
     exec_cmd_generic_output(cmd, execution_dir, args, |_stdout| Ok(()))
 }
 
-pub fn exec_cmd_string_output(
+fn exec_cmd_string_output(
     cmd: &str,
     execution_dir: &Path,
     args: Vec<&str>,
@@ -53,7 +66,7 @@ where
     })
 }
 
-pub fn exec_cmd_generic_output<T, F>(
+fn exec_cmd_generic_output<T, F>(
     cmd: &str,
     execution_dir: &Path,
     args: Vec<&str>,

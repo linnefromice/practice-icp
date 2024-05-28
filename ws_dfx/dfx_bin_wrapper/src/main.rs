@@ -3,7 +3,7 @@ use std::{env, fmt::Debug};
 use config::Network;
 use tokio::runtime::Runtime;
 
-use crate::dfx_wrapper::{canister_create, ping};
+use crate::dfx_wrapper::{build, canister_call, canister_create, canister_install, ping};
 
 mod config;
 mod dfx_wrapper;
@@ -42,6 +42,9 @@ async fn execute(args: Args) {
     let res: Box<dyn Debug> = match args.command.as_str() {
         "ping" => Box::new(ping(args.network)),
         "canister_create" => Box::new(canister_create(args.network)),
+        "build" => Box::new(build(args.network)),
+        "canister_install" => Box::new(canister_install(args.network)),
+        "canister_call" => Box::new(canister_call(args.network)),
         _ => Box::new("Invalid command"),
     };
     println!("{:?}", res)
