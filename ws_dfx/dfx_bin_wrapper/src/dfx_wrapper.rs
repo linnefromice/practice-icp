@@ -39,6 +39,36 @@ pub fn canister_call(network: Network) -> Result<String, String> {
     exec_cmd_string_output("dfx", &Path::new("."), args)
 }
 
+pub fn identity_whoami() -> Result<String, String> {
+    exec_cmd_string_output("dfx", &Path::new("."), vec!["identity", "whoami"])
+        .map(remove_trailing_newline)
+}
+
+pub fn identity_get_wallet(network: Network) -> Result<String, String> {
+    let args = vec![vec!["identity", "get-wallet"], network.args()].concat();
+    exec_cmd_string_output("dfx", &Path::new("."), args).map(remove_trailing_newline)
+}
+
+pub fn canister_info(network: Network, canister_name_or_id: String) -> Result<String, String> {
+    let args = vec![
+        vec!["canister", "info"],
+        network.args(),
+        vec![canister_name_or_id.as_str()],
+    ]
+    .concat();
+    exec_cmd_string_output("dfx", &Path::new("."), args)
+}
+
+pub fn canister_id(network: Network, canister_name_or_id: String) -> Result<String, String> {
+    let args = vec![
+        vec!["canister", "id"],
+        network.args(),
+        vec![canister_name_or_id.as_str()],
+    ]
+    .concat();
+    exec_cmd_string_output("dfx", &Path::new("."), args).map(remove_trailing_newline)
+}
+
 fn exec_cmd_none_output(cmd: &str, execution_dir: &Path, args: Vec<&str>) -> Result<(), String> {
     exec_cmd_generic_output(cmd, execution_dir, args, |_stdout| Ok(()))
 }
@@ -94,4 +124,19 @@ fn exec_cmd(
         .args(args)
         // .stdout(Stdio::piped())
         .output()
+}
+
+fn remove_trailing_newline<T>(s: T) -> String
+where
+    T: AsRef<str>,
+{
+    let s = s.as_ref();
+    let mut result = s.to_string();
+    if let Some('\n') = result.chars().last() {
+        result.pop();
+        if let Some('\r') = result.chars().last() {
+            result.pop();
+        }
+    }
+    result
 }
