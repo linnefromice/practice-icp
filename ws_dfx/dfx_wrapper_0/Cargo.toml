@@ -1,0 +1,11 @@
+[package]
+name = "dfx_wrapper_1"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# dfx-core = { git = "https://github.com/dfinity/sdk", tag="0.19.0", package = "dfx-core" }
+# dfx = { git = "https://github.com/dfinity/sdk", tag="0.19.0", package = "dfx" }
+dfx = { git = "https://github.com/linnefromice/dfinity-sdk", branch="feature/dfx-lib", package = "dfx" }
