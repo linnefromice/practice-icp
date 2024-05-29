@@ -12,61 +12,69 @@ pub struct ResponseTypePing {
     pub impl_version: Option<String>,
     pub impl_hash: Option<String>,
 }
-pub fn ping(network: Network) -> Result<ResponseTypePing, String> {
+pub fn ping(network: Network, path: String) -> Result<ResponseTypePing, String> {
     let args = vec!["ping", network.url()];
-    exec_cmd_json_output::<ResponseTypePing>("dfx", &Path::new("."), args)
+    exec_cmd_json_output::<ResponseTypePing>("dfx", &Path::new(&path), args)
 }
 
-pub fn canister_create(network: Network) -> Result<(), String> {
+pub fn canister_create(network: Network, path: String) -> Result<(), String> {
     let args = vec![vec!["canister", "create", "--all"], network.args()].concat();
-    exec_cmd_none_output("dfx", &Path::new("."), args)
+    exec_cmd_none_output("dfx", &Path::new(&path), args)
 }
 
-pub fn build(network: Network) -> Result<(), String> {
+pub fn build(network: Network, path: String) -> Result<(), String> {
     let args = vec![vec!["build"], network.args()].concat();
-    exec_cmd_none_output("dfx", &Path::new("."), args)
+    exec_cmd_none_output("dfx", &Path::new(&path), args)
 }
 
-pub fn canister_install(network: Network) -> Result<String, String> {
+pub fn canister_install(network: Network, path: String) -> Result<String, String> {
     let args = vec![vec!["canister", "install", "--all"], network.args()].concat();
-    exec_cmd_string_output("dfx", &Path::new("."), args)
+    exec_cmd_string_output("dfx", &Path::new(&path), args)
 }
 
-pub fn canister_call(network: Network) -> Result<String, String> {
+pub fn canister_call(network: Network, path: String) -> Result<String, String> {
     let canister_args = vec!["backend_candid", "hello"]; // temp
 
     let args = vec![vec!["canister", "call"], canister_args, network.args()].concat();
-    exec_cmd_string_output("dfx", &Path::new("."), args)
+    exec_cmd_string_output("dfx", &Path::new(&path), args)
 }
 
-pub fn identity_whoami() -> Result<String, String> {
-    exec_cmd_string_output("dfx", &Path::new("."), vec!["identity", "whoami"])
+pub fn identity_whoami(path: String) -> Result<String, String> {
+    exec_cmd_string_output("dfx", &Path::new(&path), vec!["identity", "whoami"])
         .map(remove_trailing_newline)
 }
 
-pub fn identity_get_wallet(network: Network) -> Result<String, String> {
+pub fn identity_get_wallet(network: Network, path: String) -> Result<String, String> {
     let args = vec![vec!["identity", "get-wallet"], network.args()].concat();
-    exec_cmd_string_output("dfx", &Path::new("."), args).map(remove_trailing_newline)
+    exec_cmd_string_output("dfx", &Path::new(&path), args).map(remove_trailing_newline)
 }
 
-pub fn canister_info(network: Network, canister_name_or_id: String) -> Result<String, String> {
+pub fn canister_info(
+    network: Network,
+    path: String,
+    canister_name_or_id: String,
+) -> Result<String, String> {
     let args = vec![
         vec!["canister", "info"],
         network.args(),
         vec![canister_name_or_id.as_str()],
     ]
     .concat();
-    exec_cmd_string_output("dfx", &Path::new("."), args)
+    exec_cmd_string_output("dfx", &Path::new(&path), args)
 }
 
-pub fn canister_id(network: Network, canister_name_or_id: String) -> Result<String, String> {
+pub fn canister_id(
+    network: Network,
+    path: String,
+    canister_name_or_id: String,
+) -> Result<String, String> {
     let args = vec![
         vec!["canister", "id"],
         network.args(),
         vec![canister_name_or_id.as_str()],
     ]
     .concat();
-    exec_cmd_string_output("dfx", &Path::new("."), args).map(remove_trailing_newline)
+    exec_cmd_string_output("dfx", &Path::new(&path), args).map(remove_trailing_newline)
 }
 
 fn exec_cmd_none_output(cmd: &str, execution_dir: &Path, args: Vec<&str>) -> Result<(), String> {
