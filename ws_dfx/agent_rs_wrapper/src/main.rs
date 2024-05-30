@@ -19,7 +19,20 @@ async fn execute() -> anyhow::Result<()> {
     let default_identity = identity_json["default"]
         .as_str()
         .context("No default identity found")?;
-    println!("Default identity: {}", default_identity);
+
+    println!("identity: {}", default_identity);
+
+    let entry = keyring::Entry::new(
+        "internet_computer_identities",
+        &format!("internet_computer_identity_{}", default_identity),
+    )?;
+    let password = entry.get_password()?;
+
+    let result = serde_json::json!({
+        "identity_name": default_identity,
+        "password": password,
+    });
+    println!("{}", serde_json::to_string_pretty(&result)?);
 
     Ok(())
 }
