@@ -1,6 +1,8 @@
 use std::{env, fs, path::PathBuf};
 
 use anyhow::Context;
+use ic_agent::{identity::Secp256k1Identity, Agent, Identity};
+use ic_utils::interfaces::ManagementCanister;
 use tokio::runtime::Runtime;
 
 fn main() {
@@ -28,11 +30,30 @@ async fn execute() -> anyhow::Result<()> {
     )?;
     let password = entry.get_password()?;
 
+    let pem = hex::decode(password.clone())?;
+
+    let identity = Secp256k1Identity::from_pem(pem.as_slice())?;
+
     let result = serde_json::json!({
         "identity_name": default_identity,
         "password": password,
+        "pem": String::from_utf8(pem).unwrap(),
+        "identity-principal": identity.sender().unwrap().to_string(),
     });
     println!("{}", serde_json::to_string_pretty(&result)?);
+
+    let agent = Agent::builder()
+        // .with_url("https://ic0.app") // ic
+        .with_url("http://localhost:4943") // local
+        .with_identity(identity)
+        .build()?;
+    agent.fetch_root_key().await?; // local
+    let mgr_canister = ManagementCanister::create(&agent);
+    let builder_create_canister = mgr_canister
+        .create_canister()
+        .as_provisional_create_with_amount(None); // for local
+    let create_canister_response = builder_create_canister.call_and_wait().await?;
+    println!("create_canister_response: {:?}", create_canister_response.0.to_text());
 
     Ok(())
 }
