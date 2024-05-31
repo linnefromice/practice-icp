@@ -1,10 +1,13 @@
 use std::{env, fs, path::PathBuf};
 
-use anyhow::Context;
+use anyhow::{Context, Ok};
 use ic_agent::{export::Principal, identity::Secp256k1Identity, Agent, Identity};
 use ic_utils::{
-    interfaces::{ManagementCanister, WalletCanister},
-    Canister,
+    interfaces::{
+        management_canister::builders::{CanisterInstall, InstallMode},
+        ManagementCanister, WalletCanister,
+    },
+    Argument, Canister,
 };
 use ic_wasm::{
     metadata::{add_metadata, Kind},
@@ -132,16 +135,50 @@ async fn execute(args: Args) -> anyhow::Result<()> {
     );
     wasm_module.emit_wasm_file(&format!("{}/{}", ARTIFACT_PATH, BUILDED_WASM_FILENAME))?;
 
+    // install canister by crates
+    let wasm_data = fs::read(&format!("{}/{}", ARTIFACT_PATH, BUILDED_WASM_FILENAME))?;
+    if network == Network::LOCAL {
+        install_canister_by_management_canister(&agent, &canister_id, &wasm_data).await?;
+    } else {
+        let wallet_canister = wallet_canister(wallet_principal, &agent).await?;
+        let install_args = CanisterInstall {
+            mode: InstallMode::Install,
+            canister_id,
+            wasm_module: wasm_data,
+            arg: Vec::new(),
+        };
+        wallet_canister
+            .call(
+                Principal::management_canister(),
+                "install_code",
+                Argument::from_candid((install_args,)),
+                0,
+            )
+            .call_and_wait()
+            .await?;
+    }
+
     Ok(())
 }
 
 async fn create_canister_by_management_canister(agent: &Agent) -> anyhow::Result<Principal> {
     let mgr_canister = ManagementCanister::create(agent);
-    let builder_create_canister = mgr_canister
+    let builder = mgr_canister
         .create_canister()
         .as_provisional_create_with_amount(None); // for local
-    let res = builder_create_canister.call_and_wait().await?;
+    let res = builder.call_and_wait().await?;
     Ok(res.0)
+}
+
+async fn install_canister_by_management_canister(
+    agent: &Agent,
+    canister_id: &Principal,
+    wasm_module: &[u8],
+) -> anyhow::Result<()> {
+    let mgr_canister = ManagementCanister::create(agent);
+    let builder = mgr_canister.install(canister_id, wasm_module);
+    builder.call_and_wait().await?;
+    Ok(())
 }
 
 async fn wallet_canister(id: Principal, agent: &Agent) -> anyhow::Result<WalletCanister> {
