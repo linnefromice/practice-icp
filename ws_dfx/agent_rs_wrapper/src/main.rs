@@ -5,16 +5,42 @@ use ic_agent::{identity::Secp256k1Identity, Agent, Identity};
 use ic_utils::interfaces::ManagementCanister;
 use tokio::runtime::Runtime;
 
+use crate::config::Network;
+
+mod config;
+mod dfx_wrapper;
+
+#[derive(Debug)]
+struct Args {
+    network: Network,
+}
+
+
 fn main() {
     println!("Hello, world!");
 
-    let runtime = Runtime::new().expect("Unable to create a runtime");
-    runtime.block_on(async {
-        execute().await.expect("Failed to execute");
+    let env_args: Vec<String> = env::args().collect();
+    let env_args_lens = env_args.len();
+    if env_args_lens != 2 {
+        println!("Usage: cargo run <network>");
+        return;
+    }
+
+    let network = if let Some(network_str) = env_args.get(2) {
+        Network::from(network_str.clone())
+    } else {
+        Network::LOCAL
+    };
+
+    Runtime::new().expect("Unable to create a runtime").block_on(async {
+        execute(Args { network }).await.expect("Failed to execute");
     });
 }
 
-async fn execute() -> anyhow::Result<()> {
+async fn execute(args: Args) -> anyhow::Result<()> {
+    println!("Args: {:?}", args);
+    let Args { network } = args;
+
     let path = get_path_to_home("~/.config/dfx/identity.json")
         .context("Not found: ~/.config/dfx/identity.json")?;
     let identity_json: serde_json::Value = serde_json::from_str(&fs::read_to_string(path)?)?;
@@ -43,17 +69,21 @@ async fn execute() -> anyhow::Result<()> {
     println!("{}", serde_json::to_string_pretty(&result)?);
 
     let agent = Agent::builder()
-        // .with_url("https://ic0.app") // ic
-        .with_url("http://localhost:4943") // local
+        .with_url(network.url())
         .with_identity(identity)
         .build()?;
-    agent.fetch_root_key().await?; // local
+    if network == Network::LOCAL {
+        agent.fetch_root_key().await?;
+    }
     let mgr_canister = ManagementCanister::create(&agent);
     let builder_create_canister = mgr_canister
         .create_canister()
         .as_provisional_create_with_amount(None); // for local
     let create_canister_response = builder_create_canister.call_and_wait().await?;
     println!("create_canister_response: {:?}", create_canister_response.0.to_text());
+
+    let wallet_id = dfx_wrapper::identity_get_wallet(network, ".".to_string());
+    println!("wallet id: {}", wallet_id.unwrap());
 
     Ok(())
 }
