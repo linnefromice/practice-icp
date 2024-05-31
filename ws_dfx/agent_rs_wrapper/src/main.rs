@@ -1,8 +1,11 @@
 use std::{env, fs, path::PathBuf};
 
 use anyhow::Context;
-use ic_agent::{identity::Secp256k1Identity, Agent, Identity};
-use ic_utils::interfaces::ManagementCanister;
+use ic_agent::{export::Principal, identity::Secp256k1Identity, Agent, Identity};
+use ic_utils::{
+    interfaces::{ManagementCanister, WalletCanister},
+    Canister,
+};
 use tokio::runtime::Runtime;
 
 use crate::config::Network;
@@ -10,11 +13,15 @@ use crate::config::Network;
 mod config;
 mod dfx_wrapper;
 
+// from: dfinity/sdk/src/dfx/src/lib/operations/canister/create_canister.rs
+pub const CANISTER_CREATE_FEE: u128 = 100_000_000_000_u128;
+pub const CANISTER_INITIAL_CYCLE_BALANCE: u128 = 3_000_000_000_000_u128;
+pub const CMC_CREATE_CANISTER_METHOD: &str = "create_canister";
+
 #[derive(Debug)]
 struct Args {
     network: Network,
 }
-
 
 fn main() {
     println!("Hello, world!");
@@ -32,9 +39,11 @@ fn main() {
         Network::LOCAL
     };
 
-    Runtime::new().expect("Unable to create a runtime").block_on(async {
-        execute(Args { network }).await.expect("Failed to execute");
-    });
+    Runtime::new()
+        .expect("Unable to create a runtime")
+        .block_on(async {
+            execute(Args { network }).await.expect("Failed to execute");
+        });
 }
 
 async fn execute(args: Args) -> anyhow::Result<()> {
@@ -72,20 +81,39 @@ async fn execute(args: Args) -> anyhow::Result<()> {
         .with_url(network.url())
         .with_identity(identity)
         .build()?;
-    if network == Network::LOCAL {
+    if &network == &Network::LOCAL {
         agent.fetch_root_key().await?;
     }
-    let mgr_canister = ManagementCanister::create(&agent);
+
+    let wallet_id = dfx_wrapper::identity_get_wallet(network.clone(), ".".to_string());
+    println!("wallet id: {}", wallet_id.unwrap());
+
+    let canister_id = if network == Network::LOCAL {
+        create_canister_by_management_canister(&agent).await?
+    } else {
+        Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap()
+    };
+    println!("canister id (created): {:?}", canister_id.to_text());
+
+    Ok(())
+}
+
+async fn create_canister_by_management_canister(agent: &Agent) -> anyhow::Result<Principal> {
+    let mgr_canister = ManagementCanister::create(agent);
     let builder_create_canister = mgr_canister
         .create_canister()
         .as_provisional_create_with_amount(None); // for local
-    let create_canister_response = builder_create_canister.call_and_wait().await?;
-    println!("create_canister_response: {:?}", create_canister_response.0.to_text());
+    let res = builder_create_canister.call_and_wait().await?;
+    Ok(res.0)
+}
 
-    let wallet_id = dfx_wrapper::identity_get_wallet(network, ".".to_string());
-    println!("wallet id: {}", wallet_id.unwrap());
-
-    Ok(())
+async fn wallet_canister(id: Principal, agent: &Agent) -> anyhow::Result<WalletCanister> {
+    let canister = Canister::builder()
+        .with_agent(agent)
+        .with_canister_id(id)
+        .build()?;
+    let wallet_canister = WalletCanister::from_canister(canister).await?;
+    Ok(wallet_canister)
 }
 
 fn get_home_dir() -> Option<PathBuf> {
