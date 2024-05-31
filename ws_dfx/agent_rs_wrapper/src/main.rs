@@ -33,6 +33,7 @@ const BUILDED_WASM_FILENAME: &str = "backend_builded.wasm";
 #[derive(Debug)]
 struct Args {
     network: Network,
+    is_from_wallet: bool,
 }
 
 fn main() {
@@ -40,7 +41,7 @@ fn main() {
 
     let env_args: Vec<String> = env::args().collect();
     let env_args_lens = env_args.len();
-    if env_args_lens != 2 {
+    if env_args_lens != 3 {
         println!("Usage: cargo run <network>");
         return;
     }
@@ -51,17 +52,30 @@ fn main() {
     } else {
         Network::LOCAL
     };
+    let is_from_wallet = if let Some(is_from_wallet_str) = env_args.get(2) {
+        is_from_wallet_str == "true"
+    } else {
+        false
+    };
 
     Runtime::new()
         .expect("Unable to create a runtime")
         .block_on(async {
-            execute(Args { network }).await.expect("Failed to execute");
+            execute(Args {
+                network,
+                is_from_wallet,
+            })
+            .await
+            .expect("Failed to execute");
         });
 }
 
 async fn execute(args: Args) -> anyhow::Result<()> {
     println!("Args: {:?}", args);
-    let Args { network } = args;
+    let Args {
+        network,
+        is_from_wallet,
+    } = args;
 
     let path = get_path_to_home("~/.config/dfx/identity.json")
         .context("Not found: ~/.config/dfx/identity.json")?;
@@ -104,7 +118,7 @@ async fn execute(args: Args) -> anyhow::Result<()> {
     println!("wallet id: {}", wallet_principal.to_text());
 
     // create canister by crates
-    let canister_id = if network == Network::LOCAL {
+    let canister_id = if network == Network::LOCAL && !is_from_wallet {
         create_canister_by_management_canister(&agent).await?
     } else {
         let wallet_canister = wallet_canister(wallet_principal, &agent).await?;
@@ -137,7 +151,7 @@ async fn execute(args: Args) -> anyhow::Result<()> {
 
     // install canister by crates
     let wasm_data = fs::read(&format!("{}/{}", ARTIFACT_PATH, BUILDED_WASM_FILENAME))?;
-    if network == Network::LOCAL {
+    if network == Network::LOCAL && !is_from_wallet {
         install_canister_by_management_canister(&agent, &canister_id, &wasm_data).await?;
     } else {
         let wallet_canister = wallet_canister(wallet_principal, &agent).await?;
