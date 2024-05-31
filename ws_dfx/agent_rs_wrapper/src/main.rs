@@ -42,7 +42,7 @@ fn main() {
     let env_args: Vec<String> = env::args().collect();
     let env_args_lens = env_args.len();
     if env_args_lens != 3 {
-        println!("Usage: cargo run <network>");
+        println!("Usage: cargo run <network> <is_from_wallet>");
         return;
     }
     println!("{:?}", env_args);
