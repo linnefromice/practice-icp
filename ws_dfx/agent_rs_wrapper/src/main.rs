@@ -6,6 +6,11 @@ use ic_utils::{
     interfaces::{ManagementCanister, WalletCanister},
     Canister,
 };
+use ic_wasm::{
+    metadata::{add_metadata, Kind},
+    shrink::shrink,
+    utils::parse_wasm,
+};
 use tokio::runtime::Runtime;
 
 use crate::config::Network;
@@ -14,9 +19,13 @@ mod config;
 mod dfx_wrapper;
 
 // from: dfinity/sdk/src/dfx/src/lib/operations/canister/create_canister.rs
-pub const CANISTER_CREATE_FEE: u128 = 100_000_000_000_u128;
-pub const CANISTER_INITIAL_CYCLE_BALANCE: u128 = 3_000_000_000_000_u128;
-pub const CMC_CREATE_CANISTER_METHOD: &str = "create_canister";
+const CANISTER_CREATE_FEE: u128 = 100_000_000_000_u128;
+const CANISTER_INITIAL_CYCLE_BALANCE: u128 = 3_000_000_000_000_u128;
+
+const ARTIFACT_PATH: &str = "./dfx-project/artifacts";
+const WASM_FILENAME: &str = "backend.wasm";
+const DID_FILENAME: &str = "interface.did";
+const BUILDED_WASM_FILENAME: &str = "backend_builded.wasm";
 
 #[derive(Debug)]
 struct Args {
@@ -32,8 +41,9 @@ fn main() {
         println!("Usage: cargo run <network>");
         return;
     }
+    println!("{:?}", env_args);
 
-    let network = if let Some(network_str) = env_args.get(2) {
+    let network = if let Some(network_str) = env_args.get(1) {
         Network::from(network_str.clone())
     } else {
         Network::LOCAL
@@ -85,15 +95,42 @@ async fn execute(args: Args) -> anyhow::Result<()> {
         agent.fetch_root_key().await?;
     }
 
+    // create/get wallet by dfx binary
     let wallet_id = dfx_wrapper::identity_get_wallet(network.clone(), ".".to_string());
-    println!("wallet id: {}", wallet_id.unwrap());
+    let wallet_principal = Principal::from_text(wallet_id.unwrap())?;
+    println!("wallet id: {}", wallet_principal.to_text());
 
+    // create canister by crates
     let canister_id = if network == Network::LOCAL {
         create_canister_by_management_canister(&agent).await?
     } else {
-        Principal::from_text("rrkah-fqaaa-aaaaa-aaaaq-cai").unwrap()
+        let wallet_canister = wallet_canister(wallet_principal, &agent).await?;
+        let res = wallet_canister
+            .wallet_create_canister(
+                CANISTER_CREATE_FEE + CANISTER_INITIAL_CYCLE_BALANCE,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await?;
+        res.canister_id
     };
     println!("canister id (created): {:?}", canister_id.to_text());
+
+    // build
+    //// from csx
+    let wasm_bytes = fs::read(&format!("{}/{}", ARTIFACT_PATH, WASM_FILENAME))?;
+    let mut wasm_module = parse_wasm(&wasm_bytes, false)?;
+    shrink(&mut wasm_module);
+    //// from dfx: wasm_post_process
+    add_metadata(
+        &mut wasm_module,
+        Kind::Public,
+        "candid:service",
+        fs::read(&format!("{}/{}", ARTIFACT_PATH, DID_FILENAME))?,
+    );
+    wasm_module.emit_wasm_file(&format!("{}/{}", ARTIFACT_PATH, BUILDED_WASM_FILENAME))?;
 
     Ok(())
 }
