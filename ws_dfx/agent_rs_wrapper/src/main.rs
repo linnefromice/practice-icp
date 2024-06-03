@@ -1,10 +1,11 @@
 use std::{env, fs, path::PathBuf};
 
 use anyhow::{Context, Ok};
-use ic_agent::{export::Principal, identity::Secp256k1Identity, Agent, Identity};
+use candid::Principal;
+use ic_agent::{identity::Secp256k1Identity, Agent, Identity};
 use ic_utils::{
     interfaces::{
-        management_canister::builders::{CanisterInstall, InstallMode},
+        management_canister::builders::{CanisterInstall, CanisterSettings, InstallMode},
         ManagementCanister, WalletCanister,
     },
     Argument, Canister,
@@ -15,11 +16,12 @@ use ic_wasm::{
     utils::parse_wasm,
 };
 use tokio::runtime::Runtime;
+use types::{Args, UpdateSettingsArgs};
 
-use crate::config::Network;
+use crate::types::Network;
 
-mod config;
 mod dfx_wrapper;
+mod types;
 
 // from: dfinity/sdk/src/dfx/src/lib/operations/canister/create_canister.rs
 const CANISTER_CREATE_FEE: u128 = 100_000_000_000_u128;
@@ -29,12 +31,6 @@ const ARTIFACT_PATH: &str = "./dfx-project/artifacts";
 const WASM_FILENAME: &str = "backend.wasm";
 const DID_FILENAME: &str = "interface.did";
 const BUILDED_WASM_FILENAME: &str = "backend_builded.wasm";
-
-#[derive(Debug)]
-struct Args {
-    network: Network,
-    is_from_wallet: bool,
-}
 
 fn main() {
     println!("Hello, world!");
@@ -95,12 +91,13 @@ async fn execute(args: Args) -> anyhow::Result<()> {
     let pem = hex::decode(password.clone())?;
 
     let identity = Secp256k1Identity::from_pem(pem.as_slice())?;
+    let sender_principal = identity.sender().unwrap();
 
     let result = serde_json::json!({
         "identity_name": default_identity,
         "password": password,
         "pem": String::from_utf8(pem).unwrap(),
-        "identity-principal": identity.sender().unwrap().to_string(),
+        "identity-principal": sender_principal.to_string(),
     });
     println!("{}", serde_json::to_string_pretty(&result)?);
 
@@ -172,6 +169,37 @@ async fn execute(args: Args) -> anyhow::Result<()> {
             .await?;
     }
 
+    // update settings by crates
+    let controllers_to_add = vec![
+        sender_principal,
+        wallet_principal,
+        Principal::from_text("aaaaa-aa")?,
+    ];
+    if network == Network::LOCAL && !is_from_wallet {
+        update_settings_by_management_canister(&agent, &canister_id, controllers_to_add).await?;
+    } else {
+        let wallet_canister = wallet_canister(wallet_principal, &agent).await?;
+        wallet_canister
+            .call(
+                Principal::management_canister(),
+                "update_settings",
+                Argument::from_candid((UpdateSettingsArgs {
+                    canister_id,
+                    settings: CanisterSettings {
+                        controllers: Some(controllers_to_add),
+                        compute_allocation: None,
+                        memory_allocation: None,
+                        freezing_threshold: None,
+                        reserved_cycles_limit: None,
+                        wasm_memory_limit: None,
+                    },
+                },)),
+                0,
+            )
+            .call_and_wait()
+            .await?;
+    }
+
     Ok(())
 }
 
@@ -192,6 +220,21 @@ async fn install_canister_by_management_canister(
     let mgr_canister = ManagementCanister::create(agent);
     let builder = mgr_canister.install(canister_id, wasm_module);
     builder.call_and_wait().await?;
+    Ok(())
+}
+
+async fn update_settings_by_management_canister(
+    agent: &Agent,
+    canister_id: &Principal,
+    controllers: Vec<Principal>,
+) -> anyhow::Result<()> {
+    let mgr_canister = ManagementCanister::create(&agent);
+    let mut builder = mgr_canister.update_settings(canister_id);
+    for controller in controllers {
+        builder = builder.with_controller(controller);
+    }
+    builder.call_and_wait().await?;
+
     Ok(())
 }
 

@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::config::Network;
+use crate::types::Network;
 
 #[allow(dead_code)]
 pub fn version() -> Result<String, String> {

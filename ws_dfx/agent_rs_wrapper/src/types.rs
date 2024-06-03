@@ -1,3 +1,12 @@
+use candid::Principal;
+use ic_utils::interfaces::management_canister::builders::CanisterSettings;
+
+#[derive(Debug)]
+pub struct Args {
+    pub network: Network,
+    pub is_from_wallet: bool,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Network {
     LOCAL,
@@ -26,4 +35,10 @@ impl Network {
             Network::IC => vec!["--network", "ic"],
         }
     }
+}
+
+#[derive(candid::CandidType)]
+pub struct UpdateSettingsArgs {
+    pub canister_id: Principal,
+    pub settings: CanisterSettings,
 }
