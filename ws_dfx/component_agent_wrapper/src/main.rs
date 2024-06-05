@@ -49,10 +49,11 @@ async fn execute(args: Args) -> anyhow::Result<()> {
         from_anonymous,
     } = args;
 
-    let call_args = match method_name {
-        FunctionName::InitIn => {
-            Encode!(&types::Env::LocalDevelopment, &CycleManagements::default())
-        }
+    let (call_args, with_cycles) = match method_name {
+        FunctionName::InitIn => (
+            Encode!(&types::Env::LocalDevelopment, &CycleManagements::default())?,
+            1_600_000_000_000u128,
+        ),
         FunctionName::Setup => {
             // note: support only relayer
             let contract_addr = "0539a0EF8e5E60891fFf0958A059E049e43020d9";
@@ -63,10 +64,13 @@ async fn execute(args: Args) -> anyhow::Result<()> {
                 chain_id: 1u64,
             };
             let src_component_id = target.to_text(); // ex: "bnz7o-iuaaa-aaaaa-qaaaa-cai";
-            Encode!(&contract_addr, &web3_ctx_param, &src_component_id)
+            (
+                Encode!(&contract_addr, &web3_ctx_param, &src_component_id)?,
+                0u128,
+            )
         }
-        FunctionName::SetTask => Encode!(&60u32, &0u32, &false),
-    }?;
+        FunctionName::SetTask => (Encode!(&60u32, &0u32, &false)?, 0u128),
+    };
     println!("method_name: {:?}", &method_name.to_string());
     println!("call_args: {:?}", call_args);
 
@@ -107,7 +111,7 @@ async fn execute(args: Args) -> anyhow::Result<()> {
 
         let argument = Argument::from_raw(call_args);
         let res: Result<((),), AgentError> = wallet_canister
-            .call128(target, method_name.to_string(), argument, 0)
+            .call128(target, method_name.to_string(), argument, with_cycles)
             .call_and_wait()
             .await;
         println!("{:?}", res);
