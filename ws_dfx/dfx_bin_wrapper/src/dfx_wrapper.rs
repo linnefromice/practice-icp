@@ -2,6 +2,10 @@ use std::path::Path;
 
 use crate::config::Network;
 
+pub fn version() -> Result<String, String> {
+    exec_cmd_string_output("dfx", &Path::new("."), vec!["--version"]).map(remove_trailing_newline)
+}
+
 #[derive(Debug, serde::Deserialize)]
 pub struct ResponseTypePing {
     pub ic_api_version: String,

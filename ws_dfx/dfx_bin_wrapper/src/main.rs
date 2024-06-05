@@ -47,6 +47,7 @@ async fn execute(args: Args) {
     println!("Command: {:?}", args.command);
 
     let res: Box<dyn Debug> = match args.command.as_str() {
+        "version" => Box::new(dfx_wrapper::version()),
         "ping" => Box::new(ping(args.network, args.path)),
         "canister_create" => Box::new(canister_create(args.network, args.path)),
         "build" => Box::new(build(args.network, args.path)),
