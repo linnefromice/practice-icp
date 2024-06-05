@@ -1,16 +1,20 @@
 use std::env;
 
 use candid::{Encode, Principal};
-use ic_agent::Agent;
+use ic_agent::{Agent, AgentError, Identity};
+use ic_utils::Argument;
 use tokio::runtime::Runtime;
 use types::{CycleManagements, FunctionName};
 
+mod identity;
 mod types;
+mod wallet;
 
 #[derive(Debug)]
 pub struct Args {
     pub target: Principal,
     pub method_name: FunctionName,
+    pub from_anonymous: bool,
 }
 
 fn main() {
@@ -18,13 +22,19 @@ fn main() {
 
     let env_args: Vec<String> = env::args().collect();
     let env_args_lens = env_args.len();
-    if env_args_lens != 3 {
-        println!("Usage: cargo run <target> <method_name>");
+    if env_args_lens != 4 {
+        println!("Usage: cargo run <target> <method_name> <from_anonymous>");
         return;
     }
+    let from_anonymous = if let Some(flag) = env_args.get(3) {
+        flag == "true"
+    } else {
+        false
+    };
     let args = Args {
         target: Principal::from_text(&env_args[1]).unwrap(),
         method_name: FunctionName::from(env_args[2].as_str()),
+        from_anonymous,
     };
 
     Runtime::new()
@@ -33,15 +43,10 @@ fn main() {
 }
 
 async fn execute(args: Args) -> anyhow::Result<()> {
-    let agent = Agent::builder()
-        .with_url("http://127.0.0.1:4943") // temp
-        .build()
-        .unwrap();
-    agent.fetch_root_key().await?;
-
     let Args {
         target,
         method_name,
+        from_anonymous,
     } = args;
 
     let call_args = match method_name {
@@ -65,14 +70,48 @@ async fn execute(args: Args) -> anyhow::Result<()> {
     println!("method_name: {:?}", &method_name.to_string());
     println!("call_args: {:?}", call_args);
 
-    let request_id = agent
-        .update(&target, method_name.to_string())
-        .with_arg(call_args)
-        .call()
+    if from_anonymous {
+        println!("> Call by anonymous identity");
+        let agent = Agent::builder()
+            .with_url("http://127.0.0.1:4943") // temp
+            .build()
+            .unwrap();
+        agent.fetch_root_key().await?;
+
+        let request_id = agent
+            .update(&target, method_name.to_string())
+            .with_arg(call_args)
+            .call()
+            .await?;
+        println!("{:?}", request_id);
+        let res = agent.wait(request_id, target).await?;
+        println!("{:?}", res);
+    } else {
+        println!("> Call by wallet");
+        let caller_identity = identity::default_identity()?;
+        println!("caller: {:?}", caller_identity.sender().unwrap().to_text());
+
+        let agent = Agent::builder()
+            .with_url("http://127.0.0.1:4943") // temp
+            .with_identity(caller_identity)
+            .build()
+            .unwrap();
+        agent.fetch_root_key().await?;
+
+        let wallet_canister = wallet::default_wallet(
+            &agent,
+            ".".to_string(), // temp
+        )
         .await?;
-    println!("{:?}", request_id);
-    let res = agent.wait(request_id, target).await?;
-    println!("{:?}", res);
+        println!("wallet: {:?}", wallet_canister.canister_id().to_text());
+
+        let argument = Argument::from_raw(call_args);
+        let res: Result<((),), AgentError> = wallet_canister
+            .call128(target, method_name.to_string(), argument, 0)
+            .call_and_wait()
+            .await;
+        println!("{:?}", res);
+    }
 
     Ok(())
 }
