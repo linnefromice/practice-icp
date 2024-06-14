@@ -1,0 +1,17 @@
+{
+  "canisters": {
+    "stable_memory_4_backend": {
+      "candid": "src/stable_memory_4_backend/stable_memory_4_backend.did",
+      "package": "stable_memory_4_backend",
+      "type": "rust"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

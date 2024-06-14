@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "src/stable_memory_4_backend"
+]
+resolver = "2"
