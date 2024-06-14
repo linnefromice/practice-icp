@@ -1,7 +1,12 @@
 type Snapshot = record { value : Transfer; timestamp : nat64 };
 type Transfer = record { to : text; from : text; amount : nat64 };
 service : {
+  btree_count : () -> (nat64) query;
+  btree_insert : (Transfer) -> (opt Snapshot);
+  btree_range : (nat64, nat64) -> (vec Snapshot) query;
+  btree_select_all : () -> (vec Snapshot) query;
   greet : (text) -> (text) query;
+  vec_count : () -> (nat64) query;
   vec_insert : (Transfer) -> ();
   vec_select_all : () -> (vec Snapshot) query;
 }

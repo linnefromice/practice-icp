@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use candid::{Decode, Encode};
 use ic_stable_structures::{
     memory_manager::{MemoryId, MemoryManager, VirtualMemory},
-    DefaultMemoryImpl, Storable, Vec as StableVec,
+    BTreeMap as StableBTreeMap, DefaultMemoryImpl, Storable, Vec as StableVec,
 };
 
 type MemoryType = VirtualMemory<DefaultMemoryImpl>;
@@ -15,6 +15,10 @@ thread_local! {
     static SNAPSHOT_VEC: std::cell::RefCell<StableVec<Snapshot, MemoryType>> = std::cell::RefCell::new(StableVec::init(
         MEMORY_MANAGER.with(|mm| mm.borrow().get(MemoryId::new(1)))
     ).unwrap());
+
+    static SNAPSHOT_MAP: std::cell::RefCell<StableBTreeMap<u64, Snapshot, MemoryType>> = std::cell::RefCell::new(StableBTreeMap::init(
+        MEMORY_MANAGER.with(|mm| mm.borrow().get(MemoryId::new(2)))
+    ));
 }
 
 #[derive(Debug, Clone, candid::CandidType, candid::Deserialize, serde::Serialize)]
@@ -64,6 +68,10 @@ fn greet(name: String) -> String {
 fn vec_select_all() -> Vec<Snapshot> {
     SNAPSHOT_VEC.with(|vec| vec.borrow().iter().collect())
 }
+#[ic_cdk::query]
+fn vec_count() -> u64 {
+    SNAPSHOT_VEC.with(|vec| vec.borrow().len())
+}
 #[ic_cdk::update]
 fn vec_insert(transfer: Transfer) {
     let datum = Snapshot {
@@ -73,6 +81,35 @@ fn vec_insert(transfer: Transfer) {
     SNAPSHOT_VEC
         .with(|vec| vec.borrow_mut().push(&datum))
         .unwrap();
+}
+
+#[ic_cdk::query]
+fn btree_select_all() -> Vec<Snapshot> {
+    let to = btree_count() + 1;
+    btree_range(1, to)
+}
+#[ic_cdk::query]
+fn btree_range(from: u64, to: u64) -> Vec<Snapshot> {
+    SNAPSHOT_MAP.with(|map| {
+        map.borrow()
+            .range(from..to)
+            .into_iter()
+            .map(|(_, v)| v)
+            .collect()
+    })
+}
+#[ic_cdk::query]
+fn btree_count() -> u64 {
+    SNAPSHOT_MAP.with(|map| map.borrow().len())
+}
+#[ic_cdk::update]
+fn btree_insert(transfer: Transfer) -> Option<Snapshot> {
+    let datum = Snapshot {
+        value: transfer.clone(),
+        timestamp: ic_cdk::api::time(),
+    };
+    let idx = btree_count() + 1;
+    SNAPSHOT_MAP.with(|map| map.borrow_mut().insert(idx, datum))
 }
 
 #[cfg(test)]
