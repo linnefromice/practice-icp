@@ -83,6 +83,14 @@ fn get_last_xxx() -> Snapshot {
     }
 }
 #[ic_cdk::query]
+fn get_last_xxx_2() -> Snapshot {
+    SNAPSHOT_MAP.with(|map| {
+        let (_, value) = map.borrow().last_key_value().unwrap();
+        value.clone()
+    })
+}
+
+#[ic_cdk::query]
 fn get_top_xxxs(n: u64) -> Vec<Snapshot> {
     let data_len = xxx_len();
     if data_len == 0 {
@@ -93,12 +101,12 @@ fn get_top_xxxs(n: u64) -> Vec<Snapshot> {
 }
 #[ic_cdk::query]
 fn get_xxx(idx: u64) -> Snapshot {
-    SNAPSHOT_MAP.with(|map| map.borrow().get(&idx).unwrap().clone())
+    SNAPSHOT_MAP.with(|map| map.borrow().get(&idx)).unwrap()
 }
 #[ic_cdk::update]
 fn add_xxx(value: Snapshot) {
-    let idx = xxx_len();
-    SNAPSHOT_MAP.with(|map| map.borrow_mut().insert(idx, value));
+    let new_key = xxx_len();
+    SNAPSHOT_MAP.with(|map| map.borrow_mut().insert(new_key, value));
 }
 
 fn range(from: u64, to: u64) -> Vec<Snapshot> {
@@ -151,6 +159,7 @@ mod tests {
         assert_eq!(&get_xxx(1), &datum_2);
         assert_eq!(&get_xxx(2), &datum_3);
         assert_eq!(&get_last_xxx(), &datum_3);
+        assert_eq!(&get_last_xxx_2(), &datum_3);
         assert_eq!(get_top_xxxs(1), vec![datum_3.clone()]);
         assert_eq!(get_top_xxxs(2), vec![datum_2.clone(), datum_3.clone()]);
         assert_eq!(
