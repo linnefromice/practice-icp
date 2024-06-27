@@ -1,0 +1,11 @@
+type Snapshot = record { value : Transfer; timestamp : nat64 };
+type Transfer = record { to : text; from : text; amount : nat64 };
+service : {
+  add_xxx : (Snapshot) -> ();
+  get_last_xxx : () -> (Snapshot) query;
+  get_top_xxxs : (nat64) -> (vec Snapshot) query;
+  get_xxx : (nat64) -> (Snapshot) query;
+  get_xxxs : () -> (vec Snapshot) query;
+  greet : (text) -> (text) query;
+  xxx_len : () -> (nat64) query;
+}
