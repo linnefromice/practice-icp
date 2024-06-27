@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "src/backend"
+    "src/backend",
+    "src/backend_btreemap"
 ]
 resolver = "2"
 
